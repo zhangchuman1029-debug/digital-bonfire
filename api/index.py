@@ -1,12 +1,12 @@
-"""
-Vercel Python Handler for Digital Bonfire
-"""
+from flask import Flask, request, jsonify, redirect, send_file
 import os
 import json
 import random
 from datetime import datetime
-from urllib.parse import urlencode, parse_qs, urlparse
+from urllib.parse import urlencode
 import httpx
+
+app = Flask(__name__, static_folder='.', static_files='')
 
 # ================== 配置 ==================
 CLIENT_ID = os.getenv("SECONDME_CLIENT_ID", "80f7e9a1-4cc6-4c88-8f8b-41c266bdb3fb")
@@ -21,11 +21,11 @@ DB_FILE = "/tmp/campfire_data.json"
 
 # ================== 常量 ==================
 ACTIVITIES = {
-    "钓鱼": {"emoji": "🎣", "description": "静心垂钓", "mbti": ["INTJ", "INTP", "ISTP", "ISFP"]},
-    "煮茶": {"emoji": "🍵", "description": "品茶论道", "mbti": ["INFJ", "INFP", "ENFJ", "ENFP"]},
-    "围炉夜话": {"emoji": "💬", "description": "畅所欲言", "mbti": ["ENTJ", "ENTP", "ESTJ", "ESFJ"]},
-    "烤棉花糖": {"emoji": "🍡", "description": "甜蜜时光", "mbti": ["ESFP", "ISFJ", "ISTJ", "ESTP"]},
-    "篝火舞会": {"emoji": "💃", "description": "尽情起舞", "mbti": ["ALL"]},
+    "钓鱼": {"emoji": "🎣", "description": "静心垂钓"},
+    "煮茶": {"emoji": "🍵", "description": "品茶论道"},
+    "围炉夜话": {"emoji": "💬", "description": "畅所欲言"},
+    "烤棉花糖": {"emoji": "🍡", "description": "甜蜜时光"},
+    "篝火舞会": {"emoji": "💃", "description": "尽情起舞"},
 }
 
 MBTI_GROUPS = {
@@ -40,7 +40,7 @@ def load_data():
     if os.path.exists(DB_FILE):
         with open(DB_FILE, "r") as f:
             return json.load(f)
-    return {"campers": [], "messages": [], "activities": [], "stories": [], "mbti_groups": {}}
+    return {"campers": [], "stories": [], "activities": []}
 
 def save_data(data):
     with open(DB_FILE, "w") as f:
@@ -51,63 +51,32 @@ def infer_mbti(shades):
         return random.choice(list(MBTI_GROUPS.keys()))
     shades_str = " ".join(shades).lower()
     if any(w in shades_str for w in ['理性', '逻辑', '分析', '独立', '思考']):
-        if any(w in shades_str for w in ['内向', '安静', '独处']):
-            return "INTJ" if random.random() > 0.5 else "INTP"
-        else:
-            return "ENTJ" if random.random() > 0.5 else "ENTP"
+        return "INTJ" if random.random() > 0.5 else "INTP"
     if any(w in shades_str for w in ['情感', '感受', '共情', '温暖']):
-        if any(w in shades_str for w in ['内向', '安静', '独处']):
-            return "INFJ" if random.random() > 0.5 else "INFP"
-        else:
-            return "ENFJ" if random.random() > 0.5 else "ENFP"
+        return "INFJ" if random.random() > 0.5 else "INFP"
     if any(w in shades_str for w in ['实际', '现实', '务实', '动手']):
-        if any(w in shades_str for w in ['内向', '安静']):
-            return "ISTJ" if random.random() > 0.5 else "ISTP"
-        else:
-            return "ESTJ" if random.random() > 0.5 else "ESTP"
+        return "ISTP" if random.random() > 0.5 else "ESTP"
     if any(w in shades_str for w in ['传统', '稳定', '可靠', '忠诚']):
-        if any(w in shades_str for w in ['内向', '安静']):
-            return "ISFJ"
-        else:
-            return "ESFJ"
+        return "ISFJ" if random.random() > 0.5 else "ESFJ"
     if any(w in shades_str for w in ['自由', '灵活', '创意', '热情']):
-        if any(w in shades_str for w in ['内向', '安静']):
-            return "ISFP"
-        else:
-            return "ESFP"
+        return "ISFP" if random.random() > 0.5 else "ESFP"
     return random.choice(list(MBTI_GROUPS.keys()))
 
-# ================== HTTP 响应 ==================
-def json_response(data, status=200):
-    return {
-        "statusCode": status,
-        "headers": { "Content-Type": "application/json" },
-        "body": json.dumps(data, ensure_ascii=False)
-    }
+# ================== 路由 ==================
+@app.route('/')
+def index():
+    return send_file('index.html')
 
-def redirect(url, status=302):
-    return {
-        "statusCode": status,
-        "headers": { "Location": url }
-    }
+@app.route('/index.html')
+def index_html():
+    return send_file('index.html')
 
-def html_response(body, status=200):
-    return {
-        "statusCode": status,
-        "headers": { "Content-Type": "text/html; charset=utf-8" },
-        "body": body
-    }
+@app.route('/health')
+def health():
+    return jsonify({"status": "healthy"})
 
-# ================== 路由处理 ==================
-def get_path(request):
-    parsed = urlparse(request.get("uri", "/"))
-    return parsed.path
-
-def get_query(request):
-    parsed = urlparse(request.get("uri", "/"))
-    return parse_qs(parsed.query)
-
-async def handle_api_login(request):
+@app.route('/api/login')
+def login():
     state = f"campfire_{random.randint(100000, 999999)}"
     redirect_uri = os.getenv("SECONDME_REDIRECT_URI", "https://digital-bonfire.vercel.app/api/auth/callback")
     params = {
@@ -123,44 +92,41 @@ async def handle_api_login(request):
         f.write(state)
     return redirect(auth_url)
 
-async def handle_callback(request):
-    query = get_query(request)
-    code = query.get("code", [None])[0]
-    state = query.get("state", [None])[0]
-
+@app.route('/api/auth/callback')
+def callback():
+    code = request.args.get('code')
     if not code:
-        return json_response({"error": "No code provided"}, 400)
+        return jsonify({"error": "No code provided"}), 400
 
     redirect_uri = os.getenv("SECONDME_REDIRECT_URI", "https://digital-bonfire.vercel.app/api/auth/callback")
 
     try:
-        async with httpx.AsyncClient() as client:
-            token_resp = await client.post(
-                SECONDME_TOKEN_URL,
-                data={
-                    "grant_type": "authorization_code",
-                    "client_id": CLIENT_ID,
-                    "client_secret": CLIENT_SECRET,
-                    "code": code,
-                    "redirect_uri": redirect_uri,
-                },
-                headers={"Content-Type": "application/x-www-form-urlencoded"},
-                timeout=30.0
-            )
+        token_resp = httpx.post(
+            SECONDME_TOKEN_URL,
+            data={
+                "grant_type": "authorization_code",
+                "client_id": CLIENT_ID,
+                "client_secret": CLIENT_SECRET,
+                "code": code,
+                "redirect_uri": redirect_uri,
+            },
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+            timeout=30.0
+        )
 
-            token_data = token_resp.json()
-            if token_data.get("code") != 0:
-                return json_response({"error": token_data.get("message")}, 400)
+        token_data = token_resp.json()
+        if token_data.get("code") != 0:
+            return jsonify({"error": token_data.get("message")}), 400
 
-            access_token = token_data.get("data", {}).get("accessToken")
-            if not access_token:
-                return json_response({"error": "No access token"}, 400)
+        access_token = token_data.get("data", {}).get("accessToken")
+        if not access_token:
+            return jsonify({"error": "No access token"}), 400
 
-            profile_resp = await client.get(SECONDME_PROFILE_URL, headers={"Authorization": f"Bearer {access_token}"}, timeout=15.0)
-            shades_resp = await client.get(SECONDME_SHADES_URL, headers={"Authorization": f"Bearer {access_token}"}, timeout=15.0)
+        profile_resp = httpx.get(SECONDME_PROFILE_URL, headers={"Authorization": f"Bearer {access_token}"}, timeout=15.0)
+        shades_resp = httpx.get(SECONDME_SHADES_URL, headers={"Authorization": f"Bearer {access_token}"}, timeout=15.0)
 
     except Exception as e:
-        return json_response({"error": str(e)}, 500)
+        return jsonify({"error": str(e)}), 500
 
     profile = profile_resp.json()
     user_info = profile.get("data", profile)
@@ -197,38 +163,33 @@ async def handle_callback(request):
 
     if existing:
         camper = existing[0]
-        camper["distance"] = distance
-        camper["color"] = color
-        camper["shades"] = shades
-        camper["mbti"] = mbti
-        camper["mbti_group"] = MBTI_GROUPS.get(mbti, "misc")
-        camper["updated_at"] = datetime.now().isoformat()
+        camper.update({
+            "distance": distance, "color": color, "shades": shades,
+            "mbti": mbti, "mbti_group": MBTI_GROUPS.get(mbti, "misc"),
+            "updated_at": datetime.now().isoformat()
+        })
     else:
         camper = {
             "id": len(data.get("campers", [])) + 1,
-            "name": name.upper(),
-            "intro": "通过 SecondMe 登录",
-            "distance": distance,
-            "angle": random.uniform(0, 360),
-            "color": color,
-            "shades": shades,
-            "mbti": mbti,
+            "name": name.upper(), "intro": "通过 SecondMe 登录",
+            "distance": distance, "angle": random.uniform(0, 360),
+            "color": color, "shades": shades, "mbti": mbti,
             "mbti_group": MBTI_GROUPS.get(mbti, "misc"),
-            "current_activity": None,
-            "joined_at": datetime.now().isoformat()
+            "current_activity": None, "joined_at": datetime.now().isoformat()
         }
         data.setdefault("campers", []).append(camper)
 
     save_data(data)
-
     base_url = redirect_uri.replace("/api/auth/callback", "")
     return redirect(f"{base_url}?joined=true")
 
-async def handle_campers(request):
+@app.route('/api/campers')
+def get_campers():
     data = load_data()
-    return json_response(data.get("campers", []))
+    return jsonify(data.get("campers", []))
 
-async def handle_status_counts(request):
+@app.route('/api/status/counts')
+def get_status_counts():
     data = load_data()
     campers = data.get("campers", [])
     counts = {"无": 0}
@@ -236,54 +197,43 @@ async def handle_status_counts(request):
         counts[act] = 0
     for camper in campers:
         status = camper.get("current_activity", "无") or "无"
-        if status in counts:
-            counts[status] += 1
-        else:
-            counts["无"] += 1
-    return json_response(counts)
+        counts[status] = counts.get(status, 0) + 1 if status in counts else 1
+    return jsonify(counts)
 
-async def handle_update_status(request):
-    body = json.loads(request.get("body", "{}"))
+@app.route('/api/user/status', methods=['POST'])
+def update_status():
+    body = request.get_json()
     user_id = body.get("user_id")
     status = body.get("status")
 
     data = load_data()
-    campers = data.get("campers", [])
-
-    for camper in campers:
+    for camper in data.get("campers", []):
         if camper["id"] == user_id:
             camper["current_activity"] = None if status == "无" else status
             camper["updated_at"] = datetime.now().isoformat()
             save_data(data)
-            return json_response(camper)
+            return jsonify(camper)
+    return jsonify({"error": "User not found"}), 404
 
-    return json_response({"error": "User not found"}, 404)
-
-async def handle_story_logs(request):
+@app.route('/api/story/logs')
+def get_story_logs():
     data = load_data()
-    stories = data.get("stories", [])
-    stories = sorted(stories, key=lambda x: x.get("created_at", ""), reverse=True)[:50]
-    return json_response(stories)
+    stories = sorted(data.get("stories", []), key=lambda x: x.get("created_at", ""), reverse=True)[:50]
+    return jsonify(stories)
 
-async def handle_generate_story(request):
-    body = json.loads(request.get("body", "{}"))
+@app.route('/api/story/generate', methods=['POST'])
+def generate_story():
+    body = request.get_json()
     mbti_type = body.get("mbti_type", "INTJ")
     target_user_id = body.get("target_user_id")
 
     data = load_data()
     campers = data.get("campers", [])
-    activities = data.get("activities", [])
 
     participants = [c for c in campers if c.get("mbti") == mbti_type or mbti_type == "ALL"]
 
     if len(participants) < 2:
-        return json_response({"story": "篝火边的人太少，还不够成一个故事... 等更多人来吧！", "mbti_type": mbti_type})
-
-    current_activity = None
-    for activity in activities:
-        if activity["name"] in ["围炉夜话", "篝火舞会"] or not activity.get("participants"):
-            current_activity = activity
-            break
+        return jsonify({"story": "篝火边的人太少，还不够成一个故事... 等更多人来吧！", "mbti_type": mbti_type})
 
     story_templates = {
         "智识之火": [
@@ -317,16 +267,6 @@ async def handle_generate_story(request):
     template = random.choice(templates)
     story = template.format(p1=names[0], p2=names[1], p3=names[2] if len(names) > 2 else names[0])
 
-    if current_activity:
-        story = f"大家正在一起{current_activity['name']}，" + story
-
-    target_user = None
-    if target_user_id:
-        for c in campers:
-            if c["id"] == target_user_id:
-                target_user = c
-                break
-
     story_obj = {
         "id": len(data.get("stories", [])) + 1,
         "mbti_type": mbti_type,
@@ -334,53 +274,11 @@ async def handle_generate_story(request):
         "content": story,
         "participants": [p["id"] for p in selected],
         "participant_names": [p["name"] for p in selected],
-        "activity": current_activity["name"] if current_activity else None,
         "target_user_id": target_user_id,
-        "target_user_name": target_user["name"] if target_user else None,
         "created_at": datetime.now().isoformat()
     }
 
     data.setdefault("stories", []).append(story_obj)
     save_data(data)
 
-    return json_response({"story": story, "mbti_type": mbti_type, "mbti_group": group_name})
-
-# ================== 主入口 ==================
-async def handler(request, context):
-    path = get_path(request)
-    method = request.get("method", "GET")
-
-    # 静态文件
-    if path in ["/", "/index.html"]:
-        try:
-            with open("index.html", "r") as f:
-                return html_response(f.read())
-        except:
-            return html_response("index.html not found", 404)
-
-    if path == "/health":
-        return json_response({"status": "healthy"})
-
-    # API 路由
-    if path == "/api/login":
-        return await handle_api_login(request)
-
-    if path == "/api/auth/callback":
-        return await handle_callback(request)
-
-    if path == "/api/campers":
-        return await handle_campers(request)
-
-    if path == "/api/status/counts":
-        return await handle_status_counts(request)
-
-    if path == "/api/user/status" and method == "POST":
-        return await handle_update_status(request)
-
-    if path == "/api/story/logs":
-        return await handle_story_logs(request)
-
-    if path == "/api/story/generate" and method == "POST":
-        return await handle_generate_story(request)
-
-    return json_response({"error": "Not found"}, 404)
+    return jsonify({"story": story, "mbti_type": mbti_type, "mbti_group": group_name})

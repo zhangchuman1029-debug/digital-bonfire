@@ -6,12 +6,13 @@
     }
   ],
   "routes": [
+    { "handle": "filesystem" },
     {
-      "src": "/api/(.*)",
+      "src": "/api/.*",
       "dest": "/api/index.py"
     },
     {
-      "src": "/(.*)",
+      "src": "/.*",
       "dest": "/index.html"
     }
   ]

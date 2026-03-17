@@ -65,6 +65,11 @@
         .fire-container {
             position: relative; width: 500px; height: 500px;
             display: flex; justify-content: center; align-items: center; z-index: 10;
+            transition: all 1s ease-in-out;
+        }
+
+        .fire-container.zoomed {
+            transform: scale(1.3);
         }
 
         .flame-layer {
@@ -73,10 +78,46 @@
             animation-delay: var(--delay);
         }
 
-        .flame-1 { width: 20px; height: 30px; background: var(--fire-inner); bottom: 30px; --blur: 2px; --speed: 0.1s; --delay: 0s; }
-        .flame-2 { width: 35px; height: 50px; background: linear-gradient(to top, var(--fire-outer), var(--fire-mid)); bottom: 20px; --blur: 4px; --speed: 0.15s; --delay: 0.05s; }
-        .flame-3 { width: 50px; height: 70px; background: linear-gradient(to top, var(--fire-glow), var(--fire-outer)); bottom: 5px; --blur: 8px; --speed: 0.2s; --delay: 0.1s; }
-        .flame-4 { width: 80px; height: 90px; background: radial-gradient(ellipse at bottom, var(--fire-outer) 0%, transparent 70%); bottom: -10px; --blur: 15px; --speed: 0.3s; --delay: 0.15s; }
+        /* 真实火焰渐变效果 */
+        .flame-1 {
+            width: 25px; height: 40px;
+            background: linear-gradient(to top, #fff 0%, #fff7e6 20%, #ffcc00 60%, #ff8800 100%);
+            bottom: 35px; --blur: 3px; --speed: 0.08s; --delay: 0s;
+            box-shadow: 0 0 20px #fff, 0 0 40px #ffcc00;
+        }
+        .flame-2 {
+            width: 45px; height: 65px;
+            background: linear-gradient(to top, #ff8800 0%, #ff6600 30%, #ff4400 70%, #cc2200 100%);
+            bottom: 20px; --blur: 6px; --speed: 0.12s; --delay: 0.03s;
+            box-shadow: 0 0 30px #ff6600, 0 0 60px #ff440066;
+        }
+        .flame-3 {
+            width: 70px; height: 95px;
+            background: linear-gradient(to top, #ff4400 0%, #dd3300 40%, #aa2200 80%, #661100 100%);
+            bottom: 5px; --blur: 12px; --speed: 0.18s; --delay: 0.08s;
+            box-shadow: 0 0 40px #ff440088, 0 0 80px #aa220044;
+        }
+        .flame-4 {
+            width: 110px; height: 120px;
+            background: radial-gradient(ellipse at 50% 80%, #ff4400 0%, #dd3300 30%, #881100 60%, transparent 80%);
+            bottom: -15px; --blur: 25px; --speed: 0.25s; --delay: 0.12s;
+            box-shadow: 0 0 60px #ff220066, 0 0 120px #aa110033;
+        }
+
+        /* 外层火焰光晕 */
+        .flame-outer-glow {
+            position: absolute;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(255, 100, 0, 0.3) 0%, rgba(255, 50, 0, 0.1) 40%, transparent 70%);
+            bottom: -30px;
+            animation: pulse-flame 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes pulse-flame {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.15); opacity: 1; }
+        }
 
         @keyframes flicker {
             0% { transform: translateY(0) scale(1) skewX(0deg); }
@@ -87,9 +128,10 @@
         }
 
         .fire-glow {
-            position: absolute; width: 400px; height: 400px;
-            background: radial-gradient(ellipse at center bottom, rgba(255, 100, 0, 0.15) 0%, transparent 60%);
-            animation: pulse-glow 4s ease-in-out infinite; pointer-events: none;
+            position: absolute; width: 500px; height: 500px;
+            background: radial-gradient(ellipse at center bottom, rgba(255, 150, 0, 0.25) 0%, rgba(255, 80, 0, 0.15) 30%, transparent 70%);
+            animation: pulse-glow 3s ease-in-out infinite; pointer-events: none;
+            box-shadow: 0 0 80px rgba(255, 100, 0, 0.3), inset 0 -20px 60px rgba(255, 50, 0, 0.2);
         }
 
         @keyframes pulse-glow { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.1); opacity: 1; } }
@@ -283,6 +325,7 @@
 
     <div class="fire-container" id="campground">
         <div class="fire-glow"></div>
+        <div class="flame-outer-glow"></div>
         <div class="flame-layer flame-1"></div>
         <div class="flame-layer flame-2"></div>
         <div class="flame-layer flame-3"></div>
@@ -322,8 +365,27 @@
         };
 
         document.getElementById('loginBtn').addEventListener('click', () => {
+            // 隐藏登录按钮
+            const btn = document.getElementById('loginBtn');
+            btn.style.opacity = '0';
+            btn.style.transform = 'scale(0.8)';
+            btn.style.pointerEvents = 'none';
+
+            // 篝火放大
+            setTimeout(() => {
+                document.getElementById('campground').classList.add('zoomed');
+            }, 300);
+
+            // 跳转登录
             window.location.href = '/api/login';
         });
+
+        // 检查是否已登录，如果是则隐藏按钮并放大篝火
+        if (urlParams.get('joined') === 'true') {
+            const btn = document.getElementById('loginBtn');
+            btn.style.display = 'none';
+            document.getElementById('campground').classList.add('zoomed');
+        }
 
         // 检查 URL 参数
         const urlParams = new URLSearchParams(window.location.search);

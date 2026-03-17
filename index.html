@@ -380,17 +380,15 @@
             window.location.href = '/api/login';
         });
 
+        // 检查 URL 参数（必须在使用 urlParams 之前定义）
+        const urlParams = new URLSearchParams(window.location.search);
+
         // 检查是否已登录，如果是则隐藏按钮并放大篝火
         if (urlParams.get('joined') === 'true') {
             const btn = document.getElementById('loginBtn');
             btn.style.display = 'none';
             document.getElementById('campground').classList.add('zoomed');
-        }
-
-        // 检查 URL 参数
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('joined') === 'true') {
-            showStatus('欢迎来到数字篝火！请选择一项行为开始');
+            showStatus('欢迎来到数字篝火！请选择一项状态开始');
         }
 
         function showStatus(msg) {
@@ -530,20 +528,29 @@
             const container = document.getElementById('mbtiGroups');
             container.innerHTML = '';
 
-            const groups = {};
+            // 统计各组成员
+            const groups = { "智识之火": [], "灵感之火": [], "秩序之火": [], "实践之火": [] };
             campers.forEach(c => {
                 const group = c.mbti_group || 'misc';
-                if (!groups[group]) groups[group] = [];
-                groups[group].push(c);
+                if (groups[group]) groups[group].push(c);
             });
 
+            // 显示全部4个分组
             Object.entries(groups).forEach(([name, members]) => {
                 const div = document.createElement('div');
                 div.className = 'mbti-group';
                 const groupInfo = mbtiGroups[name] || { color: '#666' };
+
+                // 判断是否是当前用户所在的组
+                const isMyGroup = currentUser && currentUser.mbti_group === name;
+                const memberNames = members.length > 0 ? members.map(m => m.name).join(' · ') : '暂无成员';
+
+                div.style.border = isMyGroup ? `1px solid ${groupInfo.color}` : '1px solid transparent';
+                div.style.background = isMyGroup ? `${groupInfo.color}22` : 'rgba(255,255,255,0.03)';
+
                 div.innerHTML = `
-                    <div class="mbti-group-name" style="color: ${groupInfo.color}">${name}</div>
-                    <div class="mbti-group-members">${members.map(m => m.name).join(' · ')}</div>
+                    <div class="mbti-group-name" style="color: ${groupInfo.color}">${name} ${isMyGroup ? '👈' : ''}</div>
+                    <div class="mbti-group-members">${memberNames}</div>
                 `;
                 div.onclick = () => generateStory(name);
                 container.appendChild(div);

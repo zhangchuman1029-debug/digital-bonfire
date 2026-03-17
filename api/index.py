@@ -31,6 +31,24 @@ MBTI_DESC = {
     "实践之火": "行动派、灵活、喜欢动手实践和冒险",
 }
 
+def infer_mbti(shades):
+    """根据兴趣标签推断 MBTI"""
+    if not shades:
+        return random.choice(list(MBTI_GROUPS.keys()))
+
+    shades_str = " ".join(shades).lower()
+
+    if any(w in shades_str for w in ['理性', '逻辑', '分析', '独立', '思考', '技术', '编程']):
+        return "INTP" if random.random() > 0.5 else "INTJ"
+    if any(w in shades_str for w in ['情感', '感受', '共情', '温暖', '艺术', '创意']):
+        return "INFP" if random.random() > 0.5 else "INFJ"
+    if any(w in shades_str for w in ['实际', '现实', '务实', '动手']):
+        return "ISTP" if random.random() > 0.5 else "ESTP"
+    if any(w in shades_str for w in ['传统', '稳定', '可靠', '忠诚']):
+        return "ISFJ" if random.random() > 0.5 else "ESFJ"
+
+    return random.choice(list(MBTI_GROUPS.keys()))
+
 def load_data():
     try:
         if os.path.exists(DB_FILE):
@@ -62,18 +80,31 @@ async def generate_story_with_chat_api(mbti_type, participants, activity=None, u
     participant_names = [p.get("name", "某人") for p in participants[:3]]
     names_str = "、".join(participant_names) if participant_names else "几位旅人"
 
-    system_prompt = """你是一个温暖的篝火 storyteller。请根据用户给定的信息生成一个简短、温馨的篝火故事（50-80字）。
+    system_prompt = """你是一个温暖的篝火 storyteller。请根据用户给定的信息生成一个简短、温馨的篝火故事（80-120字）。
 
 要求：
-1. 故事要符合给定群组的性格特点
+1. 故事要体现两个参与者之间的互动和他们各自的背景经历
 2. 画面感强，让读者仿佛身临其境
-3. 不要使用引号或特殊格式
-4. 直接输出故事内容，不要有额外解释"""
+3. 包含人物的过往经历和当下的情感
+4. 不要使用引号或特殊格式
+5. 直接输出故事内容，不要有额外解释"""
+
+    # 获取参与者的背景信息
+    participant_info = []
+    for p in participants[:3]:
+        name = p.get("name", "某人")
+        shades = p.get("shades", [])
+        shades_str = "、".join(shades[:3]) if shades else "热爱生活"
+        mbti = p.get("mbti", "?")
+        participant_info.append(f"- {name}({mbti}): {shades_str}")
 
     user_message = f"""请为以下群组生成一个篝火故事：
 - 群组类型：{group_name}（{group_desc}）
-- 参与者：{names_str}
-{f'- 当前活动：{activity}' if activity else ''}"""
+- 参与者：
+{chr(10).join(participant_info)}
+{f'- 当前活动：{activity}' if activity else ''}
+
+请写出他们之间的互动，并体现各自的人生经历和当下的心情。"""
 
     # 如果有用户 token，调用 API
     if user_token:
@@ -216,16 +247,35 @@ async def handler(event, context):
                 timeout=15.0
             )
 
+            # 获取 shades
+            shades_resp = httpx.get(
+                "https://api.mindverse.com/gate/lab/api/secondme/user/shades",
+                headers={"Authorization": f"Bearer {access_token}"},
+                timeout=15.0
+            )
+
             profile = profile_resp.json()
             user_info = profile.get("data", profile)
             name = user_info.get("name", user_info.get("username", "Anonymous")).upper()
+
+            # 解析 shades
+            shades = []
+            try:
+                shades_data = shades_resp.json()
+                shades_obj = shades_data.get("data", {})
+                if isinstance(shades_obj, dict):
+                    shades = shades_obj.get("shades", shades_obj.get("tags", []))
+                elif isinstance(shades_obj, list):
+                    shades = shades_obj
+            except:
+                pass
 
             # 保存用户，包含 token
             data = load_data()
             existing = [c for c in data.get("campers", []) if c.get("name", "").upper() == name]
 
             # MBTI 推断
-            mbti = random.choice(list(MBTI_GROUPS.keys()))
+            mbti = infer_mbti(shades)
             group = MBTI_GROUPS.get(mbti)
 
             if existing:
@@ -239,6 +289,7 @@ async def handler(event, context):
                     "id": len(data.get("campers", [])) + 1,
                     "name": name,
                     "access_token": access_token,
+                    "shades": shades,
                     "mbti": mbti,
                     "mbti_group": group,
                     "distance": random.randint(80, 130),

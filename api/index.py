@@ -1,5 +1,5 @@
 """
-Vercel Python - ASGI App with SecondMe API
+Vercel Python - ASGI App with SecondMe Chat API
 """
 import json
 import os
@@ -25,7 +25,7 @@ MBTI_GROUPS = {
 }
 
 MBTI_DESC = {
-    "智识之火": "理性、逻辑、分析型思考者，喜欢深入讨论哲学和科学问题",
+    "智识之火": "理性、逻辑，分析型思考者，喜欢深入讨论哲学和科学问题",
     "灵感之火": "创意、直觉、富有想象力的理想主义者",
     "秩序之火": "务实、组织性强、注重规则和传统",
     "实践之火": "行动派、灵活、喜欢动手实践和冒险",
@@ -52,14 +52,8 @@ def parse_path(uri):
         return uri.split("?")[0]
     return uri
 
-def get_access_token():
-    """获取 SecondMe access_token"""
-    # 这里简化处理，实际应该存储用户的 token
-    # 暂时返回一个模拟的调用方式
-    return None
-
-async def generate_story_with_ai(mbti_type, participants, activity=None):
-    """调用 SecondMe API 生成故事"""
+async def generate_story_with_chat_api(mbti_type, participants, activity=None, user_token=None):
+    """调用 SecondMe Chat API 生成故事"""
     import httpx
 
     group_name = MBTI_GROUPS.get(mbti_type, "智识之火")
@@ -68,47 +62,81 @@ async def generate_story_with_ai(mbti_type, participants, activity=None):
     participant_names = [p.get("name", "某人") for p in participants[:3]]
     names_str = "、".join(participant_names) if participant_names else "几位旅人"
 
-    prompt = f"""你是一个篝火边的 storyteller。请根据以下信息生成一个温暖、简短（50-80字）的篝火故事：
-
-- 群组类型：{group_name}（{group_desc}）
-- 参与者：{names_str}
-{f'- 当前活动：{activity}' if activity else ''}
+    system_prompt = """你是一个温暖的篝火 storyteller。请根据用户给定的信息生成一个简短、温馨的篝火故事（50-80字）。
 
 要求：
-1. 故事要体现该群组的性格特点
-2. 温暖、有画面感
+1. 故事要符合给定群组的性格特点
+2. 画面感强，让读者仿佛身临其境
 3. 不要使用引号或特殊格式
-4. 直接输出故事内容"""
+4. 直接输出故事内容，不要有额外解释"""
 
-    try:
-        # 由于 Vercel 无状态，我们使用简单的本地生成
-        # 实际部署时可以存储用户 token 来调用真实 API
-        stories = {
-            "智识之火": [
-                f"围坐在篝火旁，{names_str} 开始讨论宇宙的本质。火焰跳动的光影映照着他们思考的脸庞，深刻的对话让夜空更加明亮。",
-                f"{names_str} 就一个悖论展开激烈辩论，从存在主义到量子力学，火光中闪烁着智慧的火花。",
-            ],
-            "灵感之火": [
-                f"{names_str} 在篝火旁分享各自的梦想，星星点点的火光映照着他们眼中的光芒，一个美好的计划在交谈中逐渐成形。",
-                f"在温暖的火光中，{names_str} 突然有了灵感即兴创作，歌声和笑声在夜空中回荡。",
-            ],
-            "秩序之火": [
-                f"{names_str} 围成一个完美的圆圈，制定了今晚的守则。火光温暖，大家分工明确，秩序中有温馨。",
-                f"在 {names_str} 的组织下，大家有序地添加柴火，分享食物，记录这美好的夜晚。",
-            ],
-            "实践之火": [
-                f"{names_str} 决定比赛谁先升起一堆火，欢笑声中火光越烧越旺，实践的乐趣让大家都沉浸其中。",
-                f"火光中，{names_str} 展示着各自的绝活，舞步、技巧，笑声不断，行动的快乐感染着每个人。",
-            ],
-        }
+    user_message = f"""请为以下群组生成一个篝火故事：
+- 群组类型：{group_name}（{group_desc}）
+- 参与者：{names_str}
+{f'- 当前活动：{activity}' if activity else ''}"""
 
-        template_list = stories.get(group_name, stories["智识之火"])
-        story = random.choice(template_list)
+    # 如果有用户 token，调用 API
+    if user_token:
+        try:
+            async with httpx.AsyncClient() as client:
+                # 流式调用
+                async with client.stream(
+                    "POST",
+                    SECONDME_CHAT_URL,
+                    json={
+                        "message": user_message,
+                        "systemPrompt": system_prompt
+                    },
+                    headers={
+                        "Authorization": f"Bearer {user_token}",
+                        "Content-Type": "application/json"
+                    },
+                    timeout=30.0
+                ) as response:
+                    story_parts = []
+                    async for line in response.aiter_lines():
+                        if line.startswith("data: "):
+                            data = line[6:]
+                            if data == "[DONE]":
+                                break
+                            try:
+                                data_obj = json.loads(data)
+                                content = data_obj.get("choices", [{}])[0].get("delta", {}).get("content", "")
+                                if content:
+                                    story_parts.append(content)
+                            except:
+                                pass
 
-        return story, group_name
+                    if story_parts:
+                        story = "".join(story_parts).strip()
+                        if story:
+                            return story, group_name
+        except Exception as e:
+            print(f"Chat API error: {e}")
+            # API 调用失败，使用模板
 
-    except Exception as e:
-        return f"篝火边，{names_str} 围坐在一起，温暖的火光驱散了夜的寒冷。", group_name
+    # 模板备用
+    stories = {
+        "智识之火": [
+            f"围坐在篝火旁，{names_str} 开始讨论宇宙的本质。火焰跳动的光影映照着他们思考的脸庞，深刻的对话让夜空更加明亮。",
+            f"{names_str} 就一个悖论展开激烈辩论，从存在主义到量子力学，火光中闪烁着智慧的火花。",
+        ],
+        "灵感之火": [
+            f"{names_str} 在篝火旁分享各自的梦想，星星点点的火光映照着他们眼中的光芒，一个美好的计划在交谈中逐渐成形。",
+            f"在温暖的火光中，{names_str} 突然有了灵感即兴创作，歌声和笑声在夜空中回荡。",
+        ],
+        "秩序之火": [
+            f"{names_str} 围成一个完美的圆圈，制定了今晚的守则。火光温暖，大家分工明确，秩序中有温馨。",
+            f"在 {names_str} 的组织下，大家有序地添加柴火，分享食物，记录这美好的夜晚。",
+        ],
+        "实践之火": [
+            f"{names_str} 决定比赛谁先升起一堆火，欢笑声中火光越烧越旺，实践的乐趣让大家都沉浸其中。",
+            f"火光中，{names_str} 展示着各自的绝活，舞步、技巧，笑声不断，行动的快乐感染着每个人。",
+        ],
+    }
+
+    template_list = stories.get(group_name, stories["智识之火"])
+    return random.choice(template_list), group_name
 
 async def handler(event, context):
     """Vercel serverless function"""
@@ -140,12 +168,103 @@ async def handler(event, context):
             "force_login": "true"
         }
         auth_url = SECONDME_AUTH_URL + "?" + urlencode(params)
+
+        # 保存 state
+        with open("/tmp/auth_state", "w") as f:
+            f.write(state)
+
         return {"statusCode": 302, "headers": {"Location": auth_url}, "body": ""}
+
+    # API: OAuth callback
+    if path == "/api/auth/callback":
+        import httpx
+
+        query = event.get("queryStringParameters", {})
+        code = query.get("code", "")
+        state = query.get("state", "")
+
+        if not code:
+            return {"statusCode": 400, "headers": {"Content-Type": "application/json"}, "body": '{"error":"No code"}'}
+
+        try:
+            # 交换 token
+            token_resp = httpx.post(
+                SECONDME_TOKEN_URL,
+                data={
+                    "grant_type": "authorization_code",
+                    "client_id": CLIENT_ID,
+                    "client_secret": CLIENT_SECRET,
+                    "code": code,
+                    "redirect_uri": REDIRECT_URI,
+                },
+                headers={"Content-Type": "application/x-www-form-urlencoded"},
+                timeout=30.0
+            )
+
+            token_data = token_resp.json()
+            if token_data.get("code") != 0:
+                return {"statusCode": 400, "headers": {"Content-Type": "application/json"}, "body": json.dumps({"error": token_data.get("message")})}
+
+            access_token = token_data.get("data", {}).get("accessToken")
+            if not access_token:
+                return {"statusCode": 400, "headers": {"Content-Type": "application/json"}, "body": '{"error":"No token"}'}
+
+            # 获取用户信息
+            profile_resp = httpx.get(
+                "https://api.mindverse.com/gate/lab/api/secondme/user/info",
+                headers={"Authorization": f"Bearer {access_token}"},
+                timeout=15.0
+            )
+
+            profile = profile_resp.json()
+            user_info = profile.get("data", profile)
+            name = user_info.get("name", user_info.get("username", "Anonymous")).upper()
+
+            # 保存用户，包含 token
+            data = load_data()
+            existing = [c for c in data.get("campers", []) if c.get("name", "").upper() == name]
+
+            # MBTI 推断
+            mbti = random.choice(list(MBTI_GROUPS.keys()))
+            group = MBTI_GROUPS.get(mbti)
+
+            if existing:
+                camper = existing[0]
+                camper["access_token"] = access_token
+                camper["mbti"] = mbti
+                camper["mbti_group"] = group
+                camper["updated_at"] = datetime.now().isoformat()
+            else:
+                camper = {
+                    "id": len(data.get("campers", [])) + 1,
+                    "name": name,
+                    "access_token": access_token,
+                    "mbti": mbti,
+                    "mbti_group": group,
+                    "distance": random.randint(80, 130),
+                    "angle": random.uniform(0, 360),
+                    "color": "#a855f7",
+                    "current_activity": None,
+                    "joined_at": datetime.now().isoformat()
+                }
+                data.setdefault("campers", []).append(camper)
+
+            save_data(data)
+
+            # 跳转回前端
+            base_url = REDIRECT_URI.replace("/api/auth/callback", "")
+            return {"statusCode": 302, "headers": {"Location": f"{base_url}?joined=true"}, "body": ""}
+
+        except Exception as e:
+            return {"statusCode": 500, "headers": {"Content-Type": "application/json"}, "body": json.dumps({"error": str(e)})}
 
     # API: campers
     if path == "/api/campers":
         data = load_data()
-        return {"statusCode": 200, "headers": {"Content-Type": "application/json"}, "body": json.dumps(data.get("campers", []))}
+        # 不返回 token
+        campers = data.get("campers", [])
+        safe_campers = [{k: v for k, v in c.items() if k != "access_token"} for c in campers]
+        return {"statusCode": 200, "headers": {"Content-Type": "application/json"}, "body": json.dumps(safe_campers)}
 
     # API: status counts
     if path == "/api/status/counts":
@@ -176,8 +295,15 @@ async def handler(event, context):
         if len(participants) < 2:
             return {"statusCode": 200, "headers": {"Content-Type": "application/json"}, "body": json.dumps({"story": "篝火边的人太少，还不够成一个故事... 等更多人来吧！", "mbti_type": mbti_type})}
 
+        # 获取当前用户的 token
+        user_token = None
+        for c in campers:
+            if c.get("access_token"):
+                user_token = c["access_token"]
+                break
+
         # 调用 AI 生成故事
-        story, group_name = await generate_story_with_ai(mbti_type, participants)
+        story, group_name = await generate_story_with_chat_api(mbti_type, participants, None, user_token)
 
         story_obj = {
             "id": len(data.get("stories", [])) + 1,
@@ -204,7 +330,9 @@ async def handler(event, context):
                 camper["current_activity"] = None if status == "无" else status
                 camper["updated_at"] = datetime.now().isoformat()
                 save_data(data)
-                return {"statusCode": 200, "headers": {"Content-Type": "application/json"}, "body": json.dumps(camper)}
+                # 不返回 token
+                safe_camper = {k: v for k, v in camper.items() if k != "access_token"}
+                return {"statusCode": 200, "headers": {"Content-Type": "application/json"}, "body": json.dumps(safe_camper)}
 
         return {"statusCode": 404, "headers": {"Content-Type": "application/json"}, "body": '{"error":"User not found"}'}
 

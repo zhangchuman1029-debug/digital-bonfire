@@ -47,14 +47,21 @@ else:
     DB_FILE = "campfire_data.json"
 
 def load_data():
-    if os.path.exists(DB_FILE):
-        with open(DB_FILE, "r") as f:
-            return json.load(f)
+    try:
+        if os.path.exists(DB_FILE):
+            with open(DB_FILE, "r") as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Warning: Failed to load data: {e}")
     return {"campers": [], "messages": [], "activities": [], "stories": [], "mbti_groups": {}}
 
 def save_data(data):
-    with open(DB_FILE, "w") as f:
-        json.dump(data, f, indent=2, default=str)
+    try:
+        with open(DB_FILE, "w") as f:
+            json.dump(data, f, indent=2, default=str)
+    except Exception as e:
+        print(f"Warning: Failed to save data: {e}")
+        # 静默失败，不影响请求
 
 # ================== 数据模型 ==================
 class JoinRequest(BaseModel):

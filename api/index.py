@@ -16,6 +16,8 @@ REDIRECT_URI = os.getenv("SECONDME_REDIRECT_URI", "https://digital-bonfire.verce
 SECONDME_AUTH_URL = "https://go.second.me/oauth/"
 SECONDME_TOKEN_URL = "https://api.mindverse.com/gate/lab/api/oauth/token/code"
 SECONDME_CHAT_URL = "https://api.mindverse.com/gate/lab/api/secondme/chat/stream"
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
+DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
 
 MBTI_GROUPS = {
     "INTJ": "智识之火", "INTP": "智识之火", "ENTJ": "智识之火", "ENTP": "智识之火",
@@ -71,7 +73,7 @@ def parse_path(uri):
     return uri
 
 async def generate_story_with_chat_api(mbti_type, participants, activity=None, user_token=None):
-    """调用 SecondMe Chat API 生成故事"""
+    """两阶段故事生成：SecondMe 确定主题 + DeepSeek 撰写故事"""
     import httpx
 
     group_name = MBTI_GROUPS.get(mbti_type, "智识之火")
@@ -79,15 +81,6 @@ async def generate_story_with_chat_api(mbti_type, participants, activity=None, u
 
     participant_names = [p.get("name", "某人") for p in participants[:3]]
     names_str = "、".join(participant_names) if participant_names else "几位旅人"
-
-    system_prompt = """你是一个温暖的篝火 storyteller。请根据用户给定的信息生成一个简短、温馨的篝火故事（80-120字）。
-
-要求：
-1. 故事要体现两个参与者之间的互动和他们各自的背景经历
-2. 画面感强，让读者仿佛身临其境
-3. 包含人物的过往经历和当下的情感
-4. 不要使用引号或特殊格式
-5. 直接输出故事内容，不要有额外解释"""
 
     # 获取参与者的背景信息
     participant_info = []
@@ -98,25 +91,25 @@ async def generate_story_with_chat_api(mbti_type, participants, activity=None, u
         mbti = p.get("mbti", "?")
         participant_info.append(f"- {name}({mbti}): {shades_str}")
 
-    user_message = f"""请为以下群组生成一个篝火故事：
-- 群组类型：{group_name}（{group_desc}）
-- 参与者：
-{chr(10).join(participant_info)}
-{f'- 当前活动：{activity}' if activity else ''}
+    participants_str = "\n".join(participant_info)
 
-请写出他们之间的互动，并体现各自的人生经历和当下的心情。"""
+    # ====== 阶段1: SecondMe API 确定故事主题 ======
+    story_theme = f"篝火边，{names_str} 围坐在一起"
 
-    # 如果有用户 token，调用 API
     if user_token:
         try:
             async with httpx.AsyncClient() as client:
-                # 流式调用
                 async with client.stream(
                     "POST",
                     SECONDME_CHAT_URL,
                     json={
-                        "message": user_message,
-                        "systemPrompt": system_prompt
+                        "message": f"""根据以下信息，用一句话描述一个篝火故事的背景和主题（不超过30字）：
+- 群组：{group_name}（{group_desc}）
+- 参与者：{participants_str}
+- 活动：{activity if activity else '随意聊天'}
+
+直接输出，不要解释。""",
+                        "systemPrompt": "你是一个故事构思助手，只输出一句话描述故事背景。"
                     },
                     headers={
                         "Authorization": f"Bearer {user_token}",
@@ -124,7 +117,7 @@ async def generate_story_with_chat_api(mbti_type, participants, activity=None, u
                     },
                     timeout=30.0
                 ) as response:
-                    story_parts = []
+                    theme_parts = []
                     async for line in response.aiter_lines():
                         if line.startswith("data: "):
                             data = line[6:]
@@ -134,17 +127,59 @@ async def generate_story_with_chat_api(mbti_type, participants, activity=None, u
                                 data_obj = json.loads(data)
                                 content = data_obj.get("choices", [{}])[0].get("delta", {}).get("content", "")
                                 if content:
-                                    story_parts.append(content)
+                                    theme_parts.append(content)
                             except:
                                 pass
-
-                    if story_parts:
-                        story = "".join(story_parts).strip()
-                        if story:
-                            return story, group_name
+                    if theme_parts:
+                        story_theme = "".join(theme_parts).strip()
         except Exception as e:
-            print(f"Chat API error: {e}")
-            # API 调用失败，使用模板
+            print(f"SecondMe API error: {e}")
+
+    # ====== 阶段2: DeepSeek API 撰写故事 ======
+    if DEEPSEEK_API_KEY:
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    DEEPSEEK_API_URL,
+                    json={
+                        "model": "deepseek-chat",
+                        "messages": [
+                            {
+                                "role": "system",
+                                "content": "你是一个温暖的篝火 storyteller。根据给定的故事主题，撰写一个温馨、短小（80-120字）的篝火故事。画面感强，体现人物背景和情感。不要使用引号，直接输出故事。"
+                            },
+                            {
+                                "role": "user",
+                                "content": f"""请根据以下信息撰写篝火故事：
+
+故事主题：{story_theme}
+- 群组类型：{group_name}（{group_desc}）
+- 参与者信息：{participants_str}
+{f'- 当前活动：{activity}' if activity else ''}
+
+请写出他们之间的互动，并体现各自的人生经历和当下的心情。"""
+                            }
+                        ],
+                        "max_tokens": 300,
+                        "temperature": 0.8
+                    },
+                    headers={
+                        "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
+                        "Content-Type": "application/json"
+                    },
+                    timeout=30.0
+                )
+
+                if response.status_code == 200:
+                    result = response.json()
+                    story = result.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+                    if story:
+                        return story, group_name
+        except Exception as e:
+            print(f"DeepSeek API error: {e}")
+
+    # 备用模板
+    stories = {
 
     # 模板备用
     stories = {

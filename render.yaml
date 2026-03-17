@@ -16,3 +16,5 @@ services:
         value: "c91baa9bf02e56cd7b6a982ada0f5a76486b85f36662e08826f3e7844fe3f3f4"
       - key: SECONDME_REDIRECT_URI
         value: "https://campfire-backend.onrender.com/api/auth/callback"
+      - key: DEEPSEEK_API_KEY
+        value: ""

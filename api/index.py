@@ -39,7 +39,12 @@ app.add_middleware(
 
 app.mount("/static", StaticFiles(directory="."), name="static")
 
-DB_FILE = "campfire_data.json"
+# Vercel Serverless 环境使用 /tmp 目录
+import platform
+if platform.uname().system == "Linux":
+    DB_FILE = "/tmp/campfire_data.json"
+else:
+    DB_FILE = "campfire_data.json"
 
 def load_data():
     if os.path.exists(DB_FILE):

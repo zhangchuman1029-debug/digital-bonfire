@@ -16,7 +16,7 @@ REDIRECT_URI = os.getenv("SECONDME_REDIRECT_URI", "https://digital-bonfire.verce
 SECONDME_AUTH_URL = "https://go.second.me/oauth/"
 SECONDME_TOKEN_URL = "https://api.mindverse.com/gate/lab/api/oauth/token/code"
 SECONDME_CHAT_URL = "https://api.mindverse.com/gate/lab/api/secondme/chat/stream"
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "sk-34b5b8fd7abf4939b10ee959f987525d")
 DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
 
 MBTI_GROUPS = {

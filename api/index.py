@@ -42,16 +42,16 @@ app.mount("/static", StaticFiles(directory="."), name="static")
 # Vercel Serverless 环境使用 /tmp 目录
 import platform
 # Vercel Blob 存储
+import os
 BLOB_FILE_NAME = "campfire_data.json"
-_cache = {}  # 请求级缓存
+BLOB_TOKEN = os.getenv("BLOB_READ_WRITE_TOKEN")
+
+if not BLOB_TOKEN:
+    print("WARNING: BLOB_READ_WRITE_TOKEN not found!")
 
 def load_data():
-    """从 Vercel Blob 加载数据"""
+    """从 Vercer Blob 加载数据 - 每次都从网络读取，不用缓存"""
     import vercel_blob
-
-    # 检查缓存
-    if "data" in _cache:
-        return _cache["data"]
 
     try:
         # 列出 Blob 文件
@@ -59,13 +59,13 @@ def load_data():
         # 查找 campfire_data.json
         for item in blob_list.get("blobs", []):
             if item.get("name") == BLOB_FILE_NAME:
-                # 下载内容
+                # 下载内容，添加 Cache-Control 防止缓存
                 url = item.get("url")
                 if url:
-                    response = httpx.get(url, timeout=10.0)
+                    response = httpx.get(url, timeout=10.0, headers={"Cache-Control": "no-cache"})
                     if response.status_code == 200:
                         data = response.json()
-                        _cache["data"] = data
+                        print(f"Loaded data from Blob: {len(data.get('campers', []))} campers")
                         return data
     except Exception as e:
         print(f"Blob load error: {e}")
@@ -78,22 +78,22 @@ def load_data():
         "stories": [],
         "mbti_groups": {}
     }
-    _cache["data"] = default_data
     return default_data
 
 def save_data(data):
-    """保存数据到 Vercesl Blob"""
+    """保存数据到 Vercel Blob - 每次都写入，不缓存"""
     import vercel_blob
 
     try:
         json_string = json.dumps(data, indent=2, default=str)
         # 覆盖写入，设置 addRandomSuffix: false
         vercel_blob.put(BLOB_FILE_NAME, json_string, {"addRandomSuffix": "false"})
-        # 更新缓存
-        _cache["data"] = data
-        print("Data saved to Blob successfully")
+        print(f"Data saved to Blob: {len(data.get('campers', []))} campers")
     except Exception as e:
         print(f"Blob save error: {e}")
+        # 打印详细错误
+        import traceback
+        traceback.print_exc()
 
 # ================== 数据模型 ==================
 class JoinRequest(BaseModel):
@@ -540,10 +540,15 @@ async def callback(code: str = Query(...), state: str = Query(...)):
 
     # 保存用户
     data = load_data()
+    print(f"Current campers in DB: {len(data.get('campers', []))}")
+    print(f"Looking for user: {name.upper()}")
+
     existing = [c for c in data.get("campers", []) if c.get("name", "").upper() == name.upper()]
+    print(f"Found existing: {len(existing)}")
 
     if existing:
         camper = existing[0]
+        camper["access_token"] = access_token  # 保存 token
         camper["distance"] = distance
         camper["color"] = color
         camper["type"] = type_label
@@ -555,6 +560,7 @@ async def callback(code: str = Query(...), state: str = Query(...)):
         camper = {
             "id": len(data.get("campers", [])) + 1,
             "name": name.upper(),
+            "access_token": access_token,  # 保存 token
             "intro": "通过 SecondMe 登录",
             "distance": distance,
             "angle": random.uniform(0, 360),
@@ -567,6 +573,7 @@ async def callback(code: str = Query(...), state: str = Query(...)):
             "joined_at": datetime.now().isoformat()
         }
         data.setdefault("campers", []).append(camper)
+        print(f"New camper created: {name.upper()}")
 
     save_data(data)
     # WebSocket broadcast 不适用于 Vercel Serverless，跳过

@@ -398,20 +398,13 @@ async def login():
         "force_login": "true"
     }
     auth_url = SECONDME_AUTH_URL + "?" + urlencode(params)
-    with open(".auth_state", "w") as f:
-        f.write(state)
+    # 不再写入文件，Vercel 环境不支持
     return RedirectResponse(url=auth_url)
 
 
 @app.get("/api/auth/callback")
 async def callback(code: str = Query(...), state: str = Query(...)):
-    try:
-        with open(".auth_state", "r") as f:
-            saved_state = f.read().strip()
-        if state != saved_state:
-            raise HTTPException(status_code=400, detail="Invalid state parameter")
-    except FileNotFoundError:
-        pass
+    # 跳过 state 验证，Vercel 环境不支持文件写入
 
     try:
         async with httpx.AsyncClient() as client:

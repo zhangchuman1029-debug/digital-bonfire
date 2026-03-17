@@ -70,6 +70,7 @@ class ActivityJoin(BaseModel):
 class StoryRequest(BaseModel):
     mbti_type: str
     participants: list = []
+    target_user_id: int = None  # 点击的用户ID
 
 # ================== 可选行为 ==================
 ACTIVITIES = {
@@ -274,7 +275,17 @@ async def get_stories(mbti: str = None):
 
     return stories[-10:][::-1]  # 最新10条
 
-# 生成故事
+
+# 获取故事日志（所有历史记录）
+@app.get("/api/story/logs")
+async def get_story_logs(limit: int = 50):
+    data = load_data()
+    stories = data.get("stories", [])
+    # 按时间倒序，返回更多记录
+    return sorted(stories, key=lambda x: x.get("created_at", ""), reverse=True)[:limit]
+
+
+# 为指定用户生成故事
 @app.post("/api/story/generate")
 async def generate_story(req: StoryRequest):
     data = load_data()
@@ -336,12 +347,24 @@ async def generate_story(req: StoryRequest):
         activity_text = f"大家正在一起{current_activity['name']}，"
         story = activity_text + story
 
-    # 保存故事
+    # 保存故事（包含更完整的元数据）
+    target_user = None
+    if req.target_user_id:
+        for c in campers:
+            if c["id"] == req.target_user_id:
+                target_user = c
+                break
+
     story_obj = {
         "id": len(data.get("stories", [])) + 1,
         "mbti_type": req.mbti_type,
+        "mbti_group": group_name,
         "content": story,
         "participants": [p["id"] for p in selected],
+        "participant_names": [p["name"] for p in selected],
+        "activity": current_activity["name"] if current_activity else None,
+        "target_user_id": req.target_user_id,
+        "target_user_name": target_user["name"] if target_user else None,
         "created_at": datetime.now().isoformat()
     }
 
@@ -350,7 +373,7 @@ async def generate_story(req: StoryRequest):
 
     await manager.broadcast({"type": "new_story", "data": story_obj})
 
-    return {"story": story, "mbti_type": req.mbti_type}
+    return {"story": story, "mbti_type": req.mbti_type, "mbti_group": group_name}
 
 # ================== SecondMe OAuth ==================
 

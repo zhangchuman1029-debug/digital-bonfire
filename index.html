@@ -66,7 +66,7 @@
 
         .fire-container {
             position: absolute;
-            top: 320px;
+            top: 280px;
             width: 100px;
             height: 100px;
             display: flex;
@@ -175,51 +175,122 @@
 
         .camper:hover .camper-activity, .camper.has-activity .camper-activity { opacity: 1; }
 
-        /* MBTI 分组区域 */
-        .mbti-panel {
-            position: absolute; left: 20px; top: 100px; width: 200px; z-index: 100;
-            background: transparent; padding: 15px; border-radius: 16px;
-            border: 1px solid rgba(255, 170, 0, 0.3);
+        /* 统一侧边栏 */
+        .sidebar {
+            position: absolute; left: 15px; top: 100px; width: 220px; z-index: 100;
+            display: flex; flex-direction: column; gap: 8px;
         }
 
-        .mbti-panel h3 {
-            font-size: 12px; color: #ffaa00; margin-bottom: 12px;
-            letter-spacing: 2px; padding-bottom: 8px;
+        /* 右侧 Agents 面板 */
+        .right-sidebar {
+            position: absolute; right: 15px; top: 100px; width: 200px; z-index: 100;
+            display: flex; flex-direction: column; gap: 8px;
         }
+
+        .sidebar-section {
+            background: rgba(10, 14, 20, 0.85); border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden; backdrop-filter: blur(10px);
+        }
+
+        /* Agents 面板特殊样式 */
+        .sidebar-section.agents { border-color: rgba(251, 191, 36, 0.4); }
+        .sidebar-section.agents .sidebar-header h3 { color: #fbbf24; }
+
+        /* 说明书面板 */
+        .sidebar-section.help { border-color: rgba(255, 255, 255, 0.2); }
+        .sidebar-section.help .sidebar-header h3 { color: #fff; }
+
+        .help-content {
+            font-size: 10px; color: var(--text-secondary); line-height: 1.6;
+            padding: 0 5px 10px;
+        }
+
+        .help-content h4 {
+            color: var(--text-primary); font-size: 11px; margin: 10px 0 5px;
+        }
+
+        .help-content p { margin: 4px 0; }
+
+        .help-content .key {
+            display: inline-block; background: rgba(255,255,255,0.1);
+            padding: 2px 6px; border-radius: 4px; font-size: 9px; margin: 2px;
+        }
+
+        .agent-item {
+            display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+            border-radius: 8px; transition: all 0.3s ease; cursor: pointer;
+        }
+
+        .agent-item:hover { background: rgba(255, 255, 255, 0.08); }
+
+        .agent-avatar {
+            width: 24px; height: 24px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: bold;
+        }
+
+        .agent-info { flex: 1; min-width: 0; }
+
+        .agent-name {
+            font-size: 11px; color: var(--text-primary); white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis;
+        }
+
+        .agent-mbti {
+            font-size: 9px; color: var(--text-secondary);
+        }
+
+        .sidebar-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 15px; cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .sidebar-header:hover { background: rgba(255, 255, 255, 0.05); }
+
+        .sidebar-header h3 {
+            font-size: 12px; letter-spacing: 2px; margin: 0;
+        }
+
+        .sidebar-toggle {
+            font-size: 10px; color: var(--text-secondary); transition: transform 0.3s ease;
+        }
+
+        .sidebar-section.collapsed .sidebar-toggle { transform: rotate(-90deg); }
+        .sidebar-section.collapsed .sidebar-content { display: none; }
+
+        .sidebar-content { padding: 0 12px 12px; }
+
+        /* MBTI 群组 */
+        .sidebar-section.mbti { border-color: rgba(255, 170, 0, 0.3); }
+        .sidebar-section.mbti .sidebar-header h3 { color: #ffaa00; }
 
         .mbti-group {
-            margin-bottom: 10px; padding: 10px 12px; border-radius: 10px;
+            margin-bottom: 8px; padding: 8px 10px; border-radius: 8px;
             background: transparent; cursor: pointer; transition: all 0.3s ease;
         }
 
         .mbti-group:hover { background: rgba(255, 255, 255, 0.08); transform: translateX(3px); }
 
-        .mbti-group-name { font-size: 11px; color: var(--text-primary); margin-bottom: 4px; }
+        .mbti-group-name { font-size: 11px; color: var(--text-primary); margin-bottom: 3px; }
         .mbti-group-members { font-size: 9px; color: var(--text-secondary); }
 
-        /* 行为选择面板 */
-        .activity-panel {
-            position: absolute; right: 20px; top: 100px; width: 220px; z-index: 100;
-            background: transparent; padding: 15px; border-radius: 16px;
-            border: 1px solid rgba(0, 212, 255, 0.3);
-        }
-
-        .activity-panel h3 {
-            font-size: 12px; color: #00d4ff; margin-bottom: 12px;
-            letter-spacing: 2px; padding-bottom: 8px;
-        }
+        /* 状态选择 */
+        .sidebar-section.activity { border-color: rgba(0, 212, 255, 0.3); }
+        .sidebar-section.activity .sidebar-header h3 { color: #00d4ff; }
 
         .activity-item {
-            display: flex; align-items: center; gap: 10px; padding: 12px; margin-bottom: 8px;
-            border-radius: 10px; background: transparent; cursor: pointer;
+            display: flex; align-items: center; gap: 8px; padding: 10px; margin-bottom: 6px;
+            border-radius: 8px; background: transparent; cursor: pointer;
             transition: all 0.3s ease;
         }
 
-        .activity-item:hover { background: rgba(255, 255, 255, 0.08); transform: translateX(-3px); }
+        .activity-item:hover { background: rgba(255, 255, 255, 0.08); }
 
-        .activity-emoji { font-size: 20px; }
-        .activity-name { font-size: 12px; color: var(--text-primary); }
-        .activity-desc { font-size: 9px; color: var(--text-secondary); }
+        .activity-emoji { font-size: 18px; }
+        .activity-name { font-size: 11px; color: var(--text-primary); }
+        .activity-desc { font-size: 8px; color: var(--text-secondary); }
 
         .activity-count {
             margin-left: auto; font-size: 10px; color: var(--accent-logic);
@@ -230,8 +301,9 @@
         .story-panel {
             position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%);
             width: 400px; max-width: 90vw; z-index: 100;
-            background: transparent; padding: 15px 20px; border-radius: 16px;
+            background: rgba(10, 14, 20, 0.85); padding: 15px 20px; border-radius: 16px;
             border: 1px solid rgba(255, 170, 0, 0.3);
+            backdrop-filter: blur(10px);
         }
 
         .story-panel h3 {
@@ -251,6 +323,38 @@
 
         .story-refresh:hover { background: var(--fire-mid); }
 
+        /* 日志 - 移到侧边栏 */
+        .sidebar-section.logs { border-color: rgba(168, 85, 247, 0.4); }
+        .sidebar-section.logs .sidebar-header h3 { color: #a855f7; }
+
+        .log-list {
+            max-height: 150px; overflow-y: auto; scrollbar-width: thin;
+            scrollbar-color: rgba(168, 85, 247, 0.5) transparent;
+        }
+
+        .log-list::-webkit-scrollbar { width: 4px; }
+        .log-list::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.5); border-radius: 2px; }
+
+        .log-item {
+            padding: 8px; margin-bottom: 6px; border-radius: 8px;
+            background: rgba(255,255,255,0.03); cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .log-item:hover { background: rgba(168, 85, 247, 0.15); transform: translateX(-2px); }
+
+        .log-story {
+            font-size: 10px; color: var(--text-primary); line-height: 1.4;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+
+        .log-meta {
+            font-size: 8px; color: var(--text-secondary); margin-top: 4px;
+            display: flex; justify-content: space-between;
+        }
+
+        .log-group { color: #a855f7; }
+
         /* 登录按钮 */
         .login-container {
             position: absolute; bottom: 30px; z-index: 100; text-align: center;
@@ -267,7 +371,7 @@
         #loginBtn:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6); }
 
         .status {
-            position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%);
+            position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
             color: var(--text-secondary); font-size: 14px; opacity: 0;
             transition: opacity 0.3s ease; pointer-events: none; z-index: 200;
             white-space: nowrap;
@@ -282,7 +386,7 @@
         }
 
         @media (max-width: 768px) {
-            .mbti-panel, .activity-panel { display: none; }
+            .sidebar, .right-sidebar { display: none; }
             .fire-container { width: 350px; height: 350px; }
             .header h1 { font-size: 1.2rem; letter-spacing: 4px; }
         }
@@ -296,16 +400,74 @@
         <p class="subtitle">◈ MBTI 篝火社群 ◈</p>
     </div>
 
-    <!-- MBTI 分组 -->
-    <div class="mbti-panel" id="mbtiPanel">
-        <h3>🔥 篝火群组</h3>
-        <div id="mbtiGroups"></div>
+    <!-- 统一侧边栏 -->
+    <div class="sidebar">
+        <!-- MBTI 群组 -->
+        <div class="sidebar-section mbti" id="mbtiSection">
+            <div class="sidebar-header" onclick="toggleSection('mbtiSection')">
+                <h3>🔥 篝火群组</h3>
+                <span class="sidebar-toggle">▼</span>
+            </div>
+            <div class="sidebar-content">
+                <div id="mbtiGroups"></div>
+            </div>
+        </div>
+
+        <!-- 状态选择 -->
+        <div class="sidebar-section activity" id="activitySection">
+            <div class="sidebar-header" onclick="toggleSection('activitySection')">
+                <h3>🎯 选择状态</h3>
+                <span class="sidebar-toggle">▼</span>
+            </div>
+            <div class="sidebar-content">
+                <div id="activityList"></div>
+            </div>
+        </div>
+
+        <!-- 故事日志 -->
+        <div class="sidebar-section logs" id="logsSection">
+            <div class="sidebar-header" onclick="toggleSection('logsSection')">
+                <h3>📜 故事日志</h3>
+                <span class="sidebar-toggle">▼</span>
+            </div>
+            <div class="sidebar-content">
+                <div class="log-list" id="logList"></div>
+            </div>
+        </div>
     </div>
 
-    <!-- 行为选择 -->
-    <div class="activity-panel" id="activityPanel">
-        <h3>🎯 选择状态</h3>
-        <div id="activityList"></div>
+    <!-- 右侧 Agents 面板 -->
+    <div class="right-sidebar">
+        <div class="sidebar-section agents" id="agentsSection">
+            <div class="sidebar-header" onclick="toggleSection('agentsSection')">
+                <h3>🤖 Agents</h3>
+                <span class="sidebar-toggle">▼</span>
+            </div>
+            <div class="sidebar-content">
+                <div id="agentsList"></div>
+            </div>
+        </div>
+
+        <!-- 说明书面板 -->
+        <div class="sidebar-section help" id="helpSection">
+            <div class="sidebar-header" onclick="toggleSection('helpSection')">
+                <h3>📖 说明书</h3>
+                <span class="sidebar-toggle">▼</span>
+            </div>
+            <div class="sidebar-content">
+                <div class="help-content">
+                    <h4>🎮 操作指南</h4>
+                    <p><span class="key">点击头像</span> 生成故事</p>
+                    <p><span class="key">点击群组</span> 切换分组故事</p>
+                    <p><span class="key">点击状态</span> 选择当前活动</p>
+                    <h4>🔥 四大群组</h4>
+                    <p>🔵 智识之火 - 理性讨论</p>
+                    <p>🟣 灵感之火 - 创意分享</p>
+                    <p>🟢 秩序之火 - 组织规划</p>
+                    <p>🟠 实践之火 - 行动派</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- 故事面板 -->
@@ -445,6 +607,7 @@
                 const data = await res.json();
                 renderCampers(data);
                 renderMbtiGroups(data);
+                renderAgents(data); // 渲染右侧 Agents 面板
                 // 找到当前登录用户（根据 localStorage 或最后一个登录的）
                 const savedUserId = localStorage.getItem('campfire_user_id');
                 if (savedUserId) {
@@ -501,6 +664,10 @@
                 camper.appendChild(name);
                 camper.appendChild(mbti);
                 camper.appendChild(activity);
+
+                // 点击头像生成故事
+                camper.onclick = () => generateStoryForUser(c);
+
                 campground.appendChild(camper);
 
                 // 连接线
@@ -544,6 +711,53 @@
                 `;
                 div.onclick = () => generateStory(name);
                 container.appendChild(div);
+            });
+        }
+
+        // 渲染 Agents 面板
+        function renderAgents(campers) {
+            const container = document.getElementById('agentsList');
+            container.innerHTML = '';
+
+            if (campers.length === 0) {
+                container.innerHTML = '<div style="color: var(--text-secondary); font-size: 10px; text-align: center; padding: 10px;">暂无 Agents</div>';
+                return;
+            }
+
+            // 按群组分类显示
+            const groups = { "智识之火": [], "灵感之火": [], "秩序之火": [], "实践之火": [] };
+            campers.forEach(c => {
+                const group = c.mbti_group || 'misc';
+                if (groups[group]) groups[group].push(c);
+            });
+
+            Object.entries(groups).forEach(([groupName, members]) => {
+                if (members.length === 0) return;
+
+                members.forEach(c => {
+                    const div = document.createElement('div');
+                    div.className = 'agent-item';
+                    div.onclick = () => generateStoryForUser(c);
+
+                    const groupColors = {
+                        "智识之火": "#00d4ff",
+                        "灵感之火": "#a855f7",
+                        "秩序之火": "#22c55e",
+                        "实践之火": "#f59e0b"
+                    };
+                    const color = groupColors[groupName] || '#666';
+
+                    div.innerHTML = `
+                        <div class="agent-avatar" style="background: ${c.color || color}; box-shadow: 0 0 8px ${c.color || color}66;">
+                            ${c.name.charAt(0)}
+                        </div>
+                        <div class="agent-info">
+                            <div class="agent-name">${c.name}</div>
+                            <div class="agent-mbti">${c.mbti || '?'} · ${groupName}</div>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
             });
         }
 
@@ -661,14 +875,90 @@
                 const data = await res.json();
                 document.getElementById('storyContent').textContent = data.story;
                 document.getElementById('storyPanel').style.display = 'block';
+                fetchStoryLogs(); // 刷新日志
             } catch (e) { console.error(e); }
+        }
+
+        // 为指定用户生成故事（点击头像时调用）
+        async function generateStoryForUser(user) {
+            if (!user.mbti) {
+                showStatus('该用户暂无 MBTI 信息');
+                return;
+            }
+            showStatus(`正在为 ${user.name} 生成故事...`);
+            try {
+                const res = await fetch('/api/story/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mbti_type: user.mbti,
+                        target_user_id: user.id
+                    })
+                });
+                const data = await res.json();
+                document.getElementById('storyContent').textContent = data.story;
+                document.getElementById('storyPanel').style.display = 'block';
+                fetchStoryLogs(); // 刷新日志
+            } catch (e) {
+                console.error(e);
+                showStatus('生成故事失败');
+            }
+        }
+
+        // 获取故事日志
+        async function fetchStoryLogs() {
+            try {
+                const res = await fetch('/api/story/logs?limit=30');
+                const logs = await res.json();
+                renderStoryLogs(logs);
+            } catch (e) { console.error(e); }
+        }
+
+        // 渲染故事日志
+        function renderStoryLogs(logs) {
+            const container = document.getElementById('logList');
+            container.innerHTML = '';
+
+            if (logs.length === 0) {
+                container.innerHTML = '<div style="color: var(--text-secondary); font-size: 10px; text-align: center; padding: 20px;">暂无故事记录</div>';
+                return;
+            }
+
+            logs.forEach(log => {
+                const div = document.createElement('div');
+                div.className = 'log-item';
+                div.onclick = () => {
+                    document.getElementById('storyContent').textContent = log.content;
+                    document.getElementById('storyPanel').style.display = 'block';
+                };
+
+                const time = new Date(log.created_at).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+                const group = log.mbti_group || log.mbti_type || '';
+
+                div.innerHTML = `
+                    <div class="log-story">${log.content}</div>
+                    <div class="log-meta">
+                        <span class="log-group">${group}</span>
+                        <span>${time}</span>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // 切换侧边栏章节展开/收起
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            section.classList.toggle('collapsed');
         }
 
         createStars();
         fetchCampers();
         fetchStatusCounts();
+        fetchStoryLogs();
         setInterval(fetchCampers, 3000);
         setInterval(fetchStatusCounts, 5000);
+        setInterval(fetchStoryLogs, 10000); // 每10秒刷新日志
     </script>
 </body>
 </html>

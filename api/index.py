@@ -455,9 +455,13 @@ async def callback(code: str = Query(...), state: str = Query(...)):
         raise HTTPException(status_code=500, detail=f"HTTP error: {e.response.status_code} - {e.response.text}")
 
     # 解析用户资料
-    profile = profile_resp.json()
-    user_info = profile.get("data", profile)
-    name = user_info.get("name", user_info.get("username", "Anonymous"))
+    try:
+        profile = profile_resp.json()
+        user_info = profile.get("data", profile)
+        name = user_info.get("name", user_info.get("username", "Anonymous"))
+    except Exception as e:
+        print(f"Profile parse error: {e}")
+        name = "USER"
 
     # 解析 shades
     shades = []
@@ -468,8 +472,11 @@ async def callback(code: str = Query(...), state: str = Query(...)):
             shades = shades_obj.get("shades", shades_obj.get("tags", []))
         elif isinstance(shades_obj, list):
             shades = shades_obj
-    except:
-        pass
+    except Exception as e:
+        print(f"Shades parse error: {e}")
+        shades = []
+
+    print(f"User: {name}, Shades: {shades}")
 
     # 根据 shades 推断 MBTI
     mbti = infer_mbti(shades)
@@ -526,7 +533,7 @@ async def callback(code: str = Query(...), state: str = Query(...)):
         data.setdefault("campers", []).append(camper)
 
     save_data(data)
-    await manager.broadcast({"type": "user_joined", "data": camper})
+    # WebSocket broadcast 不适用于 Vercel Serverless，跳过
 
     frontend_url = f"{FRONTEND_URL}?joined=true"
     return RedirectResponse(url=frontend_url)

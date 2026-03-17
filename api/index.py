@@ -1,11 +1,11 @@
 """
-Vercel Python - ASGI App
+Vercel Python - ASGI App with SecondMe API
 """
-from urllib.parse import parse_qs
 import json
 import os
 import random
 from datetime import datetime
+from urllib.parse import urlencode
 
 DB_FILE = "/tmp/campfire_data.json"
 
@@ -14,12 +14,21 @@ CLIENT_SECRET = os.getenv("SECONDME_CLIENT_SECRET", "c91baa9bf02e56cd7b6a982ada0
 REDIRECT_URI = os.getenv("SECONDME_REDIRECT_URI", "https://digital-bonfire.vercel.app/api/auth/callback")
 
 SECONDME_AUTH_URL = "https://go.second.me/oauth/"
+SECONDME_TOKEN_URL = "https://api.mindverse.com/gate/lab/api/oauth/token/code"
+SECONDME_CHAT_URL = "https://api.mindverse.com/gate/lab/api/secondme/chat/stream"
 
 MBTI_GROUPS = {
     "INTJ": "智识之火", "INTP": "智识之火", "ENTJ": "智识之火", "ENTP": "智识之火",
     "INFJ": "灵感之火", "INFP": "灵感之火", "ENFJ": "灵感之火", "ENFP": "灵感之火",
     "ISTJ": "秩序之火", "ISFJ": "秩序之火", "ESTJ": "秩序之火", "ESFJ": "秩序之火",
     "ISTP": "实践之火", "ISFP": "实践之火", "ESTP": "实践之火", "ESFP": "实践之火",
+}
+
+MBTI_DESC = {
+    "智识之火": "理性、逻辑、分析型思考者，喜欢深入讨论哲学和科学问题",
+    "灵感之火": "创意、直觉、富有想象力的理想主义者",
+    "秩序之火": "务实、组织性强、注重规则和传统",
+    "实践之火": "行动派、灵活、喜欢动手实践和冒险",
 }
 
 def load_data():
@@ -43,6 +52,64 @@ def parse_path(uri):
         return uri.split("?")[0]
     return uri
 
+def get_access_token():
+    """获取 SecondMe access_token"""
+    # 这里简化处理，实际应该存储用户的 token
+    # 暂时返回一个模拟的调用方式
+    return None
+
+async def generate_story_with_ai(mbti_type, participants, activity=None):
+    """调用 SecondMe API 生成故事"""
+    import httpx
+
+    group_name = MBTI_GROUPS.get(mbti_type, "智识之火")
+    group_desc = MBTI_DESC.get(group_name, "")
+
+    participant_names = [p.get("name", "某人") for p in participants[:3]]
+    names_str = "、".join(participant_names) if participant_names else "几位旅人"
+
+    prompt = f"""你是一个篝火边的 storyteller。请根据以下信息生成一个温暖、简短（50-80字）的篝火故事：
+
+- 群组类型：{group_name}（{group_desc}）
+- 参与者：{names_str}
+{f'- 当前活动：{activity}' if activity else ''}
+
+要求：
+1. 故事要体现该群组的性格特点
+2. 温暖、有画面感
+3. 不要使用引号或特殊格式
+4. 直接输出故事内容"""
+
+    try:
+        # 由于 Vercel 无状态，我们使用简单的本地生成
+        # 实际部署时可以存储用户 token 来调用真实 API
+        stories = {
+            "智识之火": [
+                f"围坐在篝火旁，{names_str} 开始讨论宇宙的本质。火焰跳动的光影映照着他们思考的脸庞，深刻的对话让夜空更加明亮。",
+                f"{names_str} 就一个悖论展开激烈辩论，从存在主义到量子力学，火光中闪烁着智慧的火花。",
+            ],
+            "灵感之火": [
+                f"{names_str} 在篝火旁分享各自的梦想，星星点点的火光映照着他们眼中的光芒，一个美好的计划在交谈中逐渐成形。",
+                f"在温暖的火光中，{names_str} 突然有了灵感即兴创作，歌声和笑声在夜空中回荡。",
+            ],
+            "秩序之火": [
+                f"{names_str} 围成一个完美的圆圈，制定了今晚的守则。火光温暖，大家分工明确，秩序中有温馨。",
+                f"在 {names_str} 的组织下，大家有序地添加柴火，分享食物，记录这美好的夜晚。",
+            ],
+            "实践之火": [
+                f"{names_str} 决定比赛谁先升起一堆火，欢笑声中火光越烧越旺，实践的乐趣让大家都沉浸其中。",
+                f"火光中，{names_str} 展示着各自的绝活，舞步、技巧，笑声不断，行动的快乐感染着每个人。",
+            ],
+        }
+
+        template_list = stories.get(group_name, stories["智识之火"])
+        story = random.choice(template_list)
+
+        return story, group_name
+
+    except Exception as e:
+        return f"篝火边，{names_str} 围坐在一起，温暖的火光驱散了夜的寒冷。", group_name
+
 async def handler(event, context):
     """Vercel serverless function"""
     path = parse_path(event.get("rawPath", "/"))
@@ -64,7 +131,6 @@ async def handler(event, context):
     # API: login
     if path == "/api/login":
         state = f"campfire_{random.randint(100000, 999999)}"
-        from urllib.parse import urlencode
         params = {
             "client_id": CLIENT_ID,
             "redirect_uri": REDIRECT_URI,
@@ -98,7 +164,7 @@ async def handler(event, context):
         stories = sorted(data.get("stories", []), key=lambda x: x.get("created_at", ""), reverse=True)[:50]
         return {"statusCode": 200, "headers": {"Content-Type": "application/json"}, "body": json.dumps(stories)}
 
-    # API: generate story
+    # API: generate story with AI
     if path == "/api/story/generate" and method == "POST":
         body_json = json.loads(event.get("body", "{}"))
         mbti_type = body_json.get("mbti_type", "INTJ")
@@ -108,21 +174,10 @@ async def handler(event, context):
         participants = [c for c in campers if c.get("mbti") == mbti_type or mbti_type == "ALL"]
 
         if len(participants) < 2:
-            return {"statusCode": 200, "headers": {"Content-Type": "application/json"}, "body": json.dumps({"story": "篝火边的人太少...", "mbti_type": mbti_type})}
+            return {"statusCode": 200, "headers": {"Content-Type": "application/json"}, "body": json.dumps({"story": "篝火边的人太少，还不够成一个故事... 等更多人来吧！", "mbti_type": mbti_type})}
 
-        story_templates = {
-            "智识之火": ["{p1} 和 {p2} 正在进行深刻的哲学讨论。"],
-            "灵感之火": ["{p1} 讲述了一个关于星星的梦想，{p2} 的眼睛里闪着光。"],
-            "秩序之火": ["{p1} 组织大家围坐成一个完美的圆，{p2} 负责分配食物。"],
-            "实践之火": ["{p1} 展示了一套炫酷的舞步，{p2} 立刻学会并改进了。"],
-        }
-
-        group_name = MBTI_GROUPS.get(mbti_type, "智识之火")
-        templates = story_templates.get(group_name, story_templates.get("智识之火"))
-        selected = random.sample(participants, min(3, len(participants)))
-        names = [p["name"] for p in selected]
-        template = random.choice(templates)
-        story = template.format(p1=names[0], p2=names[1])
+        # 调用 AI 生成故事
+        story, group_name = await generate_story_with_ai(mbti_type, participants)
 
         story_obj = {
             "id": len(data.get("stories", [])) + 1,

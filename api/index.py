@@ -41,27 +41,23 @@ app.mount("/static", StaticFiles(directory="."), name="static")
 
 # Vercel Serverless 环境使用 /tmp 目录
 import platform
-if platform.uname().system == "Linux":
-    DB_FILE = "/tmp/campfire_data.json"
-else:
-    DB_FILE = "campfire_data.json"
+# 全局数据存储（Vercel Serverless 环境）
+DATA_STORE = {
+    "campers": [],
+    "messages": [],
+    "activities": [],
+    "stories": [],
+    "mbti_groups": {}
+}
 
 def load_data():
-    try:
-        if os.path.exists(DB_FILE):
-            with open(DB_FILE, "r") as f:
-                return json.load(f)
-    except Exception as e:
-        print(f"Warning: Failed to load data: {e}")
-    return {"campers": [], "messages": [], "activities": [], "stories": [], "mbti_groups": {}}
+    """加载数据 - 优先从全局变量"""
+    return DATA_STORE
 
 def save_data(data):
-    try:
-        with open(DB_FILE, "w") as f:
-            json.dump(data, f, indent=2, default=str)
-    except Exception as e:
-        print(f"Warning: Failed to save data: {e}")
-        # 静默失败，不影响请求
+    """保存数据 - 更新全局变量"""
+    global DATA_STORE
+    DATA_STORE = data
 
 # ================== 数据模型 ==================
 class JoinRequest(BaseModel):

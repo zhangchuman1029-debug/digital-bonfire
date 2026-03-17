@@ -1,0 +1,18 @@
+build:
+  env:
+    - LANGUAGE_VERSION: "3.11"
+    - PACKAGE_VERSION: "1.0.0"
+
+services:
+  - type: web
+    name: campfire-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m flask --app api.index:app run --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SECONDME_CLIENT_ID
+        value: "80f7e9a1-4cc6-4c88-8f8b-41c266bdb3fb"
+      - key: SECONDME_CLIENT_SECRET
+        value: "c91baa9bf02e56cd7b6a982ada0f5a76486b85f36662e08826f3e7844fe3f3f4"
+      - key: SECONDME_REDIRECT_URI
+        value: "https://campfire-backend.onrender.com/api/auth/callback"

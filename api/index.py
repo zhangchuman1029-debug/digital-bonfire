@@ -41,23 +41,59 @@ app.mount("/static", StaticFiles(directory="."), name="static")
 
 # Vercel Serverless 环境使用 /tmp 目录
 import platform
-# 全局数据存储（Vercel Serverless 环境）
-DATA_STORE = {
-    "campers": [],
-    "messages": [],
-    "activities": [],
-    "stories": [],
-    "mbti_groups": {}
-}
+# Vercel Blob 存储
+BLOB_FILE_NAME = "campfire_data.json"
+_cache = {}  # 请求级缓存
 
 def load_data():
-    """加载数据 - 优先从全局变量"""
-    return DATA_STORE
+    """从 Vercel Blob 加载数据"""
+    import vercel_blob
+
+    # 检查缓存
+    if "data" in _cache:
+        return _cache["data"]
+
+    try:
+        # 列出 Blob 文件
+        blob_list = vercel_blob.list()
+        # 查找 campfire_data.json
+        for item in blob_list.get("blobs", []):
+            if item.get("name") == BLOB_FILE_NAME:
+                # 下载内容
+                url = item.get("url")
+                if url:
+                    response = httpx.get(url, timeout=10.0)
+                    if response.status_code == 200:
+                        data = response.json()
+                        _cache["data"] = data
+                        return data
+    except Exception as e:
+        print(f"Blob load error: {e}")
+
+    # 返回默认数据
+    default_data = {
+        "campers": [],
+        "messages": [],
+        "activities": [],
+        "stories": [],
+        "mbti_groups": {}
+    }
+    _cache["data"] = default_data
+    return default_data
 
 def save_data(data):
-    """保存数据 - 更新全局变量"""
-    global DATA_STORE
-    DATA_STORE = data
+    """保存数据到 Vercesl Blob"""
+    import vercel_blob
+
+    try:
+        json_string = json.dumps(data, indent=2, default=str)
+        # 覆盖写入，设置 addRandomSuffix: false
+        vercel_blob.put(BLOB_FILE_NAME, json_string, {"addRandomSuffix": "false"})
+        # 更新缓存
+        _cache["data"] = data
+        print("Data saved to Blob successfully")
+    except Exception as e:
+        print(f"Blob save error: {e}")
 
 # ================== 数据模型 ==================
 class JoinRequest(BaseModel):

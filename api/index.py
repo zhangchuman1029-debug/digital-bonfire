@@ -175,14 +175,15 @@ async def handler(event, context):
     method = event.get("httpMethod", "GET")
     headers = event.get("headers", {})
 
-    # Static files
-    if path in ["/", "/index.html"]:
+    # Static files - 返回 index.html
+    if path in ["/", "/index.html"] or not path.startswith("/api"):
         try:
-            with open("index.html", "r") as f:
+            with open("index.html", "r", encoding="utf-8") as f:
                 body = f.read()
-        except:
+        except Exception as e:
+            print(f"Error reading index.html: {e}")
             body = "Not found"
-        return {"statusCode": 200, "headers": {"Content-Type": "text/html"}, "body": body}
+        return {"statusCode": 200, "headers": {"Content-Type": "text/html; charset=utf-8"}, "body": body}
 
     if path == "/health":
         return {"statusCode": 200, "headers": {"Content-Type": "application/json"}, "body": '{"status":"ok"}'}

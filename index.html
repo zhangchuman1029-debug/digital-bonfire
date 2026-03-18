@@ -387,12 +387,6 @@
 
         .status.visible { opacity: 1; }
 
-        .connection-line {
-            position: absolute; height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 170, 0, 0.3), transparent);
-            transform-origin: left center; pointer-events: none; z-index: 5;
-        }
-
         @media (max-width: 768px) {
             .sidebar, .right-sidebar { display: none; }
             .fire-container { width: 200px; height: 200px; top: 45% !important; left: 50% !important; transform: translate(-50%, -50%) !important; }
@@ -834,7 +828,6 @@
 
         function renderCampers(campers) {
             document.querySelectorAll('.camper').forEach(el => el.remove());
-            document.querySelectorAll('.connection-line').forEach(el => el.remove());
 
             campers.forEach(c => {
                 const camper = document.createElement('div');
@@ -871,15 +864,6 @@
                 camper.onclick = () => generateStoryForUser(c);
 
                 campground.appendChild(camper);
-
-                // 连接线
-                const line = document.createElement('div');
-                line.className = 'connection-line';
-                line.style.width = c.distance + 'px';
-                line.style.left = centerX + 'px';
-                line.style.top = centerY + 'px';
-                line.style.transform = `rotate(${c.angle}deg)`;
-                campground.insertBefore(line, campground.firstChild);
             });
         }
 

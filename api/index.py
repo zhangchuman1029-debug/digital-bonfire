@@ -83,32 +83,84 @@ async def generate_story_with_ai(participants, group_name):
     if len(participants) < 1:
         return None
 
-    # 构建参与者信息
+    # MBTI 性格特征映射
+    mbti_traits = {
+        "INTJ": "冷静理性，喜欢思考战略和长期规划",
+        "INTP": "好奇心强，喜欢理论分析和逻辑思考",
+        "ENTJ": "果断有领导力，喜欢组织和推动项目",
+        "ENTP": "思维活跃，喜欢辩论和新奇想法",
+        "INFJ": "理想主义，有洞察力，关注他人感受",
+        "INFP": "浪漫敏感，追求意义和价值",
+        "ENFJ": "热情有感染力，天生的领导者",
+        "ENFP": "充满热情，喜欢创意和可能性",
+        "ISTJ": "可靠务实，注重细节和传统",
+        "ISFJ": "温柔体贴，乐于照顾他人",
+        "ESTJ": "有责任心，喜欢按规则办事",
+        "ESFJ": "热情周到，重视和谐的人际关系",
+        "ISTP": "冷静务实，喜欢动手解决问题",
+        "ISFP": "温柔内敛，追求美和舒适",
+        "ESTP": "活力十足，喜欢冒险和挑战",
+        "ESFP": "热情开朗，喜欢即兴和欢乐"
+    }
+
+    # 群组特征
+    group_traits = {
+        "智识之火": "理性、深刻、喜欢探讨问题和知识",
+        "灵感之火": "创意、浪漫、情感丰富",
+        "秩序之火": "稳重、有组织、注重规则和传统",
+        "实践之火": "行动派、务实、喜欢动手和冒险"
+    }
+
+    # 构建参与者详细信息
     p1 = participants[0]
     p2 = participants[1] if len(participants) > 1 else p1
     p3 = participants[2] if len(participants) > 2 else p1
 
-    names = [p['name'] for p in participants]
+    mbti1 = p1.get('mbti', '未知')
+    mbti2 = p2.get('mbti', '未知')
+    mbti3 = p3.get('mbti', '未知')
+
+    traits1 = mbti_traits.get(mbti1, '一位旅者')
+    traits2 = mbti_traits.get(mbti2, '一位旅者')
+    traits3 = mbti_traits.get(mbti3, '一位旅者')
+
     statuses = [p.get('current_activity', '无') or '无' for p in participants]
     intros = [p.get('intro', '') or '一位旅者' for p in participants]
 
-    prompt = f"""你是数字篝火的故事生成器。请根据以下参与者信息生成一个温馨、有趣的篝火故事片段。
+    prompt = f"""你是数字篝火的故事生成器。请根据以下参与者详细信息生成一个精准反映每个人性格特点的篝火故事。
 
-参与者：
-- {p1['name']}（{p1.get('mbti', '?')}），简介：{intros[0]}，当前状态：{statuses[0]}
-- {p2['name']}（{p2.get('mbti', '?')}），简介：{intros[1 if len(participants) > 1 else 0]}，当前状态：{statuses[1 if len(participants) > 1 else 0]}
-- {p3['name']}（{p3.get('mbti', '?')}），简介：{intros[2 if len(participants) > 2 else 0]}，当前状态：{statuses[2 if len(participants) > 2 else 0]}
+参与者详情：
+1. {p1['name']}
+   - MBTI：{mbti1}，性格：{traits1}
+   - 简介：{intros[0]}
+   - 当前状态：{statuses[0]}
 
-群组：{group_name}
+2. {p2['name']}
+   - MBTI：{mbti2}，性格：{traits2}
+   - 简介：{intros[1 if len(participants) > 1 else 0]}
+   - 当前状态：{statuses[1 if len(participants) > 1 else 0]}
+
+3. {p3['name']}
+   - MBTI：{mbti3}，性格：{traits3}
+   - 简介：{intros[2 if len(participants) > 2 else 0]}
+   - 当前状态：{statuses[2 if len(participants) > 2 else 0]}
+
+所属群组：{group_name}（{group_traits.get(group_name, '')}）
 
 要求：
-1. 故事要温馨、有画面感，接地气的生活细节
-2. 可以围绕他们当前的状态展开（如钓鱼、煮茶等）
-3. 避免谈论宇宙、量子物理等深奥话题
-4. 故事长度约100-200字
-5. 用自然、亲切的语言
+1. 故事必须精准反映每个MBTI的性格特点！例如：
+   - INTJ/INTP 应该表现出理性分析和思考
+   - ENFP/ENFJ 应该表现出热情和创意
+   - ISFJ/ESFJ 应该表现出关心和照顾
+   - ESTP/ESFP 应该表现出活跃和冒险
 
-请直接输出故事，不要有引号或其他格式："""
+2. 围绕他们当前的状态展开（钓鱼、煮茶、围炉夜话等）
+
+3. 避免深奥话题，多用生活化的细节
+
+4. 故事长度约150字
+
+请直接输出故事："""
 
     try:
         async with httpx.AsyncClient() as client:

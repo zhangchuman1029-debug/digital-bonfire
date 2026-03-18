@@ -713,6 +713,24 @@ async def get_user_info(token: str):
     except Exception as e:
         return {"error": str(e)}
 
+@app.post("/api/recalculate-positions")
+async def recalculate_positions():
+    """重新计算所有用户位置，使用黄金角分布"""
+    data = load_data()
+    campers = data.get("campers", [])
+
+    if not campers:
+        return {"message": "没有用户需要更新", "count": 0}
+
+    # 使用黄金角重新计算每个用户的位置
+    for i, camper in enumerate(campers):
+        golden_angle = 137.508 * (i + 1)
+        camper["angle"] = golden_angle % 360
+
+    data["campers"] = campers
+    save_data(data)
+
+    return {"message": "位置已更新", "count": len(campers)}
 @app.post("/api/chat")
 async def chat_with_secondme(message: str, token: str):
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}

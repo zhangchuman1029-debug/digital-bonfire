@@ -41,61 +41,60 @@ app.mount("/static", StaticFiles(directory="."), name="static")
 
 # Vercel Serverless 环境使用 /tmp 目录
 import platform
-# Vercel Blob 存储
+# Supabase 存储
 import os
-BLOB_FILE_NAME = "campfire_data.json"
-BLOB_TOKEN = os.getenv("BLOB_READ_WRITE_TOKEN")
+from supabase import create_client, Client
 
-if not BLOB_TOKEN:
-    print("WARNING: BLOB_READ_WRITE_TOKEN not found!")
+SUPABASE_URL = os.getenv("SUPABASE_URL", "")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY", "")
+
+_supabase_client = None
+
+def get_supabase() -> Client:
+    global _supabase_client
+    if not _supabase_client and SUPABASE_URL and SUPABASE_KEY:
+        _supabase_client = create_client(SUPABASE_URL, SUPABASE_KEY)
+    return _supabase_client
+
+TABLE_NAME = "campfire_data"
 
 def load_data():
-    """从 Vercer Blob 加载数据 - 每次都从网络读取，不用缓存"""
-    import vercel_blob
-
+    """从 Supabase 加载数据"""
     try:
-        # 列出 Blob 文件
-        blob_list = vercel_blob.list()
-        # 查找 campfire_data.json
-        for item in blob_list.get("blobs", []):
-            if item.get("name") == BLOB_FILE_NAME:
-                # 下载内容，添加 Cache-Control 防止缓存
-                url = item.get("url")
-                if url:
-                    response = httpx.get(url, timeout=10.0, headers={"Cache-Control": "no-cache"})
-                    if response.status_code == 200:
-                        data = response.json()
-                        print(f"Loaded data from Blob: {len(data.get('campers', []))} campers")
-                        return data
-    except Exception as e:
-        print(f"Blob load error: {e}")
+        client = get_supabase()
+        if not client:
+            print("WARNING: Supabase not configured!")
+            return get_default_data()
 
-    # 返回默认数据
-    default_data = {
-        "campers": [],
-        "messages": [],
-        "activities": [],
-        "stories": [],
-        "mbti_groups": {}
-    }
-    return default_data
+        # 从 Supabase 查询数据
+        response = client.table(TABLE_NAME).select("*").limit(1).execute()
+
+        if response.data and len(response.data) > 0:
+            data = response.data[0].get("data", {})
+            print(f"Loaded from Supabase: {len(data.get('campers', []))} campers")
+            return data
+    except Exception as e:
+        print(f"Supabase load error: {e}")
+
+    return get_default_data()
 
 def save_data(data):
-    """保存数据到 Vercel Blob - 先合并再写入"""
-    import vercel_blob
+    """保存数据到 Supabase"""
     import time
 
-    for attempt in range(3):  # 最多重试3次
+    for attempt in range(3):
         try:
-            # 先读取最新数据
-            existing_data = load_data()
+            client = get_supabase()
+            if not client:
+                print("WARNING: Supabase not configured!")
+                return
 
-            # 合并 campers（保留最新的）
+            # 先读取最新数据并合并
+            existing_data = load_data()
             existing_campers = {c.get("id"): c for c in existing_data.get("campers", [])}
             new_campers = {c.get("id"): c for c in data.get("campers", [])}
             existing_campers.update(new_campers)
 
-            # 合并其他数据
             merged_data = {
                 "campers": list(existing_campers.values()),
                 "messages": data.get("messages", []),
@@ -104,14 +103,39 @@ def save_data(data):
                 "mbti_groups": data.get("mbti_groups", {})
             }
 
-            json_string = json.dumps(merged_data, indent=2, default=str)
-            vercel_blob.put(BLOB_FILE_NAME, json_string, {"addRandomSuffix": "false"})
-            print(f"Data saved to Blob (attempt {attempt + 1}): {len(merged_data.get('campers', []))} campers")
+            # 尝试更新，如果表不存在则创建
+            try:
+                # 先尝试查询是否有记录
+                check = client.table(TABLE_NAME).select("id").limit(1).execute()
+                if check.data and len(check.data) > 0:
+                    # 更新现有记录
+                    client.table(TABLE_NAME).update({"data": merged_data}).eq("id", 1).execute()
+                else:
+                    # 插入新记录
+                    client.table(TABLE_NAME).insert({"id": 1, "data": merged_data}).execute()
+            except Exception as table_error:
+                print(f"Table error, trying to create: {table_error}")
+                # 尝试创建表（如果表不存在）
+                try:
+                    client.table(TABLE_NAME).insert({"id": 1, "data": merged_data}).execute()
+                except:
+                    pass
+
+            print(f"Data saved to Supabase: {len(merged_data.get('campers', []))} campers")
             return
         except Exception as e:
-            print(f"Blob save error (attempt {attempt + 1}): {e}")
+            print(f"Supabase save error (attempt {attempt + 1}): {e}")
             if attempt < 2:
-                time.sleep(0.1)  # 短暂延迟后重试
+                time.sleep(0.1)
+
+def get_default_data():
+    return {
+        "campers": [],
+        "messages": [],
+        "activities": [],
+        "stories": [],
+        "mbti_groups": {}
+    }
             else:
                 import traceback
                 traceback.print_exc()

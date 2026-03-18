@@ -302,51 +302,99 @@ async def generate_story(req: StoryRequest):
     if len(participants) < 2:
         return {"story": "篝火边的人太少，还不够成一个故事... 等更多人来吧！", "mbti_type": req.mbti_type}
 
-    current_activity = None
-    for activity in activities:
-        if activity["name"] in ["围炉夜话", "篝火舞会"] or not activity["participants"]:
-            current_activity = activity
-            break
-
-    story_templates = {
-        "智识之火": [
-            "{p1} 和 {p2} 正在进行深刻的哲学讨论，从存在主义聊到量子力学，{p3} 偶尔插几句嘴，气氛十分热烈。",
-            "围绕篝火，{p1} 提出了一个关于宇宙本质的问题，{p2} 和 {p3} 陷入了沉思...",
-            "{p1} 分享了一个有趣的逻辑悖论，{p2} 立刻给出了解决方案，{p3} 则提出了另一种思考角度。",
-        ],
-        "灵感之火": [
-            "{p1} 讲述了一个关于星星的梦想，{p2} 的眼睛里闪着光，{p3} 轻声说：'我们可以一起实现它'。",
-            "在温暖的火光中，{p1} 突然灵感爆发，画出了一幅美丽的画，{p2} 和 {p3} 成了第一批观众。",
-            "{p1} 和 {p2} 合唱了一首歌，{p3} 打着节拍，歌声在夜空中回荡。",
-        ],
-        "秩序之火": [
-            "{p1} 组织大家围坐成一个完美的圆，{p2} 负责分配食物，{p3} 负责记录这美好的时刻。",
-            "在 {p1} 的提议下，大家制定了今晚的守则：{p2} 负责添柴，{p3} 负责讲笑话。",
-            "{p1} 讲解着篝火的正确生法，{p2} 认真学习，{p3} 已经迫不及待想烤棉花糖了。",
-        ],
-        "实践之火": [
-            "{p1} 展示了一套炫酷的舞步，{p2} 立刻学会并改进了，{p3} 笑得合不拢嘴。",
-            "{p1} 钓到了一条大鱼！{p2} 帮忙处理，{p3} 生起了火，准备烤鱼大餐。",
-            "{p1} 和 {p2} 比赛谁先把火生起来，{p3} 当裁判，笑声不断。",
-        ],
-    }
-
     # 确定群组名称
     if req.mbti_type in MBTI_GROUPS.values():
-        group_name = req.mbti_type  # 已经是群组名称
+        group_name = req.mbti_type
     else:
         group_name = MBTI_GROUPS.get(req.mbti_type, "misc")
 
-    templates = story_templates.get(group_name, story_templates.get("智识之火"))
-
+    # 获取参与者的状态信息
     selected = random.sample(participants, min(3, len(participants)))
-    names = [p["name"] for p in selected]
 
-    template = random.choice(templates)
-    story = template.format(p1=names[0], p2=names[1], p3=names[2] if len(names) > 2 else names[0])
+    # 生成更长的故事
+    story_parts = []
 
-    if current_activity:
-        story = f"大家正在一起{current_activity['name']}，" + story
+    # 开头：描述时间和环境
+    time_descriptions = [
+        "夜幕降临，星空璀璨，",
+        "温暖的篝火在夜色中跳动，",
+        "月光洒在营地上，",
+        "微风轻拂，篝火噼啪作响，",
+    ]
+    story_parts.append(random.choice(time_descriptions))
+
+    # 描述参与者
+    p1 = selected[0]
+    p2 = selected[1] if len(selected) > 1 else selected[0]
+    p3 = selected[2] if len(selected) > 2 else selected[0]
+
+    # 获取用户简介
+    intro1 = p1.get("intro", "") or "一位神秘的旅者"
+    intro2 = p2.get("intro", "") or "一位沉默的观察者"
+    intro3 = p3.get("intro", "") if len(selected) > 2 else intro1
+
+    # 获取当前状态
+    status1 = p1.get("current_activity") or "无"
+    status2 = p2.get("current_activity") or "无"
+    status3 = p3.get("current_activity") if len(selected) > 2 else status1
+
+    # 群组特征
+    group_traits = {
+        "智识之火": "充满智慧与思辨的氛围",
+        "灵感之火": "创意与梦想的火花",
+        "秩序之火": "温暖而有组织的交流",
+        "实践之火": "活力四射的行动派"
+    }
+
+    # 主体故事
+    main_story_templates = {
+        "智识之火": [
+            f"来自{intro1}的{p1['name']}（{p1.get('mbti', '?')}）与{p2['name']}（{p2.get('mbti', '?')}）围坐在火堆旁，{group_traits.get(group_name, '这里')}。{p1['name']}分享了一个深刻的想法，涉及到宇宙的本质和存在的意义，{p2['name']}立刻回应并补充了自己的见解，两人陷入了热烈的讨论。",
+            f"在{p1['name']}的提议下，大家开始探讨人工智能的未来。{p2['name']}提出了一个独特的观点，认为机器最终会产生意识。这个话题引发了激烈的争论，连一向沉默的{p3['name']}也加入了讨论。",
+            f"第{p1['name']}正在讲述一个关于量子物理的有趣现象，{p2['name']}听得很入神。虽然{p3['name']}对物理不太了解，但也被这神秘的宇宙话题所吸引，大家都沉浸在知识的海洋中。"
+        ],
+        "灵感之火": [
+            f"来自{intro1}的{p1['name']}（{p1.get('mbti', '?')}）在火光中轻声吟唱着一首关于星星的歌谣，{p2['name']}（{p2.get('mbti', '?')}）的眼中闪烁着光芒。{p3['name']}被这美妙的氛围感染，轻轻打着节拍。",
+            f"在{group_traits.get(group_name, '这里')}，{p1['name']}突然有了一个绝妙的想法，想要创作一幅画。{p2['name']}立刻找来了画具，两人一起在星空下开始创作，{p3['name']}成为了他们的第一位观众。",
+            f"音乐在营地上空回荡，{p1['name']}和{p2['name']}合唱了一首温暖的歌。{p3['name']}被这美好的时刻所打动，决定把这一刻永远记在心里。"
+        ],
+        "秩序之火": [
+            f"来自{intro1}的{p1['name']}（{p1.get('mbti', '?')}）组织大家围坐成一个温暖的圆圈，{p2['name']}（{p2.get('mbti', '?')}）负责分发食物。在{group_traits.get(group_name, '这里')}，每个人都感受到了归属感。",
+            f"在{p1['name']}的提议下，大家制定了今晚的守则：{p2['name']}负责添柴火，{p3['name']}负责讲笑话活跃气氛。这种有组织的安排让篝火晚会更加温馨。",
+            f"{p1['name']}讲解着篝火的历史和文化意义，{p2['name']}和{p3['name']}认真地听着。在这种有秩序的氛围中，大家的距离更近了一步。"
+        ],
+        "实践之火": [
+            f"来自{intro1}的{p1['name']}（{p1.get('mbti', '?')}）展示了一套炫酷的舞步，{p2['name']}（{p2.get('mbti', '?')}）立刻学会并改进了。{p3['name']}笑得合不拢嘴，整个营地充满了活力。",
+            f"{p1['name']}在河边钓到了一条大鱼！{p2['name']}帮忙处理，{p3['name']}生起了火，准备烤鱼大餐。大家分工合作，在{group_traits.get(group_name, '这里')}享受着劳动的成果。",
+            f"在{p1['name']}和{p2['name']}的比赛开始后，{p3['name']}当起了裁判。笑声和欢呼声回荡在夜空中，大家尽情享受着这欢乐的时光。"
+        ],
+    }
+
+    story_parts.append(random.choice(main_story_templates.get(group_name, main_story_templates["智识之火"])))
+
+    # 加入状态信息
+    if status1 != "无" or status2 != "无" or status3 != "无":
+        status_parts = []
+        if status1 != "无":
+            status_parts.append(f"{p1['name']}正在{status1}")
+        if status2 != "无" and status2 != status1:
+            status_parts.append(f"{p2['name']}正在{status2}")
+        if status3 != "无" and status3 != status1 and status3 != status2:
+            status_parts.append(f"{p3['name']}正在{status3}")
+
+        if status_parts:
+            story_parts.append("此时，" + "，".join(status_parts) + "，这一切构成了篝火边最美好的回忆。")
+
+    # 结尾
+    ending_templates = [
+        "篝火的火光映照着每个人的脸庞，温暖而美好。",
+        "星光与篝火交相辉映，这一刻将成为永恒。",
+        "在这个夜晚，大家找到了彼此的连接，篝火见证了这一切。",
+        "夜深了，但篝火的温度永不消退，正如这份羁绊。",
+    ]
+    story_parts.append(random.choice(ending_templates))
+
+    story = "".join(story_parts)
 
     target_user = None
     if req.target_user_id:

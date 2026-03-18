@@ -317,11 +317,11 @@ async def generate_story(req: StoryRequest):
     if len(participants) < 1:
         return {"story": "篝火边没有人，还不够成一个故事... 等更多人来吧！", "mbti_type": req.mbti_type}
 
-    # 确定群组名称
+    # 确定群组名称 - 确保始终使用有效的群组
     if req.mbti_type in MBTI_GROUPS.values():
         group_name = req.mbti_type
     else:
-        group_name = MBTI_GROUPS.get(req.mbti_type, "misc")
+        group_name = MBTI_GROUPS.get(req.mbti_type, "智识之火")  # 默认使用智识之火
 
     # 获取参与者的状态信息
     selected = random.sample(participants, min(3, len(participants)))

@@ -126,72 +126,74 @@
             100% { transform: translateY(-150px) translateX(20px) scale(0); opacity: 0; }
         }
 
-        /* 专注模式 - 火焰增强 */
-        body.focus-mode .fire-container {
-            transform: scale(1.8) !important;
-            top: 35% !important;
-            transition: all 0.8s ease-in-out;
+        /* 专注模式 - 火焰中心化与放大 */
+        .fire-container.focus-active {
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) scale(2.0) !important;
+            transition: all 0.8s ease-in-out !important;
+            z-index: 50 !important;
         }
 
-        body.focus-mode .flame {
-            width: 80px !important;
-            height: 80px !important;
+        .fire-container.focus-active .flame {
+            width: 100px !important;
+            height: 100px !important;
             box-shadow:
-                0 0 40px #ff5e00,
-                0 0 80px #ff5e00,
-                0 0 120px #ffaa00,
-                0 0 20px #fefcc9 inset !important;
-            animation: burn 0.15s infinite alternate !important;
+                0 0 50px #ff5e00,
+                0 0 100px #ff5e00,
+                0 0 150px #ffaa00,
+                0 0 30px #fefcc9 inset !important;
+            animation: burn 0.12s infinite alternate !important;
         }
 
-        body.focus-mode .fire-particle {
-            animation: rise-intense 1s infinite ease-out !important;
-            width: 6px !important;
-            height: 6px !important;
+        .fire-container.focus-active .fire-particle {
+            animation: rise-intense 0.8s infinite ease-out !important;
+            width: 7px !important;
+            height: 7px !important;
         }
 
         @keyframes rise-intense {
             0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-300px) translateX(40px) scale(0); opacity: 0; }
+            100% { transform: translateY(-400px) translateX(50px) scale(0); opacity: 0; }
         }
 
-        body.focus-mode .fire-particle:nth-child(2) { animation-delay: 0.1s; }
-        body.focus-mode .fire-particle:nth-child(3) { animation-delay: 0.2s; }
-        body.focus-mode .fire-particle:nth-child(4) { animation-delay: 0.3s; }
-        body.focus-mode .fire-particle:nth-child(5) { animation-delay: 0.15s; }
+        .fire-container.focus-active .fire-particle:nth-child(2) { animation-delay: 0.1s; }
+        .fire-container.focus-active .fire-particle:nth-child(3) { animation-delay: 0.2s; }
+        .fire-container.focus-active .fire-particle:nth-child(4) { animation-delay: 0.3s; }
+        .fire-container.focus-active .fire-particle:nth-child(5) { animation-delay: 0.15s; }
 
         /* 专注模式 - 背景加深 */
         body.focus-mode {
-            background: radial-gradient(ellipse at 50% 80%, #0a0500 0%, #000000 60%, #000000 100%) !important;
+            background: radial-gradient(ellipse at 50% 50%, #000000 0%, #000000 70%, #0a0500 100%) !important;
         }
 
-        /* 专注模式 - 隐藏干扰项 */
-        body.focus-mode .header { opacity: 0 !important; pointer-events: none !important; }
-        body.focus-mode .sidebar { opacity: 0 !important; pointer-events: none !important; }
-        body.focus-mode .right-sidebar { opacity: 0 !important; pointer-events: none !important; }
-        body.focus-mode .mobile-menu-btn { opacity: 0 !important; pointer-events: none !important; }
-        body.focus-mode .login-container { opacity: 0 !important; pointer-events: none !important; }
-        body.focus-mode .camper { opacity: 0 !important; pointer-events: none !important; transition: opacity 0.5s ease !important; }
-        body.focus-mode .story-panel { opacity: 0 !important; pointer-events: none !important; }
-        body.focus-mode .focusing-indicator { opacity: 0 !important; pointer-events: none !important; }
+        /* 专注模式 - 隐藏干扰项 (平滑消失) */
+        .focus-hide {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transition: all 0.8s ease !important;
+        }
 
         /* 专注模式 - 倒计时位置重排到火焰下方 */
-        body.focus-mode .focus-timer {
+        .focus-timer.focus-active {
             position: fixed !important;
-            top: 65% !important;
+            top: 70% !important;
             left: 50% !important;
             transform: translateX(-50%) !important;
             z-index: 100 !important;
-            padding: 30px 50px !important;
-            background: rgba(0, 0, 0, 0.6) !important;
-            border-radius: 20px !important;
-            border: 1px solid rgba(34, 197, 94, 0.3) !important;
-            backdrop-filter: blur(10px) !important;
+            padding: 30px 60px !important;
+            background: rgba(0, 0, 0, 0.7) !important;
+            border-radius: 24px !important;
+            border: 1px solid rgba(34, 197, 94, 0.4) !important;
+            backdrop-filter: blur(15px) !important;
+            box-shadow: 0 0 40px rgba(34, 197, 94, 0.2) !important;
         }
 
-        body.focus-mode .focus-timer-display {
+        .focus-timer.focus-active .focus-timer-display {
             font-size: 5rem !important;
             font-weight: 700 !important;
+            color: #22c55e !important;
             text-shadow: 0 0 30px rgba(34, 197, 94, 0.8), 0 0 60px rgba(34, 197, 94, 0.4) !important;
             animation: breathe 2s ease-in-out infinite !important;
         }
@@ -201,15 +203,28 @@
             50% { opacity: 1; transform: scale(1.05); }
         }
 
-        body.focus-mode .focus-duration-select,
-        body.focus-mode .focus-start-btn,
-        body.focus-mode .focus-cancel-btn {
+        /* 专注时隐藏输入框和开始按钮，显示取消按钮 */
+        .focus-timer.focus-active .focus-duration-input-wrap,
+        .focus-timer.focus-active .focus-start-btn {
             display: none !important;
         }
 
-        body.focus-mode .focus-cancel-btn {
+        .focus-timer.focus-active .focus-cancel-btn {
             display: block !important;
             margin-top: 20px !important;
+            width: 100%;
+            padding: 12px 24px;
+            font-size: 14px;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #ef4444;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .focus-timer.focus-active .focus-cancel-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
         }
 
         .fire-glow {
@@ -319,26 +334,40 @@
             margin: 10px 0;
         }
 
-        .focus-duration-select {
-            display: flex; gap: 8px; justify-content: center; margin-bottom: 12px;
+        /* 自定义时间输入 */
+        .focus-duration-input-wrap {
+            display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px;
         }
 
-        .focus-duration-btn {
-            background: rgba(34, 197, 94, 0.15);
+        .focus-duration-input {
+            width: 80px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(34, 197, 94, 0.3);
-            color: #22c55e;
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            text-align: center;
+            outline: none;
+            backdrop-filter: blur(10px);
             transition: all 0.3s ease;
         }
 
-        .focus-duration-btn:hover { background: rgba(34, 197, 94, 0.25); }
+        .focus-duration-input:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(34, 197, 94, 0.6);
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.2);
+        }
 
-        .focus-duration-btn.selected {
-            background: rgba(34, 197, 94, 0.4);
-            border-color: #22c55e;
+        .focus-duration-input::-webkit-inner-spin-button,
+        .focus-duration-input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .focus-duration-unit {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
         }
 
         .focus-start-btn {
@@ -501,20 +530,6 @@
 
         .focus-popup-share:hover {
             box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
-        }
-
-        /* 沉浸模式 */
-        body.focus-mode .header { opacity: 0.3; }
-        body.focus-mode .sidebar { opacity: 0.2; transition: opacity 0.5s ease; }
-        body.focus-mode .sidebar:hover { opacity: 1; }
-        body.focus-mode .right-sidebar { opacity: 0.2; transition: opacity 0.5s ease; }
-        body.focus-mode .right-sidebar:hover { opacity: 1; }
-        body.focus-mode .mobile-menu-btn { opacity: 0.3; }
-        body.focus-mode .login-btn { opacity: 0.3; }
-
-        body.focus-mode .focus-timer-display {
-            font-size: 4rem;
-            text-shadow: 0 0 40px rgba(34, 197, 94, 0.8);
         }
 
         /* 专注中状态指示 */
@@ -908,10 +923,9 @@
             <div class="sidebar-content">
                 <div class="focus-timer">
                     <div class="focus-timer-display" id="focusTimerDisplay">25:00</div>
-                    <div class="focus-duration-select">
-                        <button class="focus-duration-btn selected" data-duration="25" onclick="selectFocusDuration(25)">25分钟</button>
-                        <button class="focus-duration-btn" data-duration="45" onclick="selectFocusDuration(45)">45分钟</button>
-                        <button class="focus-duration-btn" data-duration="60" onclick="selectFocusDuration(60)">60分钟</button>
+                    <div class="focus-duration-input-wrap">
+                        <input type="number" id="focusDuration" class="focus-duration-input" value="25" min="1" max="180" placeholder="25">
+                        <span class="focus-duration-unit">分钟</span>
                     </div>
                     <button class="focus-start-btn" id="focusStartBtn" onclick="startFocus()">开始专注</button>
                     <button class="focus-cancel-btn" id="focusCancelBtn" style="display:none;" onclick="cancelFocus()">取消专注</button>
@@ -1096,6 +1110,7 @@
 
             const savedFocusStart = localStorage.getItem('campfire_focus_start_time');
             const savedFocusDuration = localStorage.getItem('campfire_focus_duration');
+            const savedFocusActive = localStorage.getItem('campfire_focus_active');
 
             if (savedFocusStart && savedFocusDuration) {
                 const startTime = parseInt(savedFocusStart);
@@ -1104,6 +1119,9 @@
                 const remaining = duration * 60 - elapsed;
 
                 if (remaining > 0) {
+                    // 恢复专注模式 UI
+                    restoreFocusModeUI();
+
                     // 继续之前的专注
                     startFocusTimer(remaining);
                 } else {
@@ -1117,6 +1135,7 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.focusing && data.remaining_seconds > 0) {
+                        restoreFocusModeUI();
                         startFocusTimer(data.remaining_seconds);
                     }
                 })
@@ -1126,11 +1145,33 @@
             loadFocusHistory();
         }
 
+        // 恢复专注模式 UI（用于页面刷新后）
+        function restoreFocusModeUI() {
+            const fireContainer = document.getElementById('campground');
+            const focusTimer = document.querySelector('.focus-timer');
+
+            // 添加 .focus-active 类到火焰容器
+            fireContainer.classList.add('focus-active');
+
+            // 添加 .focus-active 类到计时器
+            focusTimer.classList.add('focus-active');
+
+            // 添加 .focus-hide 类隐藏所有干扰项
+            document.querySelectorAll('.sidebar, .right-sidebar, .header, .mobile-menu-btn, .login-container, .camper, .story-panel, .focusing-indicator').forEach(el => {
+                el.classList.add('focus-hide');
+            });
+
+            // 添加 body 沉浸模式类
+            document.body.classList.add('focus-mode');
+
+            // 添加额外的粒子效果
+            addFocusParticles();
+        }
+
         function selectFocusDuration(minutes) {
             selectedFocusDuration = minutes;
-            document.querySelectorAll('.focus-duration-btn').forEach(btn => {
-                btn.classList.toggle('selected', parseInt(btn.dataset.duration) === minutes);
-            });
+            const durationInput = document.getElementById('focusDuration');
+            durationInput.value = minutes;
             updateFocusTimerDisplay(minutes * 60);
         }
 
@@ -1150,6 +1191,16 @@
                 return;
             }
 
+            // 从输入框获取专注时长
+            const durationInput = document.getElementById('focusDuration');
+            const focusDuration = parseInt(durationInput.value) || 25;
+            selectedFocusDuration = focusDuration;
+
+            if (focusDuration < 1 || focusDuration > 180) {
+                alert('请输入 1-180 之间的分钟数');
+                return;
+            }
+
             // 调用后端 API 开始专注
             try {
                 const res = await fetch('/api/focus/start', {
@@ -1160,7 +1211,7 @@
                     },
                     body: JSON.stringify({
                         user_id: parseInt(userId),
-                        duration: selectedFocusDuration
+                        duration: focusDuration
                     })
                 });
                 const data = await res.json();
@@ -1173,21 +1224,34 @@
                 console.error('Focus start error:', e);
             }
 
-            // 保存到 localStorage
+            // 保存到 localStorage（用于页面刷新后恢复状态）
             localStorage.setItem('campfire_focus_start_time', Date.now().toString());
-            localStorage.setItem('campfire_focus_duration', selectedFocusDuration.toString());
+            localStorage.setItem('campfire_focus_duration', focusDuration.toString());
+            localStorage.setItem('campfire_focus_active', 'true');
+
+            // 添加 .focus-active 类到火焰容器（中心化放大）
+            const fireContainer = document.getElementById('campground');
+            fireContainer.classList.add('focus-active');
+
+            // 添加 .focus-active 类到计时器（移动到火焰下方）
+            const focusTimer = document.querySelector('.focus-timer');
+            focusTimer.classList.add('focus-active');
+
+            // 添加 .focus-hide 类隐藏所有干扰项
+            document.querySelectorAll('.sidebar, .right-sidebar, .header, .mobile-menu-btn, .login-container, .camper, .story-panel, .focusing-indicator').forEach(el => {
+                el.classList.add('focus-hide');
+            });
 
             // 添加额外的粒子效果（专注模式）
             addFocusParticles();
 
             // 开始计时器
-            startFocusTimer(selectedFocusDuration * 60);
+            startFocusTimer(focusDuration * 60);
 
-            // 进入沉浸模式 - CSS 会自动处理火焰增强和背景变化
+            // 进入沉浸模式
             document.body.classList.add('focus-mode');
-            document.getElementById('focusingIndicator').classList.add('active');
 
-            showStatus(`开始专注 ${selectedFocusDuration} 分钟`);
+            showStatus(`开始专注 ${focusDuration} 分钟`);
         }
 
         // 添加专注模式额外粒子
@@ -1271,13 +1335,21 @@
             // 清除 localStorage
             localStorage.removeItem('campfire_focus_start_time');
             localStorage.removeItem('campfire_focus_duration');
+            localStorage.removeItem('campfire_focus_active');
 
-            // 退出沉浸模式 - CSS 会自动恢复所有效果
+            // 移除所有专注模式类
+            document.getElementById('campground').classList.remove('focus-active');
+            document.querySelector('.focus-timer').classList.remove('focus-active');
+            document.querySelectorAll('.focus-hide').forEach(el => {
+                el.classList.remove('focus-hide');
+            });
+
+            // 退出沉浸模式
             document.body.classList.remove('focus-mode');
-            document.getElementById('focusingIndicator').classList.remove('active');
 
             // 重置计时器显示
-            updateFocusTimerDisplay(selectedFocusDuration * 60);
+            const durationInput = document.getElementById('focusDuration');
+            updateFocusTimerDisplay((parseInt(durationInput.value) || 25) * 60);
 
             // 调用后端 API 结束专注，获取故事
             try {
@@ -1322,13 +1394,21 @@
             // 清除 localStorage
             localStorage.removeItem('campfire_focus_start_time');
             localStorage.removeItem('campfire_focus_duration');
+            localStorage.removeItem('campfire_focus_active');
 
-            // 退出沉浸模式 - CSS 会自动恢复所有效果
+            // 移除所有专注模式类
+            document.getElementById('campground').classList.remove('focus-active');
+            document.querySelector('.focus-timer').classList.remove('focus-active');
+            document.querySelectorAll('.focus-hide').forEach(el => {
+                el.classList.remove('focus-hide');
+            });
+
+            // 退出沉浸模式
             document.body.classList.remove('focus-mode');
-            document.getElementById('focusingIndicator').classList.remove('active');
 
             // 重置计时器显示
-            updateFocusTimerDisplay(selectedFocusDuration * 60);
+            const durationInput = document.getElementById('focusDuration');
+            updateFocusTimerDisplay((parseInt(durationInput.value) || 25) * 60);
 
             showStatus('专注已取消');
         }
@@ -1926,6 +2006,21 @@
         fetchStatusCounts();
         fetchStoryLogs();
         checkFocusStatus(); // 检查专注状态
+
+        // 专注时长输入框事件监听
+        const focusDurationInput = document.getElementById('focusDuration');
+        focusDurationInput.addEventListener('input', function() {
+            const value = parseInt(this.value) || 25;
+            updateFocusTimerDisplay(value * 60);
+        });
+        focusDurationInput.addEventListener('change', function() {
+            let value = parseInt(this.value) || 25;
+            if (value < 1) value = 1;
+            if (value > 180) value = 180;
+            this.value = value;
+            updateFocusTimerDisplay(value * 60);
+        });
+
         setInterval(fetchCampers, 3000);
         setInterval(fetchStatusCounts, 5000);
         setInterval(fetchStoryLogs, 10000); // 每10秒刷新日志

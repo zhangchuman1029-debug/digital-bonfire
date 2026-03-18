@@ -387,13 +387,48 @@
 
         @media (max-width: 768px) {
             .sidebar, .right-sidebar { display: none; }
-            .fire-container { width: 350px; height: 350px; }
+            .fire-container { width: 280px; height: 280px; }
             .header h1 { font-size: 1.2rem; letter-spacing: 4px; }
+            body { background: radial-gradient(ellipse at 50% 120%, #1a0a00 0%, #0a0e14 30%, #030508 100%) !important; }
+            .header { padding: 10px; }
+            .login-container { bottom: 20px; }
+            #loginBtn { padding: 12px 24px; font-size: 14px; }
+            /* 移动端底部状态栏 */
+            .mobile-status-bar {
+                display: flex !important;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: rgba(0,0,0,0.8);
+                padding: 10px;
+                overflow-x: auto;
+                z-index: 100;
+            }
+            .mobile-status-bar::-webkit-scrollbar { display: none; }
+            .mobile-status-item {
+                flex: 0 0 auto;
+                padding: 8px 12px;
+                margin: 0 4px;
+                border-radius: 20px;
+                background: rgba(255,255,255,0.1);
+                color: white;
+                font-size: 12px;
+                white-space: nowrap;
+            }
+            .mobile-status-item.active {
+                background: var(--fire-mid);
+                color: black;
+            }
         }
+        .mobile-status-bar { display: none; }
     </style>
 </head>
 <body>
     <div class="stars" id="stars"></div>
+
+    <!-- 移动端状态栏 -->
+    <div class="mobile-status-bar" id="mobileStatusBar"></div>
 
     <div class="header">
         <h1>DIGITAL BONFIRE</h1>
@@ -916,6 +951,34 @@
             `;
             clearDiv.onclick = () => clearActivity();
             container.appendChild(clearDiv);
+
+            // 渲染移动端状态栏
+            renderMobileStatusBar(counts);
+        }
+
+        function renderMobileStatusBar(counts) {
+            const bar = document.getElementById('mobileStatusBar');
+            if (!bar) return;
+            bar.innerHTML = '';
+
+            // 添加状态选项
+            activities.forEach(act => {
+                const count = counts[act.name] || 0;
+                const isActive = currentUser && currentUser.current_activity === act.name;
+                const item = document.createElement('div');
+                item.className = 'mobile-status-item' + (isActive ? ' active' : '');
+                item.innerHTML = `${act.emoji} ${act.name} ${count > 0 ? '('+count+')' : ''}`;
+                item.onclick = () => joinActivity(act.name);
+                bar.appendChild(item);
+            });
+
+            // 添加"无"选项
+            const clearItem = document.createElement('div');
+            const isCleared = !currentUser || !currentUser.current_activity;
+            clearItem.className = 'mobile-status-item' + (isCleared ? ' active' : '');
+            clearItem.innerHTML = `❌ 无`;
+            clearItem.onclick = () => clearActivity();
+            bar.appendChild(clearItem);
         }
 
         async function generateStory(groupName) {

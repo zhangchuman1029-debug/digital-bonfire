@@ -383,7 +383,6 @@ async def login():
 
 @app.get("/api/auth/callback")
 async def callback(code: str = Query(...), state: str = Query(...)):
-    print(f"[CALLBACK] Starting callback, code length: {len(code)}")
     try:
         async with httpx.AsyncClient() as client:
             # 1. 获取 token
@@ -449,6 +448,13 @@ async def callback(code: str = Query(...), state: str = Query(...)):
             shades = shades_obj.get("shades", shades_obj.get("tags", []))
         elif isinstance(shades_obj, list):
             shades = shades_obj
+
+        # 处理可能是字典列表的情况
+        if shades and isinstance(shades[0], dict):
+            # 尝试提取字符串值
+            shades = [s.get("name") or s.get("value") or s.get("tag", "") for s in shades]
+        # 确保所有元素都是字符串
+        shades = [str(s) for s in shades if s]
     except Exception:
         shades = []
 
@@ -459,7 +465,7 @@ async def callback(code: str = Query(...), state: str = Query(...)):
     keywords_logic = ['python', 'code', 'dev', '后端', 'algorithm', 'logic', 'ai', 'ml', 'data', '技术', '编程']
     keywords_creative = ['design', 'art', 'creative', 'music', '画', '创意', '设计', '艺术', '绘画']
 
-    shades_lower = [s.lower() for s in shades]
+    shades_lower = [str(s).lower() for s in shades]
     is_logic = any(any(kw in s for kw in keywords_logic) for s in shades_lower)
     is_creative = any(any(kw in s for kw in keywords_creative) for s in shades_lower)
 
@@ -519,7 +525,8 @@ def infer_mbti(shades: list) -> str:
     if not shades:
         return random.choice(list(MBTI_GROUPS.keys()))
 
-    shades_str = " ".join(shades).lower()
+    # 确保所有元素都是字符串
+    shades_str = " ".join(str(s) for s in shades).lower()
 
     if any(w in shades_str for w in ['理性', '逻辑', '分析', '独立', '思考']):
         if any(w in shades_str for w in ['内向', '安静', '独处']):

@@ -217,6 +217,249 @@
             padding: 2px 6px; border-radius: 4px; font-size: 9px; margin: 2px;
         }
 
+        /* 专注模式样式 */
+        .sidebar-section.focus { border-color: rgba(34, 197, 94, 0.4); }
+        .sidebar-section.focus .sidebar-header h3 { color: #22c55e; }
+
+        .focus-timer {
+            text-align: center; padding: 10px 0;
+        }
+
+        .focus-timer-display {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            color: #22c55e;
+            text-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+            margin: 10px 0;
+        }
+
+        .focus-duration-select {
+            display: flex; gap: 8px; justify-content: center; margin-bottom: 12px;
+        }
+
+        .focus-duration-btn {
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .focus-duration-btn:hover { background: rgba(34, 197, 94, 0.25); }
+
+        .focus-duration-btn.selected {
+            background: rgba(34, 197, 94, 0.4);
+            border-color: #22c55e;
+        }
+
+        .focus-start-btn {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border: none;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .focus-start-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
+        }
+
+        .focus-start-btn:disabled {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.3);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .focus-cancel-btn {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #ef4444;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 8px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .focus-cancel-btn:hover { background: rgba(239, 68, 68, 0.3); }
+
+        .focus-history {
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .focus-history-title {
+            font-size: 11px; color: var(--text-secondary);
+            margin-bottom: 8px; text-align: center;
+        }
+
+        .focus-history-item {
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.15);
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .focus-history-item:hover {
+            background: rgba(34, 197, 94, 0.15);
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .focus-history-time {
+            font-size: 10px; color: var(--text-secondary);
+        }
+
+        .focus-history-duration {
+            font-size: 11px; color: #22c55e;
+            margin-top: 2px;
+        }
+
+        /* 专注模式弹窗 */
+        .focus-popup {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .focus-popup.show { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .focus-popup-content {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .focus-popup-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            color: #22c55e;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .focus-popup-story {
+            font-size: 14px;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9);
+            text-align: left;
+            white-space: pre-wrap;
+        }
+
+        .focus-popup-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            justify-content: center;
+        }
+
+        .focus-popup-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .focus-popup-close {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .focus-popup-close:hover { background: rgba(255, 255, 255, 0.2); }
+
+        .focus-popup-share {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border: none;
+            color: white;
+        }
+
+        .focus-popup-share:hover {
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
+        }
+
+        /* 沉浸模式 */
+        body.focus-mode .header { opacity: 0.3; }
+        body.focus-mode .sidebar { opacity: 0.2; transition: opacity 0.5s ease; }
+        body.focus-mode .sidebar:hover { opacity: 1; }
+        body.focus-mode .right-sidebar { opacity: 0.2; transition: opacity 0.5s ease; }
+        body.focus-mode .right-sidebar:hover { opacity: 1; }
+        body.focus-mode .mobile-menu-btn { opacity: 0.3; }
+        body.focus-mode .login-btn { opacity: 0.3; }
+
+        body.focus-mode .focus-timer-display {
+            font-size: 4rem;
+            text-shadow: 0 0 40px rgba(34, 197, 94, 0.8);
+        }
+
+        /* 专注中状态指示 */
+        .focusing-indicator {
+            display: none;
+            position: absolute;
+            top: 10px; right: 10px;
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid #22c55e;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 11px;
+            color: #22c55e;
+            z-index: 50;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .focusing-indicator.active { display: flex; }
+
+        .focusing-indicator::before {
+            content: ''; width: 8px; height: 8px;
+            background: #22c55e; border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
         .agent-item {
             display: flex; align-items: center; gap: 8px; padding: 8px 10px;
             border-radius: 8px; transition: all 0.3s ease; cursor: pointer;
@@ -570,6 +813,29 @@
             </div>
         </div>
 
+        <!-- 专注模式面板 -->
+        <div class="sidebar-section focus" id="focusSection">
+            <div class="sidebar-header" onclick="toggleSection('focusSection')">
+                <h3>🎯 专注模式</h3>
+                <span class="sidebar-toggle">▼</span>
+            </div>
+            <div class="sidebar-content">
+                <div class="focus-timer">
+                    <div class="focus-timer-display" id="focusTimerDisplay">25:00</div>
+                    <div class="focus-duration-select">
+                        <button class="focus-duration-btn selected" data-duration="25" onclick="selectFocusDuration(25)">25分钟</button>
+                        <button class="focus-duration-btn" data-duration="45" onclick="selectFocusDuration(45)">45分钟</button>
+                        <button class="focus-duration-btn" data-duration="60" onclick="selectFocusDuration(60)">60分钟</button>
+                    </div>
+                    <button class="focus-start-btn" id="focusStartBtn" onclick="startFocus()">开始专注</button>
+                    <button class="focus-cancel-btn" id="focusCancelBtn" style="display:none;" onclick="cancelFocus()">取消专注</button>
+                </div>
+                <div class="focus-history" id="focusHistory">
+                    <div class="focus-history-title">专注记录</div>
+                </div>
+            </div>
+        </div>
+
         <!-- 说明书面板 -->
         <div class="sidebar-section help" id="helpSection">
             <div class="sidebar-header" onclick="toggleSection('helpSection')">
@@ -597,6 +863,23 @@
         <h3>📖 篝火故事 <span onclick="closeStoryPanel()" style="float:right;cursor:pointer;font-size:16px;">✕</span></h3>
         <p class="story-content" id="storyContent"></p>
         <button class="story-refresh" onclick="generateStory()">换一换</button>
+    </div>
+
+    <!-- 专注模式弹窗 -->
+    <div class="focus-popup" id="focusPopup">
+        <div class="focus-popup-content">
+            <h2 class="focus-popup-title">🌟 专注结束</h2>
+            <div class="focus-popup-story" id="focusPopupStory"></div>
+            <div class="focus-popup-actions">
+                <button class="focus-popup-btn focus-popup-close" onclick="closeFocusPopup()">关闭</button>
+                <button class="focus-popup-btn focus-popup-share" onclick="shareFocusStory()">分享故事</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 专注中状态指示 -->
+    <div class="focusing-indicator" id="focusingIndicator">
+        专注中
     </div>
 
     <div class="fire-container" id="campground">
@@ -712,6 +995,283 @@
         function showInstructions() {
             toggleMobileDrawer();
             alert('数字篝火使用说明：\n\n1. 点击"开始相遇"按钮登录\n2. 选择你的状态（钓鱼/煮茶/围炉夜话等）\n3. 与其他用户互动生成故事\n4. 点击篝火中的用户查看信息');
+        }
+
+        // ================== 专注模式 ==================
+        let focusTimer = null;
+        let focusRemainingSeconds = 0;
+        let selectedFocusDuration = 25;
+        let isFocusing = false;
+
+        // 页面加载时检查专注状态
+        function checkFocusStatus() {
+            const userId = localStorage.getItem('campfire_user_id');
+            if (!userId) return;
+
+            const savedFocusStart = localStorage.getItem('campfire_focus_start_time');
+            const savedFocusDuration = localStorage.getItem('campfire_focus_duration');
+
+            if (savedFocusStart && savedFocusDuration) {
+                const startTime = parseInt(savedFocusStart);
+                const duration = parseInt(savedFocusDuration);
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const remaining = duration * 60 - elapsed;
+
+                if (remaining > 0) {
+                    // 继续之前的专注
+                    startFocusTimer(remaining);
+                } else {
+                    // 专注时间已过，结束专注
+                    endFocus();
+                }
+            }
+
+            // 获取后端专注状态
+            fetch(`/api/focus/status?user_id=${userId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.focusing && data.remaining_seconds > 0) {
+                        startFocusTimer(data.remaining_seconds);
+                    }
+                })
+                .catch(e => console.error('Failed to get focus status:', e));
+
+            // 加载专注历史
+            loadFocusHistory();
+        }
+
+        function selectFocusDuration(minutes) {
+            selectedFocusDuration = minutes;
+            document.querySelectorAll('.focus-duration-btn').forEach(btn => {
+                btn.classList.toggle('selected', parseInt(btn.dataset.duration) === minutes);
+            });
+            updateFocusTimerDisplay(minutes * 60);
+        }
+
+        function updateFocusTimerDisplay(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            document.getElementById('focusTimerDisplay').textContent =
+                `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        async function startFocus() {
+            const userId = localStorage.getItem('campfire_user_id');
+            const token = localStorage.getItem('campfire_token');
+
+            if (!userId) {
+                alert('请先登录后再开始专注');
+                return;
+            }
+
+            // 调用后端 API 开始专注
+            try {
+                const res = await fetch('/api/focus/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        user_id: parseInt(userId),
+                        duration: selectedFocusDuration
+                    })
+                });
+                const data = await res.json();
+
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+            } catch (e) {
+                console.error('Focus start error:', e);
+            }
+
+            // 保存到 localStorage
+            localStorage.setItem('campfire_focus_start_time', Date.now().toString());
+            localStorage.setItem('campfire_focus_duration', selectedFocusDuration.toString());
+
+            // 开始计时器
+            startFocusTimer(selectedFocusDuration * 60);
+
+            // 进入沉浸模式
+            document.body.classList.add('focus-mode');
+            document.getElementById('focusingIndicator').classList.add('active');
+
+            // 隐藏开始按钮，显示取消按钮
+            document.getElementById('focusStartBtn').style.display = 'none';
+            document.getElementById('focusCancelBtn').style.display = 'block';
+
+            showStatus(`开始专注 ${selectedFocusDuration} 分钟`);
+        }
+
+        function startFocusTimer(seconds) {
+            focusRemainingSeconds = seconds;
+            isFocusing = true;
+
+            // 减慢粒子动画
+            document.querySelectorAll('.fire-particle').forEach(p => {
+                p.style.animationDuration = '1s';
+            });
+
+            focusTimer = setInterval(() => {
+                focusRemainingSeconds--;
+                updateFocusTimerDisplay(focusRemainingSeconds);
+
+                if (focusRemainingSeconds <= 0) {
+                    endFocus();
+                }
+            }, 1000);
+        }
+
+        async function endFocus() {
+            clearInterval(focusTimer);
+            focusTimer = null;
+            isFocusing = false;
+
+            const userId = localStorage.getItem('campfire_user_id');
+            const token = localStorage.getItem('campfire_token');
+
+            // 清除 localStorage
+            localStorage.removeItem('campfire_focus_start_time');
+            localStorage.removeItem('campfire_focus_duration');
+
+            // 恢复正常粒子速度
+            document.querySelectorAll('.fire-particle').forEach(p => {
+                p.style.animationDuration = '0.2s';
+            });
+
+            // 退出沉浸模式
+            document.body.classList.remove('focus-mode');
+            document.getElementById('focusingIndicator').classList.remove('active');
+
+            // 显示开始按钮，隐藏取消按钮
+            document.getElementById('focusStartBtn').style.display = 'block';
+            document.getElementById('focusCancelBtn').style.display = 'none';
+
+            // 重置计时器显示
+            updateFocusTimerDisplay(selectedFocusDuration * 60);
+
+            // 调用后端 API 结束专注，获取故事
+            try {
+                const res = await fetch('/api/focus/end', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        user_id: parseInt(userId)
+                    })
+                });
+                const data = await res.json();
+
+                if (data.story) {
+                    // 显示故事弹窗
+                    document.getElementById('focusPopupStory').textContent = data.story;
+                    document.getElementById('focusPopup').classList.add('show');
+                    showStatus('专注结束！');
+                } else {
+                    showStatus('专注结束，但故事生成失败');
+                }
+            } catch (e) {
+                console.error('Focus end error:', e);
+                showStatus('专注结束');
+            }
+
+            // 刷新专注历史
+            loadFocusHistory();
+        }
+
+        function cancelFocus() {
+            clearInterval(focusTimer);
+            focusTimer = null;
+            isFocusing = false;
+
+            // 清除 localStorage
+            localStorage.removeItem('campfire_focus_start_time');
+            localStorage.removeItem('campfire_focus_duration');
+
+            // 恢复正常粒子速度
+            document.querySelectorAll('.fire-particle').forEach(p => {
+                p.style.animationDuration = '0.2s';
+            });
+
+            // 退出沉浸模式
+            document.body.classList.remove('focus-mode');
+            document.getElementById('focusingIndicator').classList.remove('active');
+
+            // 显示开始按钮，隐藏取消按钮
+            document.getElementById('focusStartBtn').style.display = 'block';
+            document.getElementById('focusCancelBtn').style.display = 'none';
+
+            // 重置计时器显示
+            updateFocusTimerDisplay(selectedFocusDuration * 60);
+
+            showStatus('专注已取消');
+        }
+
+        function closeFocusPopup() {
+            document.getElementById('focusPopup').classList.remove('show');
+        }
+
+        function shareFocusStory() {
+            const story = document.getElementById('focusPopupStory').textContent;
+            const text = `🌟 我的数字篝火专注故事\n\n${story}\n\n#数字篝火 #专注 #SecondMe`;
+
+            // 复制到剪贴板
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showStatus('故事已复制到剪贴板');
+                });
+            } else {
+                // 备用方案
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showStatus('故事已复制到剪贴板');
+            }
+        }
+
+        async function loadFocusHistory() {
+            const userId = localStorage.getItem('campfire_user_id');
+            if (!userId) return;
+
+            try {
+                const res = await fetch('/api/stories?type=focus_social');
+                const data = await res.json();
+
+                const historyContainer = document.getElementById('focusHistory');
+                const userStories = data.stories ? data.stories.filter(s => s.user_id == userId) : [];
+
+                if (userStories.length === 0) {
+                    historyContainer.innerHTML = '<div class="focus-history-title">暂无专注记录</div>';
+                    return;
+                }
+
+                let html = '<div class="focus-history-title">专注记录</div>';
+                userStories.slice(0, 10).forEach(story => {
+                    const date = new Date(story.created_at);
+                    const dateStr = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+                    html += `
+                        <div class="focus-history-item" onclick="showFocusStoryDetail('${story.content.replace(/'/g, "\\'")}')">
+                            <div class="focus-history-time">${dateStr}</div>
+                            <div class="focus-history-duration">${story.duration} 分钟专注</div>
+                        </div>
+                    `;
+                });
+                historyContainer.innerHTML = html;
+            } catch (e) {
+                console.error('Failed to load focus history:', e);
+            }
+        }
+
+        function showFocusStoryDetail(story) {
+            document.getElementById('focusPopupStory').textContent = story;
+            document.getElementById('focusPopup').classList.add('show');
         }
 
         function createStars() {
@@ -1243,6 +1803,7 @@
         fetchCampers();
         fetchStatusCounts();
         fetchStoryLogs();
+        checkFocusStatus(); // 检查专注状态
         setInterval(fetchCampers, 3000);
         setInterval(fetchStatusCounts, 5000);
         setInterval(fetchStoryLogs, 10000); // 每10秒刷新日志

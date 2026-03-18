@@ -400,14 +400,17 @@ async def leave_activity(join_req: ActivityJoin):
     raise HTTPException(status_code=404, detail="Activity not found")
 
 @app.get("/api/stories")
-async def get_stories(mbti: str = None):
+async def get_stories(mbti: str = None, story_type: str = None):
     data = load_data()
     stories = data.get("stories", [])
 
     if mbti:
         stories = [s for s in stories if s.get("mbti_type") == mbti]
 
-    return stories[-10:][::-1]
+    if story_type:
+        stories = [s for s in stories if s.get("type") == story_type]
+
+    return {"stories": stories[-30:][::-1]}
 
 @app.get("/api/story/logs")
 async def get_story_logs(limit: int = 50):

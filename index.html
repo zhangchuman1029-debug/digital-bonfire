@@ -1118,19 +1118,52 @@
             bar.appendChild(clearItem);
         }
 
+        // 打字机效果函数
+        function typeWriter(element, text, speed = 30) {
+            element.textContent = '';
+            let i = 0;
+            element.dataset.typing = 'true';
+
+            function type() {
+                if (element.dataset.typing !== 'true') return;
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }
+
+        // 停止打字机效果
+        function stopTypeWriter(element) {
+            element.dataset.typing = 'false';
+        }
+
         async function generateStory(groupName) {
             try {
                 const mbti = groupName || currentUser?.mbti || 'INTJ';
+                const storyContent = document.getElementById('storyContent');
+
+                // 显示加载状态
+                stopTypeWriter(storyContent);
+                storyContent.textContent = '✨ 故事生成中...';
+                document.getElementById('storyPanel').style.display = 'block';
+
                 const res = await fetch('/api/story/generate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ mbti_type: mbti })
                 });
                 const data = await res.json();
-                document.getElementById('storyContent').textContent = data.story;
-                document.getElementById('storyPanel').style.display = 'block';
+
+                // 使用打字机效果呈现
+                typeWriter(storyContent, data.story, 25);
                 fetchStoryLogs(); // 刷新日志
-            } catch (e) { console.error(e); }
+            } catch (e) {
+                console.error(e);
+                document.getElementById('storyContent').textContent = '故事生成失败，请重试';
+            }
         }
 
         // 为指定用户生成故事（点击头像时调用）
@@ -1150,9 +1183,12 @@
                     })
                 });
                 const data = await res.json();
-                document.getElementById('storyContent').textContent = data.story;
+                const storyContent = document.getElementById('storyContent');
+
+                // 使用打字机效果呈现
+                typeWriter(storyContent, data.story, 25);
                 document.getElementById('storyPanel').style.display = 'block';
-                fetchStoryLogs(); // 刷新日志
+                fetchStoryLogs();
             } catch (e) {
                 console.error(e);
                 showStatus('生成故事失败');

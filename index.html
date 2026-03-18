@@ -538,12 +538,21 @@
         if (urlParams.get('joined') === 'true') {
             const userId = urlParams.get('user_id');
             const userName = urlParams.get('user_name');
+            const token = urlParams.get('token');
+
+            if (token) {
+                localStorage.setItem('campfire_token', token);
+            }
             if (userId) {
                 localStorage.setItem('campfire_user_id', userId);
             }
             if (userName) {
                 localStorage.setItem('campfire_user_name', decodeURIComponent(userName));
             }
+
+            // 清除 URL 参数
+            window.history.replaceState({}, document.title, window.location.pathname);
+
             const btn = document.getElementById('loginBtn');
             btn.style.display = 'none';
             document.getElementById('campground').classList.add('zoomed');

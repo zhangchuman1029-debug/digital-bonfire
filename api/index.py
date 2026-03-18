@@ -428,32 +428,11 @@ async def generate_story(req: StoryRequest):
     deepseek_story = await generate_story_with_ai(participants, group_name)
     if deepseek_story:
         story = deepseek_story
-
-    story_parts.append(random.choice(main_story_templates.get(group_name, main_story_templates["智识之火"])))
-
-    # 加入状态信息
-    if status1 != "无" or status2 != "无" or status3 != "无":
-        status_parts = []
-        if status1 != "无":
-            status_parts.append(f"{p1['name']}正在{status1}")
-        if status2 != "无" and status2 != status1:
-            status_parts.append(f"{p2['name']}正在{status2}")
-        if status3 != "无" and status3 != status1 and status3 != status2:
-            status_parts.append(f"{p3['name']}正在{status3}")
-
-        if status_parts:
-            story_parts.append("此时，" + "，".join(status_parts) + "，这一切构成了篝火边最美好的回忆。")
-
-    # 结尾
-    ending_templates = [
-        "篝火的火光映照着每个人的脸庞，温暖而美好。",
-        "星光与篝火交相辉映，这一刻将成为永恒。",
-        "在这个夜晚，大家找到了彼此的连接，篝火见证了这一切。",
-        "夜深了，但篝火的温度永不消退，正如这份羁绊。",
-    ]
-    story_parts.append(random.choice(ending_templates))
-
-    story = "".join(story_parts)
+    else:
+        # 简单回退：使用简短模板
+        names = [p['name'] for p in selected]
+        activities = [p.get('current_activity', '无') or '无' for p in selected]
+        story = f"夜幕降临，篝火跳动。{names[0]}和{names[1] if len(names) > 1 else names[0]}围坐在火堆旁，{activities[0]}。温暖的笑容在火光中绽放，这一刻成为美好的回忆。"
 
     target_user = None
     if req.target_user_id:

@@ -309,6 +309,14 @@
         .story-panel h3 {
             font-size: 11px; color: var(--fire-mid); margin-bottom: 10px; letter-spacing: 2px;
         }
+        .story-panel h3 span {
+            float: right;
+            cursor: pointer;
+            color: rgba(255,255,255,0.5);
+        }
+        .story-panel h3 span:hover {
+            color: white;
+        }
 
         .story-content {
             font-size: 12px; color: var(--text-primary); line-height: 1.6;
@@ -592,7 +600,7 @@
 
     <!-- 故事面板 -->
     <div class="story-panel" id="storyPanel" style="display: none;">
-        <h3>📖 篝火故事</h3>
+        <h3>📖 篝火故事 <span onclick="closeStoryPanel()" style="float:right;cursor:pointer;font-size:16px;">✕</span></h3>
         <p class="story-content" id="storyContent"></p>
         <button class="story-refresh" onclick="generateStory()">换一换</button>
     </div>
@@ -699,7 +707,12 @@
 
         function showStoryPanel() {
             toggleMobileDrawer();
+            document.getElementById('storyPanel').style.display = 'block';
             showStoryLogs();
+        }
+
+        function closeStoryPanel() {
+            document.getElementById('storyPanel').style.display = 'none';
         }
 
         function showInstructions() {

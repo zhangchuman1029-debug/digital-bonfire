@@ -47,6 +47,7 @@ from supabase import create_client, Client
 
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY", "")
+TABLE_NAME = "campfire_storage"
 
 _supabase_client = None
 
@@ -56,8 +57,6 @@ def get_supabase() -> Client:
         _supabase_client = create_client(SUPABASE_URL, SUPABASE_KEY)
     return _supabase_client
 
-TABLE_NAME = "campfire_data"
-
 def load_data():
     """从 Supabase 加载数据"""
     try:
@@ -66,8 +65,8 @@ def load_data():
             print("WARNING: Supabase not configured!")
             return get_default_data()
 
-        # 从 Supabase 查询数据
-        response = client.table(TABLE_NAME).select("*").limit(1).execute()
+        # 查询 id='main_data' 的记录
+        response = client.table(TABLE_NAME).select("data").eq("id", "main_data").execute()
 
         if response.data and len(response.data) > 0:
             data = response.data[0].get("data", {})
@@ -79,54 +78,24 @@ def load_data():
     return get_default_data()
 
 def save_data(data):
-    """保存数据到 Supabase"""
-    import time
-
-    for attempt in range(3):
-        try:
-            client = get_supabase()
-            if not client:
-                print("WARNING: Supabase not configured!")
-                return
-
-            # 先读取最新数据并合并
-            existing_data = load_data()
-            existing_campers = {c.get("id"): c for c in existing_data.get("campers", [])}
-            new_campers = {c.get("id"): c for c in data.get("campers", [])}
-            existing_campers.update(new_campers)
-
-            merged_data = {
-                "campers": list(existing_campers.values()),
-                "messages": data.get("messages", []),
-                "activities": data.get("activities", []),
-                "stories": data.get("stories", []),
-                "mbti_groups": data.get("mbti_groups", {})
-            }
-
-            # 尝试更新，如果表不存在则创建
-            try:
-                # 先尝试查询是否有记录
-                check = client.table(TABLE_NAME).select("id").limit(1).execute()
-                if check.data and len(check.data) > 0:
-                    # 更新现有记录
-                    client.table(TABLE_NAME).update({"data": merged_data}).eq("id", 1).execute()
-                else:
-                    # 插入新记录
-                    client.table(TABLE_NAME).insert({"id": 1, "data": merged_data}).execute()
-            except Exception as table_error:
-                print(f"Table error, trying to create: {table_error}")
-                # 尝试创建表（如果表不存在）
-                try:
-                    client.table(TABLE_NAME).insert({"id": 1, "data": merged_data}).execute()
-                except:
-                    pass
-
-            print(f"Data saved to Supabase: {len(merged_data.get('campers', []))} campers")
+    """保存数据到 Supabase（upsert）"""
+    try:
+        client = get_supabase()
+        if not client:
+            print("WARNING: Supabase not configured!")
             return
-        except Exception as e:
-            print(f"Supabase save error (attempt {attempt + 1}): {e}")
-            if attempt < 2:
-                time.sleep(0.1)
+
+        # 使用 upsert 插入或更新
+        client.table(TABLE_NAME).upsert({
+            "id": "main_data",
+            "data": data
+        }).execute()
+
+        print(f"Data saved to Supabase: {len(data.get('campers', []))} campers")
+    except Exception as e:
+        print(f"Supabase save error: {e}")
+        import traceback
+        traceback.print_exc()
 
 def get_default_data():
     return {

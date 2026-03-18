@@ -295,12 +295,28 @@ async def generate_story(req: StoryRequest):
     if req.mbti_type in MBTI_GROUPS.values():
         # 传入的是群组名称（如"智识之火"）
         participants = [c for c in campers if c.get("mbti_group") == req.mbti_type]
+    elif req.mbti_type == "ALL" or not req.mbti_type:
+        # 查询所有用户
+        participants = campers
     else:
         # 传入的是具体 MBTI 类型（如"INTP"）
-        participants = [c for c in campers if c.get("mbti") == req.mbti_type or req.mbti_type == "ALL"]
+        participants = [c for c in campers if c.get("mbti") == req.mbti_type]
 
+    # 如果特定MBTI用户不够，使用群组内的用户
     if len(participants) < 2:
-        return {"story": "篝火边的人太少，还不够成一个故事... 等更多人来吧！", "mbti_type": req.mbti_type}
+        # 尝试使用当前用户的群组
+        if campers:
+            first_user = campers[0]
+            group = first_user.get("mbti_group")
+            if group:
+                participants = [c for c in campers if c.get("mbti_group") == group]
+
+    # 如果还不够2人，使用所有用户
+    if len(participants) < 2:
+        participants = campers
+
+    if len(participants) < 1:
+        return {"story": "篝火边没有人，还不够成一个故事... 等更多人来吧！", "mbti_type": req.mbti_type}
 
     # 确定群组名称
     if req.mbti_type in MBTI_GROUPS.values():

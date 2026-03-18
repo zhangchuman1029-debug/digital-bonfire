@@ -71,6 +71,69 @@ def save_data(data):
     except Exception as e:
         print(f"Supabase save error: {e}")
 
+# DeepSeek API 配置
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
+DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
+
+async def generate_story_with_ai(participants, group_name):
+    """使用 DeepSeek API 生成故事"""
+    if not DEEPSEEK_API_KEY:
+        return None
+
+    if len(participants) < 1:
+        return None
+
+    # 构建参与者信息
+    p1 = participants[0]
+    p2 = participants[1] if len(participants) > 1 else p1
+    p3 = participants[2] if len(participants) > 2 else p1
+
+    names = [p['name'] for p in participants]
+    statuses = [p.get('current_activity', '无') or '无' for p in participants]
+    intros = [p.get('intro', '') or '一位旅者' for p in participants]
+
+    prompt = f"""你是数字篝火的故事生成器。请根据以下参与者信息生成一个温馨、有趣的篝火故事片段。
+
+参与者：
+- {p1['name']}（{p1.get('mbti', '?')}），简介：{intros[0]}，当前状态：{statuses[0]}
+- {p2['name']}（{p2.get('mbti', '?')}），简介：{intros[1 if len(participants) > 1 else 0]}，当前状态：{statuses[1 if len(participants) > 1 else 0]}
+- {p3['name']}（{p3.get('mbti', '?')}），简介：{intros[2 if len(participants) > 2 else 0]}，当前状态：{statuses[2 if len(participants) > 2 else 0]}
+
+群组：{group_name}
+
+要求：
+1. 故事要温馨、有画面感，接地气的生活细节
+2. 可以围绕他们当前的状态展开（如钓鱼、煮茶等）
+3. 避免谈论宇宙、量子物理等深奥话题
+4. 故事长度约100-200字
+5. 用自然、亲切的语言
+
+请直接输出故事，不要有引号或其他格式："""
+
+    try:
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(
+                DEEPSEEK_API_URL,
+                headers={
+                    "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "model": "deepseek-chat",
+                    "messages": [{"role": "user", "content": prompt}],
+                    "max_tokens": 300,
+                    "temperature": 0.8
+                },
+                timeout=30.0
+            )
+            if resp.status_code == 200:
+                result = resp.json()
+                return result['choices'][0]['message']['content'].strip()
+    except Exception as e:
+        print(f"DeepSeek API error: {e}")
+
+    return None
+
 def get_default_data():
     return {
         "campers": [],
@@ -361,29 +424,10 @@ async def generate_story(req: StoryRequest):
         "实践之火": "活力四射的行动派"
     }
 
-    # 主体故事
-    main_story_templates = {
-        "智识之火": [
-            f"来自{intro1}的{p1['name']}（{p1.get('mbti', '?')}）与{p2['name']}（{p2.get('mbti', '?')}）围坐在火堆旁，{group_traits.get(group_name, '这里')}。{p1['name']}分享了一个深刻的想法，涉及到宇宙的本质和存在的意义，{p2['name']}立刻回应并补充了自己的见解，两人陷入了热烈的讨论。",
-            f"在{p1['name']}的提议下，大家开始探讨人工智能的未来。{p2['name']}提出了一个独特的观点，认为机器最终会产生意识。这个话题引发了激烈的争论，连一向沉默的{p3['name']}也加入了讨论。",
-            f"第{p1['name']}正在讲述一个关于量子物理的有趣现象，{p2['name']}听得很入神。虽然{p3['name']}对物理不太了解，但也被这神秘的宇宙话题所吸引，大家都沉浸在知识的海洋中。"
-        ],
-        "灵感之火": [
-            f"来自{intro1}的{p1['name']}（{p1.get('mbti', '?')}）在火光中轻声吟唱着一首关于星星的歌谣，{p2['name']}（{p2.get('mbti', '?')}）的眼中闪烁着光芒。{p3['name']}被这美妙的氛围感染，轻轻打着节拍。",
-            f"在{group_traits.get(group_name, '这里')}，{p1['name']}突然有了一个绝妙的想法，想要创作一幅画。{p2['name']}立刻找来了画具，两人一起在星空下开始创作，{p3['name']}成为了他们的第一位观众。",
-            f"音乐在营地上空回荡，{p1['name']}和{p2['name']}合唱了一首温暖的歌。{p3['name']}被这美好的时刻所打动，决定把这一刻永远记在心里。"
-        ],
-        "秩序之火": [
-            f"来自{intro1}的{p1['name']}（{p1.get('mbti', '?')}）组织大家围坐成一个温暖的圆圈，{p2['name']}（{p2.get('mbti', '?')}）负责分发食物。在{group_traits.get(group_name, '这里')}，每个人都感受到了归属感。",
-            f"在{p1['name']}的提议下，大家制定了今晚的守则：{p2['name']}负责添柴火，{p3['name']}负责讲笑话活跃气氛。这种有组织的安排让篝火晚会更加温馨。",
-            f"{p1['name']}讲解着篝火的历史和文化意义，{p2['name']}和{p3['name']}认真地听着。在这种有秩序的氛围中，大家的距离更近了一步。"
-        ],
-        "实践之火": [
-            f"来自{intro1}的{p1['name']}（{p1.get('mbti', '?')}）展示了一套炫酷的舞步，{p2['name']}（{p2.get('mbti', '?')}）立刻学会并改进了。{p3['name']}笑得合不拢嘴，整个营地充满了活力。",
-            f"{p1['name']}在河边钓到了一条大鱼！{p2['name']}帮忙处理，{p3['name']}生起了火，准备烤鱼大餐。大家分工合作，在{group_traits.get(group_name, '这里')}享受着劳动的成果。",
-            f"在{p1['name']}和{p2['name']}的比赛开始后，{p3['name']}当起了裁判。笑声和欢呼声回荡在夜空中，大家尽情享受着这欢乐的时光。"
-        ],
-    }
+    # 尝试使用 DeepSeek API 生成更丰富多样的故事
+    deepseek_story = await generate_story_with_ai(participants, group_name)
+    if deepseek_story:
+        story = deepseek_story
 
     story_parts.append(random.choice(main_story_templates.get(group_name, main_story_templates["智识之火"])))
 

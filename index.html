@@ -126,6 +126,92 @@
             100% { transform: translateY(-150px) translateX(20px) scale(0); opacity: 0; }
         }
 
+        /* 专注模式 - 火焰增强 */
+        body.focus-mode .fire-container {
+            transform: scale(1.8) !important;
+            top: 35% !important;
+            transition: all 0.8s ease-in-out;
+        }
+
+        body.focus-mode .flame {
+            width: 80px !important;
+            height: 80px !important;
+            box-shadow:
+                0 0 40px #ff5e00,
+                0 0 80px #ff5e00,
+                0 0 120px #ffaa00,
+                0 0 20px #fefcc9 inset !important;
+            animation: burn 0.15s infinite alternate !important;
+        }
+
+        body.focus-mode .fire-particle {
+            animation: rise-intense 1s infinite ease-out !important;
+            width: 6px !important;
+            height: 6px !important;
+        }
+
+        @keyframes rise-intense {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-300px) translateX(40px) scale(0); opacity: 0; }
+        }
+
+        body.focus-mode .fire-particle:nth-child(2) { animation-delay: 0.1s; }
+        body.focus-mode .fire-particle:nth-child(3) { animation-delay: 0.2s; }
+        body.focus-mode .fire-particle:nth-child(4) { animation-delay: 0.3s; }
+        body.focus-mode .fire-particle:nth-child(5) { animation-delay: 0.15s; }
+
+        /* 专注模式 - 背景加深 */
+        body.focus-mode {
+            background: radial-gradient(ellipse at 50% 80%, #0a0500 0%, #000000 60%, #000000 100%) !important;
+        }
+
+        /* 专注模式 - 隐藏干扰项 */
+        body.focus-mode .header { opacity: 0 !important; pointer-events: none !important; }
+        body.focus-mode .sidebar { opacity: 0 !important; pointer-events: none !important; }
+        body.focus-mode .right-sidebar { opacity: 0 !important; pointer-events: none !important; }
+        body.focus-mode .mobile-menu-btn { opacity: 0 !important; pointer-events: none !important; }
+        body.focus-mode .login-container { opacity: 0 !important; pointer-events: none !important; }
+        body.focus-mode .camper { opacity: 0 !important; pointer-events: none !important; transition: opacity 0.5s ease !important; }
+        body.focus-mode .story-panel { opacity: 0 !important; pointer-events: none !important; }
+        body.focus-mode .focusing-indicator { opacity: 0 !important; pointer-events: none !important; }
+
+        /* 专注模式 - 倒计时位置重排到火焰下方 */
+        body.focus-mode .focus-timer {
+            position: fixed !important;
+            top: 65% !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            z-index: 100 !important;
+            padding: 30px 50px !important;
+            background: rgba(0, 0, 0, 0.6) !important;
+            border-radius: 20px !important;
+            border: 1px solid rgba(34, 197, 94, 0.3) !important;
+            backdrop-filter: blur(10px) !important;
+        }
+
+        body.focus-mode .focus-timer-display {
+            font-size: 5rem !important;
+            font-weight: 700 !important;
+            text-shadow: 0 0 30px rgba(34, 197, 94, 0.8), 0 0 60px rgba(34, 197, 94, 0.4) !important;
+            animation: breathe 2s ease-in-out infinite !important;
+        }
+
+        @keyframes breathe {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        body.focus-mode .focus-duration-select,
+        body.focus-mode .focus-start-btn,
+        body.focus-mode .focus-cancel-btn {
+            display: none !important;
+        }
+
+        body.focus-mode .focus-cancel-btn {
+            display: block !important;
+            margin-top: 20px !important;
+        }
+
         .fire-glow {
             display: none;
         }
@@ -1091,29 +1177,75 @@
             localStorage.setItem('campfire_focus_start_time', Date.now().toString());
             localStorage.setItem('campfire_focus_duration', selectedFocusDuration.toString());
 
+            // 添加额外的粒子效果（专注模式）
+            addFocusParticles();
+
             // 开始计时器
             startFocusTimer(selectedFocusDuration * 60);
 
-            // 进入沉浸模式
+            // 进入沉浸模式 - CSS 会自动处理火焰增强和背景变化
             document.body.classList.add('focus-mode');
             document.getElementById('focusingIndicator').classList.add('active');
 
-            // 隐藏开始按钮，显示取消按钮
-            document.getElementById('focusStartBtn').style.display = 'none';
-            document.getElementById('focusCancelBtn').style.display = 'block';
-
             showStatus(`开始专注 ${selectedFocusDuration} 分钟`);
         }
+
+        // 添加专注模式额外粒子
+        let focusParticleInterval = null;
+        function addFocusParticles() {
+            const fireContainer = document.getElementById('campground');
+
+            // 立即添加一批粒子
+            for (let i = 0; i < 10; i++) {
+                createFocusParticle();
+            }
+
+            // 持续添加粒子
+            focusParticleInterval = setInterval(() => {
+                if (isFocusing) {
+                    createFocusParticle();
+                }
+            }, 100);
+        }
+
+        function createFocusParticle() {
+            const fireContainer = document.getElementById('campground');
+            const particle = document.createElement('div');
+            particle.className = 'particle focus-spark';
+            particle.style.cssText = `
+                position: absolute;
+                bottom: 30px;
+                left: ${45 + Math.random() * 10}%;
+                width: ${3 + Math.random() * 4}px;
+                height: ${3 + Math.random() * 4}px;
+                background: #ffcc00;
+                border-radius: 50%;
+                box-shadow: 0 0 6px #ff6600;
+                pointer-events: none;
+                animation: focus-spark-rise ${0.8 + Math.random() * 0.4}s ease-out forwards;
+            `;
+            fireContainer.appendChild(particle);
+
+            setTimeout(() => {
+                particle.remove();
+            }, 1200);
+        }
+
+        // 添加专注粒子动画样式
+        const focusStyle = document.createElement('style');
+        focusStyle.textContent = `
+            @keyframes focus-spark-rise {
+                0% { transform: translateY(0) scale(1); opacity: 1; }
+                100% { transform: translateY(-350px) translateX(${Math.random() > 0.5 ? '' : '-'}${30 + Math.random() * 30}px) scale(0); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(focusStyle);
 
         function startFocusTimer(seconds) {
             focusRemainingSeconds = seconds;
             isFocusing = true;
 
-            // 减慢粒子动画
-            document.querySelectorAll('.fire-particle').forEach(p => {
-                p.style.animationDuration = '1s';
-            });
-
+            // CSS focus-mode 会自动处理火焰增强效果
             focusTimer = setInterval(() => {
                 focusRemainingSeconds--;
                 updateFocusTimerDisplay(focusRemainingSeconds);
@@ -1126,8 +1258,12 @@
 
         async function endFocus() {
             clearInterval(focusTimer);
+            clearInterval(focusParticleInterval);
             focusTimer = null;
             isFocusing = false;
+
+            // 清除专注粒子
+            document.querySelectorAll('.focus-spark').forEach(p => p.remove());
 
             const userId = localStorage.getItem('campfire_user_id');
             const token = localStorage.getItem('campfire_token');
@@ -1136,18 +1272,9 @@
             localStorage.removeItem('campfire_focus_start_time');
             localStorage.removeItem('campfire_focus_duration');
 
-            // 恢复正常粒子速度
-            document.querySelectorAll('.fire-particle').forEach(p => {
-                p.style.animationDuration = '0.2s';
-            });
-
-            // 退出沉浸模式
+            // 退出沉浸模式 - CSS 会自动恢复所有效果
             document.body.classList.remove('focus-mode');
             document.getElementById('focusingIndicator').classList.remove('active');
-
-            // 显示开始按钮，隐藏取消按钮
-            document.getElementById('focusStartBtn').style.display = 'block';
-            document.getElementById('focusCancelBtn').style.display = 'none';
 
             // 重置计时器显示
             updateFocusTimerDisplay(selectedFocusDuration * 60);
@@ -1185,25 +1312,20 @@
 
         function cancelFocus() {
             clearInterval(focusTimer);
+            clearInterval(focusParticleInterval);
             focusTimer = null;
             isFocusing = false;
+
+            // 清除专注粒子
+            document.querySelectorAll('.focus-spark').forEach(p => p.remove());
 
             // 清除 localStorage
             localStorage.removeItem('campfire_focus_start_time');
             localStorage.removeItem('campfire_focus_duration');
 
-            // 恢复正常粒子速度
-            document.querySelectorAll('.fire-particle').forEach(p => {
-                p.style.animationDuration = '0.2s';
-            });
-
-            // 退出沉浸模式
+            // 退出沉浸模式 - CSS 会自动恢复所有效果
             document.body.classList.remove('focus-mode');
             document.getElementById('focusingIndicator').classList.remove('active');
-
-            // 显示开始按钮，隐藏取消按钮
-            document.getElementById('focusStartBtn').style.display = 'block';
-            document.getElementById('focusCancelBtn').style.display = 'none';
 
             // 重置计时器显示
             updateFocusTimerDisplay(selectedFocusDuration * 60);

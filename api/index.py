@@ -127,38 +127,53 @@ async def generate_story_with_ai(participants, group_name):
     statuses = [p.get('current_activity', '无') or '无' for p in participants]
     intros = [p.get('intro', '') or '一位旅者' for p in participants]
 
+    # 获取用户的 SecondMe shades（兴趣标签）
+    shades_list = []
+    for p in participants:
+        user_shades = p.get('shades', [])
+        if user_shades:
+            if isinstance(user_shades[0], dict):
+                shades_list.append([s.get('name', s.get('value', '')) for s in user_shades[:5]])
+            else:
+                shades_list.append(user_shades[:5])
+        else:
+            shades_list.append([])
+
     prompt = f"""你是数字篝火的故事生成器。请根据以下参与者详细信息生成一个精准反映每个人性格特点的篝火故事。
 
 参与者详情：
 1. {p1['name']}
    - MBTI：{mbti1}，性格：{traits1}
-   - 简介：{intros[0]}
+   - 简介/经历：{intros[0]}
+   - 兴趣标签：{', '.join(shades_list[0]) if shades_list[0] else '无'}
    - 当前状态：{statuses[0]}
 
 2. {p2['name']}
    - MBTI：{mbti2}，性格：{traits2}
-   - 简介：{intros[1 if len(participants) > 1 else 0]}
+   - 简介/经历：{intros[1 if len(participants) > 1 else 0]}
+   - 兴趣标签：{', '.join(shades_list[1]) if len(shades_list) > 1 and shades_list[1] else '无'}
    - 当前状态：{statuses[1 if len(participants) > 1 else 0]}
 
 3. {p3['name']}
    - MBTI：{mbti3}，性格：{traits3}
-   - 简介：{intros[2 if len(participants) > 2 else 0]}
+   - 简介/经历：{intros[2 if len(participants) > 2 else 0]}
+   - 兴趣标签：{', '.join(shades_list[2]) if len(shades_list) > 2 and shades_list[2] else '无'}
    - 当前状态：{statuses[2 if len(participants) > 2 else 0]}
 
 所属群组：{group_name}（{group_traits.get(group_name, '')}）
 
 要求：
-1. 故事必须精准反映每个MBTI的性格特点！例如：
-   - INTJ/INTP 应该表现出理性分析和思考
-   - ENFP/ENFJ 应该表现出热情和创意
-   - ISFJ/ESFJ 应该表现出关心和照顾
-   - ESTP/ESFP 应该表现出活跃和冒险
+1. 故事必须精准反映每个MBTI的性格特点！
 
-2. 围绕他们当前的状态展开（钓鱼、煮茶、围炉夜话等）
+2. 必须引用用户的经历/简介和兴趣标签来展开对话！
+   - 例如：提到他的职业、去过的地方、擅长的事
+   - 例如：围绕共同兴趣展开话题
 
-3. 避免深奥话题，多用生活化的细节
+3. 加入自然的对话，用引号标注说话者
 
-4. 故事长度约150字
+4. 围绕他们当前的状态展开（钓鱼、煮茶、围炉夜话等）
+
+5. 故事长度约200字
 
 请直接输出故事："""
 

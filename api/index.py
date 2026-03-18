@@ -44,36 +44,30 @@ def get_supabase() -> Client:
 
 def load_data():
     """从 Supabase 加载数据"""
-    print(f"[DEBUG] load_data: SUPABASE_URL={bool(SUPABASE_URL)}, SUPABASE_KEY={SUPABASE_KEY[:20]}...")
     try:
         client = get_supabase()
         if not client:
-            print("[DEBUG] No Supabase client")
             return get_default_data()
 
         response = client.table(TABLE_NAME).select("data").eq("id", "main_data").execute()
-        print(f"[DEBUG] load response: {response.data}")
         if response.data and len(response.data) > 0:
             return response.data[0].get("data", {})
     except Exception as e:
-        print(f"[DEBUG] Supabase load error: {e}")
+        print(f"Supabase load error: {e}")
 
     return get_default_data()
 
 def save_data(data):
     """保存数据到 Supabase（upsert）"""
-    print(f"[DEBUG] save_data: SUPABASE_URL={bool(SUPABASE_URL)}, SUPABASE_KEY={SUPABASE_KEY[:20]}...")
     try:
         client = get_supabase()
         if not client:
-            print("[DEBUG] No Supabase client for save")
             return
 
-        result = client.table(TABLE_NAME).upsert({
+        client.table(TABLE_NAME).upsert({
             "id": "main_data",
             "data": data
         }).execute()
-        print(f"[DEBUG] save result: {result.data}")
     except Exception as e:
         print(f"Supabase save error: {e}")
 

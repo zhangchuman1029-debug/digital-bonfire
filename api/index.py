@@ -392,38 +392,6 @@ async def generate_story(req: StoryRequest):
     # 生成更长的故事
     story_parts = []
 
-    # 开头：描述时间和环境
-    time_descriptions = [
-        "夜幕降临，星空璀璨，",
-        "温暖的篝火在夜色中跳动，",
-        "月光洒在营地上，",
-        "微风轻拂，篝火噼啪作响，",
-    ]
-    story_parts.append(random.choice(time_descriptions))
-
-    # 描述参与者
-    p1 = selected[0]
-    p2 = selected[1] if len(selected) > 1 else selected[0]
-    p3 = selected[2] if len(selected) > 2 else selected[0]
-
-    # 获取用户简介
-    intro1 = p1.get("intro", "") or "一位神秘的旅者"
-    intro2 = p2.get("intro", "") or "一位沉默的观察者"
-    intro3 = p3.get("intro", "") if len(selected) > 2 else intro1
-
-    # 获取当前状态
-    status1 = p1.get("current_activity") or "无"
-    status2 = p2.get("current_activity") or "无"
-    status3 = p3.get("current_activity") if len(selected) > 2 else status1
-
-    # 群组特征
-    group_traits = {
-        "智识之火": "充满智慧与思辨的氛围",
-        "灵感之火": "创意与梦想的火花",
-        "秩序之火": "温暖而有组织的交流",
-        "实践之火": "活力四射的行动派"
-    }
-
     # 尝试使用 DeepSeek API 生成更丰富多样的故事
     deepseek_story = await generate_story_with_ai(participants, group_name)
     if deepseek_story:

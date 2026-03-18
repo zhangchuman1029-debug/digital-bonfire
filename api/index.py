@@ -17,10 +17,10 @@ from pydantic import BaseModel
 import httpx
 
 # ================== 配置 ==================
-CLIENT_ID = os.getenv("SECONDME_CLIENT_ID", "80f7e9a1-4cc6-4c88-8f8b-41c266bdb3fb")
-CLIENT_SECRET = os.getenv("SECONDME_CLIENT_SECRET", "c91baa9bf02e56cd7b6a982ada0f5a76486b85f36662e08826f3e7844fe3f3f4")
-REDIRECT_URI = os.getenv("SECONDME_REDIRECT_URI", "https://digital-bonfire.vercel.app/api/auth/callback")
-FRONTEND_URL = os.getenv("FRONTEND_URL", "https://digital-bonfire.vercel.app")
+CLIENT_ID = os.getenv("SECONDME_CLIENT_ID", "")
+CLIENT_SECRET = os.getenv("SECONDME_CLIENT_SECRET", "")
+REDIRECT_URI = os.getenv("SECONDME_REDIRECT_URI", "")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "")
 
 SECONDME_AUTH_URL = "https://go.second.me/oauth/"
 SECONDME_TOKEN_URL = "https://api.mindverse.com/gate/lab/api/oauth/token/code"

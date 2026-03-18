@@ -629,9 +629,9 @@ async def callback(code: str = Query(...), state: str = Query(...)):
     save_data(data)
     # WebSocket broadcast 不适用于 Vercel Serverless，跳过
 
-    # 通过 URL 参数传递用户信息
+    # 通过 URL 参数传递用户信息（包含 access_token）
     from urllib.parse import quote
-    frontend_url = f"{FRONTEND_URL}?joined=true&user_id={camper['id']}&user_name={quote(camper['name'])}"
+    frontend_url = f"{FRONTEND_URL}?joined=true&user_id={camper['id']}&user_name={quote(camper['name'])}&token={quote(access_token)}"
     return RedirectResponse(url=frontend_url)
 
 

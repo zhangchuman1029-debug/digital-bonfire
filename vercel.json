@@ -1,12 +1,6 @@
 {
-  "builds": [
-    {
-      "src": "api/index.py",
-      "use": "@fastapi/v#asgi"
-    }
-  ],
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/api/index.py" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index.py" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

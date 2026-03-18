@@ -425,7 +425,7 @@ async def generate_story(req: StoryRequest):
         "content": story,
         "participants": [p["id"] for p in selected],
         "participant_names": [p["name"] for p in selected],
-        "activity": current_activity["name"] if current_activity else None,
+        "activity": None,
         "target_user_id": req.target_user_id,
         "target_user_name": target_user["name"] if target_user else None,
         "created_at": datetime.now().isoformat()

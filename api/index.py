@@ -598,17 +598,31 @@ async def callback(code: str = Query(...), state: str = Query(...)):
     is_logic = any(any(kw in s for kw in keywords_logic) for s in shades_lower)
     is_creative = any(any(kw in s for kw in keywords_creative) for s in shades_lower)
 
+    # 低饱和度配色方案 - 柔和优雅
+    soft_colors = [
+        "#7EB8DA",  # 柔和蓝
+        "#B8A9C9",  # 淡紫
+        "#F0B8B8",  # 珊瑚粉
+        "#A8D5BA",   # 薄荷绿
+        "#E8C07D",  # 暖杏
+        "#9DC1D6",  # 雾霾蓝
+        "#D4A5A5",  # 玫瑰灰
+        "#C5B9A3",  # 燕麦
+        "#B5C7C9",  # 青灰
+        "#D4B8A0",  # 奶茶
+    ]
+
+    # 随机选择低饱和颜色
+    color = random.choice(soft_colors)
+
     if is_logic and not is_creative:
-        distance = 130
-        color = "#00d4ff"
+        distance = random.randint(100, 150)
         type_label = "LOGIC"
     elif is_creative and not is_logic:
-        distance = 85
-        color = "#ff6b35"
+        distance = random.randint(80, 120)
         type_label = "CREATIVE"
     else:
-        distance = 110
-        color = "#a855f7"
+        distance = random.randint(90, 140)
         type_label = "HYBRID"
 
     # 保存用户
@@ -632,7 +646,7 @@ async def callback(code: str = Query(...), state: str = Query(...)):
             "access_token": access_token,
             "intro": "通过 SecondMe 登录",
             "distance": distance,
-            "angle": random.uniform(0, 360),
+            "angle": random.uniform(0, 360),  # 随机角度分布
             "color": color,
             "type": type_label,
             "shades": shades,

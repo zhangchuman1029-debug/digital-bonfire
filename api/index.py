@@ -628,6 +628,7 @@ async def callback(code: str = Query(...), state: str = Query(...)):
     # 保存用户
     data = load_data()
     existing = [c for c in data.get("campers", []) if c.get("name", "").upper() == name.upper()]
+    existing_count = len(data.get("campers", []))
 
     if existing:
         camper = existing[0]
@@ -640,13 +641,18 @@ async def callback(code: str = Query(...), state: str = Query(...)):
         camper["mbti_group"] = MBTI_GROUPS.get(mbti, "misc")
         camper["updated_at"] = datetime.now().isoformat()
     else:
+        # 计算均匀分布的角度，避免重叠
+        # 使用黄金角分布，确保持续均匀
+        golden_angle = 137.508 * (existing_count + 1)  # 黄金角
+        angle = (golden_angle % 360)
+
         camper = {
-            "id": len(data.get("campers", [])) + 1,
+            "id": existing_count + 1,
             "name": name.upper(),
             "access_token": access_token,
             "intro": "通过 SecondMe 登录",
+            "angle": angle,  # 使用黄金角分布
             "distance": distance,
-            "angle": random.uniform(0, 360),  # 随机角度分布
             "color": color,
             "type": type_label,
             "shades": shades,

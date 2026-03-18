@@ -553,6 +553,12 @@
             // 清除 URL 参数
             window.history.replaceState({}, document.title, window.location.pathname);
 
+            // 直接设置 currentUser，不等待 fetchCampers
+            currentUser = {
+                id: parseInt(userId),
+                name: decodeURIComponent(userName)
+            };
+
             const btn = document.getElementById('loginBtn');
             btn.style.display = 'none';
             document.getElementById('campground').classList.add('zoomed');
@@ -646,8 +652,19 @@
                 // 备用：查找本地存储的用户
                 if (!currentUser) {
                     const savedUserId = localStorage.getItem('campfire_user_id');
+                    const savedUserName = localStorage.getItem('campfire_user_name');
                     if (savedUserId) {
-                        currentUser = data.find(c => c.id == savedUserId);
+                        // 先尝试从数据中查找
+                        const found = data.find(c => c.id == savedUserId);
+                        if (found) {
+                            currentUser = found;
+                        } else {
+                            // 如果数据中没有，创建一个临时用户对象
+                            currentUser = {
+                                id: parseInt(savedUserId),
+                                name: savedUserName || 'User'
+                            };
+                        }
                     } else if (data.length > 0) {
                         currentUser = data[data.length - 1];
                         localStorage.setItem('campfire_user_id', currentUser.id);

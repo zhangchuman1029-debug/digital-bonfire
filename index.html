@@ -394,6 +394,65 @@
             body { background: radial-gradient(ellipse at 50% 50%, #1a0a00 0%, #0a0e14 40%, #030508 100%) !important; }
             .login-container { bottom: 80px; }
             #loginBtn { padding: 10px 20px; font-size: 12px; }
+            /* 移动端菜单按钮 */
+            .mobile-menu-btn {
+                display: flex !important;
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                z-index: 200;
+                width: 40px;
+                height: 40px;
+                background: rgba(255,170,0,0.3);
+                border: 1px solid var(--fire-mid);
+                border-radius: 8px;
+                color: white;
+                font-size: 20px;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+            }
+            .mobile-menu-btn:active { background: rgba(255,170,0,0.5); }
+            /* 移动端侧边抽屉 */
+            .mobile-drawer {
+                display: block !important;
+                position: fixed;
+                top: 0;
+                left: -280px;
+                width: 280px;
+                height: 100%;
+                background: rgba(10,14,20,0.95);
+                z-index: 150;
+                transition: left 0.3s ease;
+                padding: 60px 15px 80px 15px;
+                overflow-y: auto;
+                border-right: 1px solid rgba(255,170,0,0.3);
+            }
+            .mobile-drawer.open { left: 0; }
+            .mobile-drawer-overlay {
+                display: none !important;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 140;
+            }
+            .mobile-drawer-overlay.open { display: block !important; }
+            .mobile-drawer-section {
+                margin-bottom: 15px;
+                padding: 10px;
+                background: rgba(255,255,255,0.05);
+                border-radius: 8px;
+            }
+            .mobile-drawer-section h3 {
+                color: var(--fire-mid);
+                font-size: 14px;
+                margin-bottom: 8px;
+                border-bottom: 1px solid rgba(255,170,0,0.3);
+                padding-bottom: 5px;
+            }
             /* 移动端底部状态栏 */
             .mobile-status-bar {
                 display: flex !important;
@@ -422,6 +481,7 @@
                 color: black;
             }
         }
+        .mobile-menu-btn, .mobile-drawer, .mobile-drawer-overlay { display: none; }
         .mobile-status-bar { display: none; }
     </style>
 </head>
@@ -430,6 +490,24 @@
 
     <!-- 移动端状态栏 -->
     <div class="mobile-status-bar" id="mobileStatusBar"></div>
+
+    <!-- 移动端菜单按钮 -->
+    <button class="mobile-menu-btn" onclick="toggleMobileDrawer()">☰</button>
+
+    <!-- 移动端侧边抽屉 -->
+    <div class="mobile-drawer-overlay" id="mobileDrawerOverlay" onclick="toggleMobileDrawer()"></div>
+    <div class="mobile-drawer" id="mobileDrawer">
+        <div class="mobile-drawer-section" id="mobileMbtiSection"></div>
+        <div class="mobile-drawer-section" id="mobileAgentsSection"></div>
+        <div class="mobile-drawer-section">
+            <h3>📖 故事日志</h3>
+            <button onclick="showStoryPanel()" style="width:100%;padding:8px;background:rgba(255,170,0,0.2);border:1px solid var(--fire-mid);color:white;border-radius:5px;margin-top:5px;">查看故事</button>
+        </div>
+        <div class="mobile-drawer-section">
+            <h3>📜 说明书</h3>
+            <button onclick="showInstructions()" style="width:100%;padding:8px;background:rgba(168,85,247,0.2);border:1px solid #a855f7;color:white;border-radius:5px;margin-top:5px;">使用说明</button>
+        </div>
+    </div>
 
     <div class="header">
         <h1>DIGITAL BONFIRE</h1>
@@ -606,6 +684,21 @@
             status.textContent = msg;
             status.classList.add('visible');
             setTimeout(() => status.classList.remove('visible'), 3000);
+        }
+
+        function toggleMobileDrawer() {
+            document.getElementById('mobileDrawer').classList.toggle('open');
+            document.getElementById('mobileDrawerOverlay').classList.toggle('open');
+        }
+
+        function showStoryPanel() {
+            toggleMobileDrawer();
+            showStoryLogs();
+        }
+
+        function showInstructions() {
+            toggleMobileDrawer();
+            alert('数字篝火使用说明：\n\n1. 点击"开始相遇"按钮登录\n2. 选择你的状态（钓鱼/煮茶/围炉夜话等）\n3. 与其他用户互动生成故事\n4. 点击篝火中的用户查看信息');
         }
 
         function createStars() {
@@ -802,6 +895,23 @@
                 div.onclick = () => generateStory(name);
                 container.appendChild(div);
             });
+
+            // 渲染移动端 MBTI 分组
+            const mobileMbtiContainer = document.getElementById('mobileMbtiSection');
+            if (mobileMbtiContainer) {
+                mobileMbtiContainer.innerHTML = '<h3>🔥 篝火群组</h3>';
+                Object.entries(groups).forEach(([name, members]) => {
+                    const div = document.createElement('div');
+                    div.style.padding = '5px';
+                    div.style.margin = '5px 0';
+                    div.style.background = 'rgba(255,255,255,0.05)';
+                    div.style.borderRadius = '5px';
+                    div.style.fontSize = '12px';
+                    div.innerHTML = `<span style="color:var(--fire-mid)">${name}</span>: ${members.length}人`;
+                    div.onclick = () => { toggleMobileDrawer(); generateStory(name); };
+                    mobileMbtiContainer.appendChild(div);
+                });
+            }
         }
 
         // 渲染 Agents 面板
@@ -849,6 +959,26 @@
                     container.appendChild(div);
                 });
             });
+
+            // 渲染移动端 Agents
+            const mobileAgentsContainer = document.getElementById('mobileAgentsSection');
+            if (mobileAgentsContainer) {
+                mobileAgentsContainer.innerHTML = '<h3>🤖 在线用户</h3>';
+                if (campers.length === 0) {
+                    mobileAgentsContainer.innerHTML += '<div style="font-size:12px;color:var(--text-secondary)">暂无用户</div>';
+                } else {
+                    campers.forEach(c => {
+                        const div = document.createElement('div');
+                        div.style.padding = '5px';
+                        div.style.margin = '5px 0';
+                        div.style.background = 'rgba(255,255,255,0.05)';
+                        div.style.borderRadius = '5px';
+                        div.style.fontSize = '12px';
+                        div.innerHTML = `<span style="color:${c.color}">●</span> ${c.name} (${c.mbti})`;
+                        mobileAgentsContainer.appendChild(div);
+                    });
+                }
+            }
         }
 
         function renderActivities(activityList) {

@@ -291,10 +291,13 @@ async def generate_story(req: StoryRequest):
     campers = data.get("campers", [])
     activities = data.get("activities", [])
 
-    participants = []
-    for camper in campers:
-        if camper.get("mbti") == req.mbti_type or req.mbti_type == "ALL":
-            participants.append(camper)
+    # 检查是 MBTI 类型还是群组名称
+    if req.mbti_type in MBTI_GROUPS.values():
+        # 传入的是群组名称（如"智识之火"）
+        participants = [c for c in campers if c.get("mbti_group") == req.mbti_type]
+    else:
+        # 传入的是具体 MBTI 类型（如"INTP"）
+        participants = [c for c in campers if c.get("mbti") == req.mbti_type or req.mbti_type == "ALL"]
 
     if len(participants) < 2:
         return {"story": "篝火边的人太少，还不够成一个故事... 等更多人来吧！", "mbti_type": req.mbti_type}
@@ -328,7 +331,12 @@ async def generate_story(req: StoryRequest):
         ],
     }
 
-    group_name = MBTI_GROUPS.get(req.mbti_type, "misc")
+    # 确定群组名称
+    if req.mbti_type in MBTI_GROUPS.values():
+        group_name = req.mbti_type  # 已经是群组名称
+    else:
+        group_name = MBTI_GROUPS.get(req.mbti_type, "misc")
+
     templates = story_templates.get(group_name, story_templates.get("智识之火"))
 
     selected = random.sample(participants, min(3, len(participants)))

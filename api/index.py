@@ -713,6 +713,277 @@ async def get_user_info(token: str):
     except Exception as e:
         return {"error": str(e)}
 
+# ================== 专注模式 ==================
+
+class FocusStartRequest(BaseModel):
+    user_id: int
+    duration: int  # 专注时长（分钟）
+
+class FocusEndRequest(BaseModel):
+    user_id: int
+
+@app.post("/api/focus/start")
+async def start_focus(request: FocusStartRequest):
+    """开始专注计时"""
+    data = load_data()
+
+    # 查找用户
+    camper = next((c for c in data.get("campers", []) if c.get("id") == request.user_id), None)
+    if not camper:
+        return {"error": "用户不存在"}
+
+    # 记录专注开始时的在场营员
+    campers_at_fire = [c for c in data.get("campers", []) if c.get("id") != request.user_id]
+    participants_info = []
+    for c in campers_at_fire:
+        participants_info.append({
+            "id": c.get("id"),
+            "name": c.get("name"),
+            "mbti": c.get("mbti", "未知"),
+            "intro": c.get("intro", ""),
+            "shades": c.get("shades", []),
+            "mbti_group": c.get("mbti_group", "misc")
+        })
+
+    # 更新用户状态为 focusing
+    camper["status"] = "focusing"
+    camper["focus_start_time"] = datetime.now().isoformat()
+    camper["focus_duration"] = request.duration
+    camper["focus_participants"] = participants_info
+
+    # 初始化专注会话记录
+    data.setdefault("focus_sessions", []).append({
+        "user_id": request.user_id,
+        "start_time": datetime.now().isoformat(),
+        "duration": request.duration,
+        "participants": participants_info,
+        "status": "active"
+    })
+
+    save_data(data)
+
+    return {
+        "message": "专注已开始",
+        "focus_until": request.duration,
+        "participants_count": len(participants_info)
+    }
+
+@app.post("/api/focus/end")
+async def end_focus(request: FocusEndRequest):
+    """结束专注计时，生成社交故事"""
+    data = load_data()
+
+    # 查找用户
+    camper = next((c for c in data.get("campers", []) if c.get("id") == request.user_id), None)
+    if not camper:
+        return {"error": "用户不存在"}
+
+    if camper.get("status") != "focusing":
+        return {"error": "用户当前不在专注状态"}
+
+    # 获取专注期间的在场营员
+    participants = camper.get("focus_participants", [])
+
+    # 恢复用户状态
+    camper["status"] = "online"
+    focus_duration = camper.pop("focus_duration", 25)
+    focus_start = camper.pop("focus_start_time", None)
+    camper.pop("focus_participants", None)
+
+    # 更新会话状态
+    for session in data.get("focus_sessions", []):
+        if session.get("user_id") == request.user_id and session.get("status") == "active":
+            session["status"] = "completed"
+            session["end_time"] = datetime.now().isoformat()
+
+    save_data(data)
+
+    # 生成"我专注时 Agent 替我社交"的故事
+    story = await generate_focus_story(camper, participants, focus_duration)
+
+    if story:
+        # 保存故事
+        story_entry = {
+            "id": len(data.get("stories", [])) + 1,
+            "type": "focus_social",
+            "user_id": request.user_id,
+            "user_name": camper.get("name"),
+            "content": story,
+            "participants": [p.get("name") for p in participants],
+            "duration": focus_duration,
+            "created_at": datetime.now().isoformat()
+        }
+        data.setdefault("stories", []).append(story_entry)
+        save_data(data)
+
+        return {
+            "message": "专注结束",
+            "story": story,
+            "participants_count": len(participants)
+        }
+    else:
+        return {
+            "message": "专注结束，但故事生成失败",
+            "participants_count": len(participants)
+        }
+
+@app.get("/api/focus/status")
+async def get_focus_status(user_id: int):
+    """获取用户专注状态"""
+    data = load_data()
+    camper = next((c for c in data.get("campers", []) if c.get("id") == user_id), None)
+
+    if not camper:
+        return {"status": "none", "focusing": False}
+
+    is_focusing = camper.get("status") == "focusing"
+    focus_start = camper.get("focus_start_time")
+    focus_duration = camper.get("focus_duration", 0)
+
+    # 计算剩余时间
+    remaining = 0
+    if is_focusing and focus_start:
+        try:
+            start = datetime.fromisoformat(focus_start)
+            elapsed = (datetime.now() - start).total_seconds()
+            remaining = max(0, focus_duration * 60 - elapsed)
+        except:
+            pass
+
+    return {
+        "focusing": is_focusing,
+        "start_time": focus_start,
+        "duration": focus_duration,
+        "remaining_seconds": int(remaining)
+    }
+
+async def generate_focus_story(focus_user, participants, duration):
+    """生成专注时的社交故事"""
+    if not DEEPSEEK_API_KEY:
+        return None
+
+    if len(participants) == 0:
+        return None
+
+    # MBTI 性格特征映射
+    mbti_traits = {
+        "INTJ": "冷静理性，喜欢思考战略和长期规划",
+        "INTP": "好奇心强，喜欢理论分析和逻辑思考",
+        "ENTJ": "果断有领导力，喜欢组织和推动项目",
+        "ENTP": "思维活跃，喜欢辩论和新奇想法",
+        "INFJ": "理想主义，有洞察力，关注他人感受",
+        "INFP": "浪漫敏感，追求意义和价值",
+        "ENFJ": "热情有感染力，天生的领导者",
+        "ENFP": "充满热情，喜欢创意和可能性",
+        "ISTJ": "可靠务实，注重细节和传统",
+        "ISFJ": "温柔体贴，乐于照顾他人",
+        "ESTJ": "有责任心，喜欢按规则办事",
+        "ESFJ": "热情周到，重视和谐的人际关系",
+        "ISTP": "冷静务实，喜欢动手解决问题",
+        "ISFP": "温柔内敛，追求美和舒适",
+        "ESTP": "活力十足，喜欢冒险和挑战",
+        "ESFP": "热情开朗，喜欢即兴和欢乐"
+    }
+
+    # 群组特征
+    group_traits = {
+        "智识之火": "理性、深刻、喜欢探讨问题和知识",
+        "灵感之火": "创意、浪漫、情感丰富",
+        "秩序之火": "稳重、有组织、注重规则和传统",
+        "实践之火": "行动派、务实、喜欢动手和冒险"
+    }
+
+    # 构建参与者信息
+    p_info = []
+    for p in participants:
+        mbti = p.get("mbti", "未知")
+        p_info.append({
+            "name": p.get("name", "未知"),
+            "mbti": mbti,
+            "traits": mbti_traits.get(mbti, "一位旅者"),
+            "intro": p.get("intro", "") or "一位旅者",
+            "shades": p.get("shades", []),
+            "group": p.get("mbti_group", "misc")
+        })
+
+    # 获取专注用户的 MBTI
+    focus_mbti = focus_user.get("mbti", "未知")
+    focus_traits = mbti_traits.get(focus_mbti, "一位旅者")
+    focus_group = focus_user.get("mbti_group", "misc")
+    focus_group_traits = group_traits.get(focus_group, "")
+
+    # 处理 shades
+    focus_shades = focus_user.get("shades", [])
+    if focus_shades:
+        if isinstance(focus_shades[0], dict):
+            focus_shades = [s.get("name", s.get("value", "")) for s in focus_shades[:5]]
+        else:
+            focus_shades = focus_shades[:5]
+
+    # 构建参与者描述
+    participants_desc = ""
+    for i, p in enumerate(p_info):
+        shades_str = ""
+        if p["shades"]:
+            if isinstance(p["shades"][0], dict):
+                shades_str = ", ".join([s.get("name", s.get("value", "")) for s in p["shades"][:3]])
+            else:
+                shades_str = ", ".join(p["shades"][:3])
+
+        participants_desc += f"""
+{i+1}. {p['name']}
+   - MBTI：{p['mbti']}，性格：{p['traits']}
+   - 简介：{p['intro']}
+   - 兴趣：{shades_str if shades_str else '无'}"""
+
+    prompt = f"""你是"数字篝火"的故事生成器。当一位用户在专注工作时，他的 AI Agent 会代替他与篝火旁的其他营员社交。
+
+请生成一个温暖治愈的故事，讲述：在 {duration} 分钟的专注时间里，{focus_user.get('name')}（{focus_mbti}，{focus_traits}）专注工作时，他的 Agent 与篝火旁的营员们的温馨互动。
+
+专注用户信息：
+- 名字：{focus_user.get('name')}
+- MBTI：{focus_mbti}，性格：{focus_traits}
+- 所属群组：{focus_group}（{focus_group_traits}）
+- 兴趣标签：{', '.join(focus_shades) if focus_shades else '无'}
+- 简介：{focus_user.get('intro', '')}
+
+篝火旁的营员：{participants_desc}
+
+要求：
+1. 故事风格：温暖、治愈、轻松
+2. 以其他营员的视角讲述他们与 {focus_user.get('name')} 的 Agent 聊天的场景
+3. 必须引用每个人的 MBTI 性格特点和兴趣标签！
+4. 体现"我专注时，Agent 替我社交"的温暖主题
+5. Agent 会向其他营员介绍 {focus_user.get('name')} 的特点和兴趣
+6. 加入自然的对话，用引号标注说话者
+7. 故事长度约 200-300 字
+
+请直接输出故事，不要有任何前缀："""
+
+    try:
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(
+                DEEPSEEK_API_URL,
+                headers={
+                    "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "model": "deepseek-chat",
+                    "messages": [{"role": "user", "content": prompt}],
+                    "max_tokens": 400,
+                    "temperature": 0.8
+                },
+                timeout=30.0
+            )
+            if resp.status_code == 200:
+                result = resp.json()
+                return result.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+    except Exception as e:
+        print(f"Focus story generation error: {e}")
+
+    return None
+
 @app.post("/api/recalculate-positions")
 async def recalculate_positions():
     """重新计算所有用户位置，使用黄金角分布"""

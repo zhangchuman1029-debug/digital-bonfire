@@ -44,7 +44,7 @@ def get_supabase() -> Client:
 
 def load_data():
     """从 Supabase 加载数据"""
-    print(f"[DEBUG] load_data: SUPABASE_URL={bool(SUPABASE_URL)}, SUPABASE_KEY={bool(SUPABASE_KEY)}")
+    print(f"[DEBUG] load_data: SUPABASE_URL={bool(SUPABASE_URL)}, SUPABASE_KEY={SUPABASE_KEY[:20]}...")
     try:
         client = get_supabase()
         if not client:
@@ -62,7 +62,7 @@ def load_data():
 
 def save_data(data):
     """保存数据到 Supabase（upsert）"""
-    print(f"[DEBUG] save_data: SUPABASE_URL={bool(SUPABASE_URL)}, SUPABASE_KEY={bool(SUPABASE_KEY)}")
+    print(f"[DEBUG] save_data: SUPABASE_URL={bool(SUPABASE_URL)}, SUPABASE_KEY={SUPABASE_KEY[:20]}...")
     try:
         client = get_supabase()
         if not client:

@@ -59,26 +59,36 @@ def get_supabase() -> Client:
 
 def load_data():
     """从 Supabase 加载数据"""
+    print(f"=== LOAD DATA ===")
+    print(f"SUPABASE_URL configured: {bool(SUPABASE_URL)}")
+    print(f"SUPABASE_KEY configured: {bool(SUPABASE_KEY)}")
     try:
         client = get_supabase()
         if not client:
             print("WARNING: Supabase not configured!")
             return get_default_data()
 
+        print(f"Querying table: {TABLE_NAME}, id: main_data")
         # 查询 id='main_data' 的记录
         response = client.table(TABLE_NAME).select("data").eq("id", "main_data").execute()
 
+        print(f"Response data: {response.data}")
         if response.data and len(response.data) > 0:
             data = response.data[0].get("data", {})
             print(f"Loaded from Supabase: {len(data.get('campers', []))} campers")
             return data
     except Exception as e:
         print(f"Supabase load error: {e}")
+        import traceback
+        traceback.print_exc()
 
     return get_default_data()
 
 def save_data(data):
     """保存数据到 Supabase（upsert）"""
+    print(f"=== SAVE DATA ===")
+    print(f"SUPABASE_URL configured: {bool(SUPABASE_URL)}")
+    print(f"SUPABASE_KEY configured: {bool(SUPABASE_KEY)}")
     try:
         client = get_supabase()
         if not client:
@@ -86,11 +96,13 @@ def save_data(data):
             return
 
         # 使用 upsert 插入或更新
-        client.table(TABLE_NAME).upsert({
+        print(f"Upserting to table: {TABLE_NAME}")
+        result = client.table(TABLE_NAME).upsert({
             "id": "main_data",
             "data": data
         }).execute()
 
+        print(f"Upsert result: {result.data}")
         print(f"Data saved to Supabase: {len(data.get('campers', []))} campers")
     except Exception as e:
         print(f"Supabase save error: {e}")

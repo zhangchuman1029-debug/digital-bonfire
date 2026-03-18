@@ -383,6 +383,7 @@ async def login():
 
 @app.get("/api/auth/callback")
 async def callback(code: str = Query(...), state: str = Query(...)):
+    print(f"[CALLBACK] Starting callback, code length: {len(code)}")
     try:
         async with httpx.AsyncClient() as client:
             # 1. 获取 token

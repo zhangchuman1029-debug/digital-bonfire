@@ -289,7 +289,6 @@ async def get_story_logs(limit: int = 50):
 async def generate_story(req: StoryRequest):
     data = load_data()
     campers = data.get("campers", [])
-    activities = data.get("activities", [])
 
     # 检查是 MBTI 类型还是群组名称
     if req.mbti_type in MBTI_GROUPS.values():

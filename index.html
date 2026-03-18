@@ -536,6 +536,14 @@
 
         // 检查是否已登录，如果是则隐藏按钮并放大篝火
         if (urlParams.get('joined') === 'true') {
+            const userId = urlParams.get('user_id');
+            const userName = urlParams.get('user_name');
+            if (userId) {
+                localStorage.setItem('campfire_user_id', userId);
+            }
+            if (userName) {
+                localStorage.setItem('campfire_user_name', decodeURIComponent(userName));
+            }
             const btn = document.getElementById('loginBtn');
             btn.style.display = 'none';
             document.getElementById('campground').classList.add('zoomed');
@@ -607,14 +615,34 @@
                 const data = await res.json();
                 renderCampers(data);
                 renderMbtiGroups(data);
-                renderAgents(data); // 渲染右侧 Agents 面板
-                // 找到当前登录用户（根据 localStorage 或最后一个登录的）
-                const savedUserId = localStorage.getItem('campfire_user_id');
-                if (savedUserId) {
-                    currentUser = data.find(c => c.id == savedUserId);
-                } else if (data.length > 0) {
-                    currentUser = data[data.length - 1];
-                    localStorage.setItem('campfire_user_id', currentUser.id);
+                renderAgents(data);
+
+                // 尝试通过 /api/me 获取当前用户
+                const token = localStorage.getItem('campfire_token');
+                if (token) {
+                    try {
+                        const meRes = await fetch('/api/me', {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        const meData = await meRes.json();
+                        if (meData.authenticated && meData.user) {
+                            currentUser = meData.user;
+                            localStorage.setItem('campfire_user_id', currentUser.id);
+                        }
+                    } catch (e) {
+                        console.error('Failed to get /api/me:', e);
+                    }
+                }
+
+                // 备用：查找本地存储的用户
+                if (!currentUser) {
+                    const savedUserId = localStorage.getItem('campfire_user_id');
+                    if (savedUserId) {
+                        currentUser = data.find(c => c.id == savedUserId);
+                    } else if (data.length > 0) {
+                        currentUser = data[data.length - 1];
+                        localStorage.setItem('campfire_user_id', currentUser.id);
+                    }
                 }
                 fetchStatusCounts();
             } catch (e) { console.error(e); }

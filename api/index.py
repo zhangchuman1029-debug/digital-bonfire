@@ -9,10 +9,10 @@ from datetime import datetime
 from urllib.parse import urlencode
 from typing import Optional, List
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query, HTTPException
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query, HTTPException, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse, FileResponse
+from fastapi.responses import RedirectResponse, FileResponse, JSONResponse
 from pydantic import BaseModel
 import httpx
 
@@ -81,19 +81,40 @@ def load_data():
     return default_data
 
 def save_data(data):
-    """保存数据到 Vercel Blob - 每次都写入，不缓存"""
+    """保存数据到 Vercel Blob - 先合并再写入"""
     import vercel_blob
+    import time
 
-    try:
-        json_string = json.dumps(data, indent=2, default=str)
-        # 覆盖写入，设置 addRandomSuffix: false
-        vercel_blob.put(BLOB_FILE_NAME, json_string, {"addRandomSuffix": "false"})
-        print(f"Data saved to Blob: {len(data.get('campers', []))} campers")
-    except Exception as e:
-        print(f"Blob save error: {e}")
-        # 打印详细错误
-        import traceback
-        traceback.print_exc()
+    for attempt in range(3):  # 最多重试3次
+        try:
+            # 先读取最新数据
+            existing_data = load_data()
+
+            # 合并 campers（保留最新的）
+            existing_campers = {c.get("id"): c for c in existing_data.get("campers", [])}
+            new_campers = {c.get("id"): c for c in data.get("campers", [])}
+            existing_campers.update(new_campers)
+
+            # 合并其他数据
+            merged_data = {
+                "campers": list(existing_campers.values()),
+                "messages": data.get("messages", []),
+                "activities": data.get("activities", []),
+                "stories": data.get("stories", []),
+                "mbti_groups": data.get("mbti_groups", {})
+            }
+
+            json_string = json.dumps(merged_data, indent=2, default=str)
+            vercel_blob.put(BLOB_FILE_NAME, json_string, {"addRandomSuffix": "false"})
+            print(f"Data saved to Blob (attempt {attempt + 1}): {len(merged_data.get('campers', []))} campers")
+            return
+        except Exception as e:
+            print(f"Blob save error (attempt {attempt + 1}): {e}")
+            if attempt < 2:
+                time.sleep(0.1)  # 短暂延迟后重试
+            else:
+                import traceback
+                traceback.print_exc()
 
 # ================== 数据模型 ==================
 class JoinRequest(BaseModel):
@@ -167,9 +188,34 @@ async def health():
 
 # 获取所有用户
 @app.get("/api/campers")
-async def get_campers():
+async def get_campers(response: Response):
     data = load_data()
-    return data.get("campers", [])
+    # 不返回 token
+    campers = []
+    for c in data.get("campers", []):
+        safe_camper = {k: v for k, v in c.items() if k != "access_token"}
+        campers.append(safe_camper)
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+    return campers
+
+# 无状态鉴权 - 根据 token 获取当前用户
+@app.get("/api/me")
+async def get_me(response: Response, authorization: str = None):
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+    if not authorization or not authorization.startswith("Bearer "):
+        return {"authenticated": False}
+
+    token = authorization.replace("Bearer ", "")
+    data = load_data()
+
+    # 在 campers 中查找匹配的用户
+    for c in data.get("campers", []):
+        if c.get("access_token") == token:
+            # 不返回 token
+            user = {k: v for k, v in c.items() if k != "access_token"}
+            return {"authenticated": True, "user": user}
+
+    return {"authenticated": False}
 
 # 获取所有行为
 @app.get("/api/activities")
@@ -578,7 +624,9 @@ async def callback(code: str = Query(...), state: str = Query(...)):
     save_data(data)
     # WebSocket broadcast 不适用于 Vercel Serverless，跳过
 
-    frontend_url = f"{FRONTEND_URL}?joined=true"
+    # 通过 URL 参数传递用户信息
+    from urllib.parse import quote
+    frontend_url = f"{FRONTEND_URL}?joined=true&user_id={camper['id']}&user_name={quote(camper['name'])}"
     return RedirectResponse(url=frontend_url)
 
 

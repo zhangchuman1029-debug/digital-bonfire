@@ -1,15 +1,15 @@
 """
 Digital Bonfire 后端服务
-- FastAPI + 行为系统 + MBTI 分组 + 故事生成
+- FastAPI + Supabase 存储 + MBTI 分组 + 故事生成
 """
 import os
 import json
 import random
 from datetime import datetime
-from urllib.parse import urlencode
+from urllib.parse import urlencode, quote
 from typing import Optional, List
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query, HTTPException, Response
+from fastapi import FastAPI, Query, HTTPException, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse, FileResponse, JSONResponse
@@ -27,22 +27,7 @@ SECONDME_TOKEN_URL = "https://api.mindverse.com/gate/lab/api/oauth/token/code"
 SECONDME_PROFILE_URL = "https://api.mindverse.com/gate/lab/api/secondme/user/info"
 SECONDME_SHADES_URL = "https://api.mindverse.com/gate/lab/api/secondme/user/shades"
 
-app = FastAPI(title="Digital Bonfire API")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-app.mount("/static", StaticFiles(directory="."), name="static")
-
-# Vercel Serverless 环境使用 /tmp 目录
-import platform
-# Supabase 存储
-import os
+# ================== Supabase 存储 ==================
 from supabase import create_client, Client
 
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
@@ -59,55 +44,32 @@ def get_supabase() -> Client:
 
 def load_data():
     """从 Supabase 加载数据"""
-    print(f"=== LOAD DATA ===")
-    print(f"SUPABASE_URL configured: {bool(SUPABASE_URL)}")
-    print(f"SUPABASE_KEY configured: {bool(SUPABASE_KEY)}")
     try:
         client = get_supabase()
         if not client:
-            print("WARNING: Supabase not configured!")
             return get_default_data()
 
-        print(f"Querying table: {TABLE_NAME}, id: main_data")
-        # 查询 id='main_data' 的记录
         response = client.table(TABLE_NAME).select("data").eq("id", "main_data").execute()
-
-        print(f"Response data: {response.data}")
         if response.data and len(response.data) > 0:
-            data = response.data[0].get("data", {})
-            print(f"Loaded from Supabase: {len(data.get('campers', []))} campers")
-            return data
+            return response.data[0].get("data", {})
     except Exception as e:
         print(f"Supabase load error: {e}")
-        import traceback
-        traceback.print_exc()
 
     return get_default_data()
 
 def save_data(data):
     """保存数据到 Supabase（upsert）"""
-    print(f"=== SAVE DATA ===")
-    print(f"SUPABASE_URL configured: {bool(SUPABASE_URL)}")
-    print(f"SUPABASE_KEY configured: {bool(SUPABASE_KEY)}")
     try:
         client = get_supabase()
         if not client:
-            print("WARNING: Supabase not configured!")
             return
 
-        # 使用 upsert 插入或更新
-        print(f"Upserting to table: {TABLE_NAME}")
-        result = client.table(TABLE_NAME).upsert({
+        client.table(TABLE_NAME).upsert({
             "id": "main_data",
             "data": data
         }).execute()
-
-        print(f"Upsert result: {result.data}")
-        print(f"Data saved to Supabase: {len(data.get('campers', []))} campers")
     except Exception as e:
         print(f"Supabase save error: {e}")
-        import traceback
-        traceback.print_exc()
 
 def get_default_data():
     return {
@@ -117,20 +79,23 @@ def get_default_data():
         "stories": [],
         "mbti_groups": {}
     }
-            else:
-                import traceback
-                traceback.print_exc()
+
+# ================== FastAPI 应用 ==================
+app = FastAPI(title="Digital Bonfire API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.mount("/static", StaticFiles(directory="."), name="static")
 
 # ================== 数据模型 ==================
-class JoinRequest(BaseModel):
-    name: str
-    intro: str
-    avatar_color: str = None
-    shades: list = []
-    mbti: str = None
-
 class ActivityCreate(BaseModel):
-    name: str  # 钓鱼, 煮茶, 围炉夜话, 烤棉花糖, 篝火舞会
+    name: str
     description: str = ""
     host_id: int
 
@@ -141,45 +106,27 @@ class ActivityJoin(BaseModel):
 class StoryRequest(BaseModel):
     mbti_type: str
     participants: list = []
-    target_user_id: int = None  # 点击的用户ID
+    target_user_id: int = None
 
-# ================== 可选行为 ==================
+class StatusUpdate(BaseModel):
+    user_id: int
+    status: str
+
+# ================== 常量 ==================
 ACTIVITIES = {
     "钓鱼": {"emoji": "🎣", "description": "静心垂钓，等待鱼儿上钩", "mbti": ["INTJ", "INTP", "ISTP", "ISFP"]},
     "煮茶": {"emoji": "🍵", "description": "煮一壶好茶，品味人生", "mbti": ["INFJ", "INFP", "ENFJ", "ENFP"]},
     "围炉夜话": {"emoji": "💬", "description": "围坐火旁，畅所欲言", "mbti": ["ENTJ", "ENTP", "ESTJ", "ESFJ"]},
     "烤棉花糖": {"emoji": "🍡", "description": "烤一份甜蜜，享受当下", "mbti": ["ESFP", "ISFJ", "ISTJ", "ESTP"]},
-    "篝火舞会": {"emoji": "💃", "description": "火光中起舞，尽情释放", "mbti": ["ALL"]},  # 所有人可参加
+    "篝火舞会": {"emoji": "💃", "description": "火光中起舞，尽情释放", "mbti": ["ALL"]},
 }
 
-# MBTI 到主篝火的映射
 MBTI_GROUPS = {
     "INTJ": "智识之火", "INTP": "智识之火", "ENTJ": "智识之火", "ENTP": "智识之火",
     "INFJ": "灵感之火", "INFP": "灵感之火", "ENFJ": "灵感之火", "ENFP": "灵感之火",
     "ISTJ": "秩序之火", "ISFJ": "秩序之火", "ESTJ": "秩序之火", "ESFJ": "秩序之火",
     "ISTP": "实践之火", "ISFP": "实践之火", "ESTP": "实践之火", "ESFP": "实践之火",
 }
-
-# ================== WebSocket ==================
-class ConnectionManager:
-    def __init__(self):
-        self.active_connections: list[WebSocket] = []
-
-    async def connect(self, websocket: WebSocket):
-        await websocket.accept()
-        self.active_connections.append(websocket)
-
-    def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
-
-    async def broadcast(self, message: dict):
-        for connection in self.active_connections:
-            try:
-                await connection.send_json(message)
-            except:
-                pass
-
-manager = ConnectionManager()
 
 # ================== API 端点 ==================
 
@@ -191,19 +138,13 @@ async def root():
 async def health():
     return {"status": "healthy"}
 
-# 获取所有用户
 @app.get("/api/campers")
 async def get_campers(response: Response):
     data = load_data()
-    # 不返回 token
-    campers = []
-    for c in data.get("campers", []):
-        safe_camper = {k: v for k, v in c.items() if k != "access_token"}
-        campers.append(safe_camper)
+    campers = [{k: v for k, v in c.items() if k != "access_token"} for c in data.get("campers", [])]
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
     return campers
 
-# 无状态鉴权 - 根据 token 获取当前用户
 @app.get("/api/me")
 async def get_me(response: Response, authorization: str = None):
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
@@ -213,22 +154,18 @@ async def get_me(response: Response, authorization: str = None):
     token = authorization.replace("Bearer ", "")
     data = load_data()
 
-    # 在 campers 中查找匹配的用户
     for c in data.get("campers", []):
         if c.get("access_token") == token:
-            # 不返回 token
             user = {k: v for k, v in c.items() if k != "access_token"}
             return {"authenticated": True, "user": user}
 
     return {"authenticated": False}
 
-# 获取所有行为
 @app.get("/api/activities")
 async def get_activities():
     data = load_data()
     return data.get("activities", [])
 
-# 获取 MBTI 分组
 @app.get("/api/mbti/groups")
 async def get_mbti_groups():
     data = load_data()
@@ -250,7 +187,6 @@ async def get_mbti_groups():
 
     return list(groups.values())
 
-# 创建行为
 @app.post("/api/activity")
 async def create_activity(act: ActivityCreate):
     data = load_data()
@@ -268,15 +204,7 @@ async def create_activity(act: ActivityCreate):
     data.setdefault("activities", []).append(activity)
     save_data(data)
 
-    await manager.broadcast({"type": "activity_created", "data": activity})
-
     return activity
-
-
-# 更新用户状态（选择状态）
-class StatusUpdate(BaseModel):
-    user_id: int
-    status: str  # 钓鱼, 煮茶, 围炉夜话, 烤棉花糖, 篝火舞会, 无
 
 @app.post("/api/user/status")
 async def update_user_status(update: StatusUpdate):
@@ -285,31 +213,16 @@ async def update_user_status(update: StatusUpdate):
 
     for camper in campers:
         if camper["id"] == update.user_id:
-            # 清除之前的活动
-            old_status = camper.get("current_activity")
-
             if update.status == "无":
                 camper["current_activity"] = None
             else:
                 camper["current_activity"] = update.status
-
             camper["updated_at"] = datetime.now().isoformat()
             save_data(data)
-
-            await manager.broadcast({
-                "type": "user_status_changed",
-                "data": {
-                    "user_id": update.user_id,
-                    "old_status": old_status,
-                    "new_status": camper["current_activity"]
-                }
-            })
             return camper
 
     raise HTTPException(status_code=404, detail="User not found")
 
-
-# 获取各状态的人数
 @app.get("/api/status/counts")
 async def get_status_counts():
     data = load_data()
@@ -328,7 +241,6 @@ async def get_status_counts():
 
     return counts
 
-# 加入行为
 @app.post("/api/activity/join")
 async def join_activity(join_req: ActivityJoin):
     data = load_data()
@@ -339,12 +251,10 @@ async def join_activity(join_req: ActivityJoin):
             if join_req.user_id not in activity["participants"]:
                 activity["participants"].append(join_req.user_id)
                 save_data(data)
-                await manager.broadcast({"type": "activity_updated", "data": activity})
             return activity
 
     raise HTTPException(status_code=404, detail="Activity not found")
 
-# 离开行为
 @app.post("/api/activity/leave")
 async def leave_activity(join_req: ActivityJoin):
     data = load_data()
@@ -355,12 +265,10 @@ async def leave_activity(join_req: ActivityJoin):
             if join_req.user_id in activity["participants"]:
                 activity["participants"].remove(join_req.user_id)
                 save_data(data)
-                await manager.broadcast({"type": "activity_updated", "data": activity})
             return activity
 
     raise HTTPException(status_code=404, detail="Activity not found")
 
-# 获取故事
 @app.get("/api/stories")
 async def get_stories(mbti: str = None):
     data = load_data()
@@ -369,26 +277,20 @@ async def get_stories(mbti: str = None):
     if mbti:
         stories = [s for s in stories if s.get("mbti_type") == mbti]
 
-    return stories[-10:][::-1]  # 最新10条
+    return stories[-10:][::-1]
 
-
-# 获取故事日志（所有历史记录）
 @app.get("/api/story/logs")
 async def get_story_logs(limit: int = 50):
     data = load_data()
     stories = data.get("stories", [])
-    # 按时间倒序，返回更多记录
     return sorted(stories, key=lambda x: x.get("created_at", ""), reverse=True)[:limit]
 
-
-# 为指定用户生成故事
 @app.post("/api/story/generate")
 async def generate_story(req: StoryRequest):
     data = load_data()
     campers = data.get("campers", [])
     activities = data.get("activities", [])
 
-    # 找到参与该 MBTI 组的用户
     participants = []
     for camper in campers:
         if camper.get("mbti") == req.mbti_type or req.mbti_type == "ALL":
@@ -397,14 +299,12 @@ async def generate_story(req: StoryRequest):
     if len(participants) < 2:
         return {"story": "篝火边的人太少，还不够成一个故事... 等更多人来吧！", "mbti_type": req.mbti_type}
 
-    # 找到当前进行的活动
     current_activity = None
     for activity in activities:
         if activity["name"] in ["围炉夜话", "篝火舞会"] or not activity["participants"]:
             current_activity = activity
             break
 
-    # 根据 MBTI 类型生成不同的故事风格
     story_templates = {
         "智识之火": [
             "{p1} 和 {p2} 正在进行深刻的哲学讨论，从存在主义聊到量子力学，{p3} 偶尔插几句嘴，气氛十分热烈。",
@@ -431,19 +331,15 @@ async def generate_story(req: StoryRequest):
     group_name = MBTI_GROUPS.get(req.mbti_type, "misc")
     templates = story_templates.get(group_name, story_templates.get("智识之火"))
 
-    # 随机选择参与者
     selected = random.sample(participants, min(3, len(participants)))
     names = [p["name"] for p in selected]
 
     template = random.choice(templates)
     story = template.format(p1=names[0], p2=names[1], p3=names[2] if len(names) > 2 else names[0])
 
-    # 添加活动描述
     if current_activity:
-        activity_text = f"大家正在一起{current_activity['name']}，"
-        story = activity_text + story
+        story = f"大家正在一起{current_activity['name']}，" + story
 
-    # 保存故事（包含更完整的元数据）
     target_user = None
     if req.target_user_id:
         for c in campers:
@@ -467,8 +363,6 @@ async def generate_story(req: StoryRequest):
     data.setdefault("stories", []).append(story_obj)
     save_data(data)
 
-    await manager.broadcast({"type": "new_story", "data": story_obj})
-
     return {"story": story, "mbti_type": req.mbti_type, "mbti_group": group_name}
 
 # ================== SecondMe OAuth ==================
@@ -485,14 +379,10 @@ async def login():
         "force_login": "true"
     }
     auth_url = SECONDME_AUTH_URL + "?" + urlencode(params)
-    # 不再写入文件，Vercel 环境不支持
     return RedirectResponse(url=auth_url)
-
 
 @app.get("/api/auth/callback")
 async def callback(code: str = Query(...), state: str = Query(...)):
-    # 跳过 state 验证，Vercel 环境不支持文件写入
-
     try:
         async with httpx.AsyncClient() as client:
             # 1. 获取 token
@@ -547,7 +437,6 @@ async def callback(code: str = Query(...), state: str = Query(...)):
         user_info = profile.get("data", profile)
         name = user_info.get("name", user_info.get("username", "Anonymous"))
     except Exception as e:
-        print(f"Profile parse error: {e}")
         name = "USER"
 
     # 解析 shades
@@ -559,13 +448,10 @@ async def callback(code: str = Query(...), state: str = Query(...)):
             shades = shades_obj.get("shades", shades_obj.get("tags", []))
         elif isinstance(shades_obj, list):
             shades = shades_obj
-    except Exception as e:
-        print(f"Shades parse error: {e}")
+    except Exception:
         shades = []
 
-    print(f"User: {name}, Shades: {shades}")
-
-    # 根据 shades 推断 MBTI
+    # 推断 MBTI
     mbti = infer_mbti(shades)
 
     # 根据 shades 分类
@@ -591,15 +477,11 @@ async def callback(code: str = Query(...), state: str = Query(...)):
 
     # 保存用户
     data = load_data()
-    print(f"Current campers in DB: {len(data.get('campers', []))}")
-    print(f"Looking for user: {name.upper()}")
-
     existing = [c for c in data.get("campers", []) if c.get("name", "").upper() == name.upper()]
-    print(f"Found existing: {len(existing)}")
 
     if existing:
         camper = existing[0]
-        camper["access_token"] = access_token  # 保存 token
+        camper["access_token"] = access_token
         camper["distance"] = distance
         camper["color"] = color
         camper["type"] = type_label
@@ -611,7 +493,7 @@ async def callback(code: str = Query(...), state: str = Query(...)):
         camper = {
             "id": len(data.get("campers", [])) + 1,
             "name": name.upper(),
-            "access_token": access_token,  # 保存 token
+            "access_token": access_token,
             "intro": "通过 SecondMe 登录",
             "distance": distance,
             "angle": random.uniform(0, 360),
@@ -624,16 +506,12 @@ async def callback(code: str = Query(...), state: str = Query(...)):
             "joined_at": datetime.now().isoformat()
         }
         data.setdefault("campers", []).append(camper)
-        print(f"New camper created: {name.upper()}")
 
     save_data(data)
-    # WebSocket broadcast 不适用于 Vercel Serverless，跳过
 
-    # 通过 URL 参数传递用户信息（包含 access_token）
-    from urllib.parse import quote
+    # 通过 URL 参数传递 access_token
     frontend_url = f"{FRONTEND_URL}?joined=true&user_id={camper['id']}&user_name={quote(camper['name'])}&token={quote(access_token)}"
     return RedirectResponse(url=frontend_url)
-
 
 def infer_mbti(shades: list) -> str:
     """根据性格标签推断 MBTI"""
@@ -642,7 +520,6 @@ def infer_mbti(shades: list) -> str:
 
     shades_str = " ".join(shades).lower()
 
-    # 简单推断逻辑
     if any(w in shades_str for w in ['理性', '逻辑', '分析', '独立', '思考']):
         if any(w in shades_str for w in ['内向', '安静', '独处']):
             return "INTJ" if random.random() > 0.5 else "INTP"
@@ -662,19 +539,12 @@ def infer_mbti(shades: list) -> str:
             return "ESTJ" if random.random() > 0.5 else "ESTP"
 
     if any(w in shades_str for w in ['传统', '稳定', '可靠', '忠诚']):
-        if any(w in shades_str for w in ['内向', '安静']):
-            return "ISFJ"
-        else:
-            return "ESFJ"
+        return "ISFJ" if random.random() > 0.5 else "ESFJ"
 
     if any(w in shades_str for w in ['自由', '灵活', '创意', '热情']):
-        if any(w in shades_str for w in ['内向', '安静']):
-            return "ISFP"
-        else:
-            return "ESFP"
+        return "ISFP" if random.random() > 0.5 else "ESFP"
 
     return random.choice(list(MBTI_GROUPS.keys()))
-
 
 @app.get("/api/user/info")
 async def get_user_info(token: str):
@@ -685,7 +555,6 @@ async def get_user_info(token: str):
             return resp.json()
     except Exception as e:
         return {"error": str(e)}
-
 
 @app.post("/api/chat")
 async def chat_with_secondme(message: str, token: str):
@@ -702,16 +571,3 @@ async def chat_with_secondme(message: str, token: str):
             return resp.json()
     except Exception as e:
         return {"error": str(e)}
-
-
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    await manager.connect(websocket)
-    try:
-        while True:
-            await websocket.receive_text()
-    except WebSocketDisconnect:
-        manager.disconnect(websocket)
-
-
-# Vercel Serverless 不需要 uvicorn.run

@@ -203,7 +203,7 @@
             50% { opacity: 1; transform: scale(1.05); }
         }
 
-        /* 专注时隐藏输入框和开始按钮，显示取消按钮 */
+        /* 专注时隐藏输入框和开始按钮，显示放弃按钮 */
         .focus-timer.focus-active .focus-duration-input-wrap,
         .focus-timer.focus-active .focus-start-btn {
             display: none !important;
@@ -213,18 +213,22 @@
             display: block !important;
             margin-top: 20px !important;
             width: 100%;
-            padding: 12px 24px;
-            font-size: 14px;
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.4);
-            color: #ef4444;
-            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 12px;
+            background: transparent !important;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-secondary);
+            border-radius: 20px;
             cursor: pointer;
             transition: all 0.3s ease;
+            opacity: 0.6;
         }
 
         .focus-timer.focus-active .focus-cancel-btn:hover {
-            background: rgba(239, 68, 68, 0.3);
+            background: rgba(255, 255, 255, 0.1) !important;
+            border-color: rgba(255, 255, 255, 0.4);
+            color: rgba(255, 255, 255, 0.9);
+            opacity: 1;
         }
 
         .fire-glow {
@@ -928,7 +932,7 @@
                         <span class="focus-duration-unit">分钟</span>
                     </div>
                     <button class="focus-start-btn" id="focusStartBtn" onclick="startFocus()">开始专注</button>
-                    <button class="focus-cancel-btn" id="focusCancelBtn" style="display:none;" onclick="cancelFocus()">取消专注</button>
+                    <button class="focus-cancel-btn" id="cancelFocusBtn" style="display:none;" onclick="cancelFocus()">放弃专注</button>
                 </div>
                 <div class="focus-history" id="focusHistory">
                     <div class="focus-history-title">专注记录</div>
@@ -1383,6 +1387,11 @@
         }
 
         function cancelFocus() {
+            // 弹出确认对话框
+            if (!confirm("确定要熄灭火堆，放弃这次专注吗？")) {
+                return;
+            }
+
             clearInterval(focusTimer);
             clearInterval(focusParticleInterval);
             focusTimer = null;
@@ -1410,7 +1419,7 @@
             const durationInput = document.getElementById('focusDuration');
             updateFocusTimerDisplay((parseInt(durationInput.value) || 25) * 60);
 
-            showStatus('专注已取消');
+            showStatus('专注已放弃');
         }
 
         function closeFocusPopup() {

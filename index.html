@@ -961,7 +961,7 @@
                         <span class="focus-duration-unit">分钟</span>
                     </div>
                     <button class="focus-start-btn" id="focusStartBtn" onclick="startFocus()">开始专注</button>
-                    <button class="focus-cancel-btn" id="cancelFocusBtn" style="display:none;" onclick="cancelFocus()">放弃专注</button>
+                    <button class="focus-cancel-btn" id="cancelFocusBtn" style="display:none;" onclick="cancelFocus()">退出专注</button>
                 </div>
                 <div class="focus-history" id="focusHistory">
                     <div class="focus-history-title">专注记录</div>
@@ -1018,7 +1018,7 @@
     <!-- 专注模式 UI（独立于侧边栏） -->
     <div id="focusUI" style="display:none; position:fixed; top:70%; left:50%; transform:translateX(-50%); z-index:9999; text-align:center;">
         <div id="focusTimerDisplay" style="font-size: 4rem; color: white; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 20px rgba(255,165,0,0.8);">00:00</div>
-        <button id="quitFocusBtn" onclick="quitFocus()" style="background:none; border:1px solid rgba(255,255,255,0.3); color:rgba(255,255,255,0.6); cursor:pointer; padding:8px 20px; border-radius:20px; margin-top:20px; font-size:14px;">放弃专注</button>
+        <button id="quitFocusBtn" onclick="quitFocus()" style="background:none; border:1px solid rgba(255,255,255,0.3); color:rgba(255,255,255,0.6); cursor:pointer; padding:8px 20px; border-radius:20px; margin-top:20px; font-size:14px;">退出专注</button>
     </div>
 
     <div class="fire-container" id="campground">
@@ -1423,7 +1423,7 @@
 
         function cancelFocus() {
             // 弹出确认对话框
-            if (!confirm("确定要熄灭火堆，放弃这次专注吗？")) {
+            if (!confirm("确定要退出专注吗？")) {
                 return;
             }
 
@@ -1457,10 +1457,10 @@
             showStatus('专注已放弃');
         }
 
-        // 放弃专注按钮调用的函数
+        // 退出专注按钮调用的函数
         function quitFocus() {
             // 弹出确认对话框
-            if (!confirm("确定要熄灭火堆，放弃这次专注吗？")) {
+            if (!confirm("确定要退出专注吗？")) {
                 return;
             }
 

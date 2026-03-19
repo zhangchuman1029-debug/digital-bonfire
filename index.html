@@ -168,8 +168,36 @@
             background: radial-gradient(ellipse at 50% 50%, #000000 0%, #000000 70%, #0a0500 100%) !important;
         }
 
+        /* 进入专注模式时，隐藏所有干扰元素 */
+        body.focus-mode .sidebar,
+        body.focus-mode .right-sidebar,
+        body.focus-mode .glass-panel,
+        body.focus-mode .header,
+        body.focus-mode .mobile-menu-btn,
+        body.focus-mode .login-container,
+        body.focus-mode .story-panel {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transition: opacity 0.8s ease;
+        }
+
+        /* 只有专注 UI 显示 */
+        body.focus-mode #focusUI {
+            display: block !important;
+        }
+
+        /* 火焰放大效果 */
+        .fire-container.focus-active {
+            transform: translate(-50%, -50%) scale(2) !important;
+            transition: transform 1.5s ease-in-out !important;
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+        }
+
         /* 专注模式 - 隐藏干扰项 (平滑消失) */
-        .focus-hide {
+        .focus-hide,
+        body.focus-mode .camper {
             opacity: 0 !important;
             pointer-events: none !important;
             transition: all 0.8s ease !important;
@@ -987,6 +1015,12 @@
         专注中
     </div>
 
+    <!-- 专注模式 UI（独立于侧边栏） -->
+    <div id="focusUI" style="display:none; position:fixed; top:70%; left:50%; transform:translateX(-50%); z-index:9999; text-align:center;">
+        <div id="focusTimerDisplay" style="font-size: 4rem; color: white; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 20px rgba(255,165,0,0.8);">00:00</div>
+        <button id="quitFocusBtn" onclick="quitFocus()" style="background:none; border:1px solid rgba(255,255,255,0.3); color:rgba(255,255,255,0.6); cursor:pointer; padding:8px 20px; border-radius:20px; margin-top:20px; font-size:14px;">放弃专注</button>
+    </div>
+
     <div class="fire-container" id="campground">
         <div class="fire-glow"></div>
         <div class="flame"></div>
@@ -1154,13 +1188,12 @@
         // 恢复专注模式 UI（用于页面刷新后）
         function restoreFocusModeUI() {
             const fireContainer = document.getElementById('campground');
-            const timerContainer = document.getElementById('timerContainer');
 
             // 添加 .focus-active 类到火焰容器
             fireContainer.classList.add('focus-active');
 
-            // 添加 .focus-active 类到计时器
-            timerContainer.classList.add('focus-active');
+            // 显示专注 UI
+            document.getElementById('focusUI').style.display = 'block';
 
             // 添加 .focus-hide 类隐藏所有干扰项
             document.querySelectorAll('.sidebar, .right-sidebar, .header, .mobile-menu-btn, .login-container, .camper, .story-panel, .focusing-indicator').forEach(el => {
@@ -1184,7 +1217,7 @@
         function updateFocusTimerDisplay(seconds) {
             const mins = Math.floor(seconds / 60);
             const secs = seconds % 60;
-            document.getElementById('timer').textContent =
+            document.getElementById('focusTimerDisplay').textContent =
                 `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
@@ -1239,9 +1272,8 @@
             const fireContainer = document.getElementById('campground');
             fireContainer.classList.add('focus-active');
 
-            // 添加 .focus-active 类到计时器（移动到火焰下方）
-            const timerContainer = document.getElementById('timerContainer');
-            timerContainer.classList.add('focus-active');
+            // 显示专注 UI
+            document.getElementById('focusUI').style.display = 'block';
 
             // 添加 .focus-hide 类隐藏所有干扰项
             document.querySelectorAll('.sidebar, .right-sidebar, .header, .mobile-menu-btn, .login-container, .camper, .story-panel, .focusing-indicator').forEach(el => {
@@ -1344,10 +1376,12 @@
 
             // 移除所有专注模式类
             document.getElementById('campground').classList.remove('focus-active');
-            document.querySelector('.focus-timer').classList.remove('focus-active');
             document.querySelectorAll('.focus-hide').forEach(el => {
                 el.classList.remove('focus-hide');
             });
+
+            // 隐藏专注 UI
+            document.getElementById('focusUI').style.display = 'none';
 
             // 退出沉浸模式
             document.body.classList.remove('focus-mode');
@@ -1412,6 +1446,44 @@
             document.querySelectorAll('.focus-hide').forEach(el => {
                 el.classList.remove('focus-hide');
             });
+
+            // 退出沉浸模式
+            document.body.classList.remove('focus-mode');
+
+            // 重置计时器显示
+            const durationInput = document.getElementById('focusDuration');
+            updateFocusTimerDisplay((parseInt(durationInput.value) || 25) * 60);
+
+            showStatus('专注已放弃');
+        }
+
+        // 放弃专注按钮调用的函数
+        function quitFocus() {
+            // 弹出确认对话框
+            if (!confirm("确定要熄灭火堆，放弃这次专注吗？")) {
+                return;
+            }
+
+            // 清除定时器
+            clearInterval(focusInterval);
+            clearInterval(focusParticleInterval);
+            focusInterval = null;
+            focusParticleInterval = null;
+            isFocusing = false;
+
+            // 清除专注粒子
+            document.querySelectorAll('.focus-spark').forEach(p => p.remove());
+
+            // 清除 localStorage
+            localStorage.removeItem('campfire_focus_start_time');
+            localStorage.removeItem('campfire_focus_duration');
+            localStorage.removeItem('campfire_focus_active');
+
+            // 隐藏专注 UI
+            document.getElementById('focusUI').style.display = 'none';
+
+            // 移除火焰放大效果
+            document.getElementById('campground').classList.remove('focus-active');
 
             // 退出沉浸模式
             document.body.classList.remove('focus-mode');

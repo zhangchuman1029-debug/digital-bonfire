@@ -327,6 +327,7 @@
             top: 0;
             width: 280px;
             height: 100vh;
+            z-index: 100;
             background: linear-gradient(180deg, rgba(20, 20, 35, 0.95) 0%, rgba(10, 10, 20, 0.98) 100%);
             backdrop-filter: blur(20px);
             border-right: 1px solid rgba(255, 255, 255, 0.08);
@@ -1059,8 +1060,38 @@
         }
 
         function showStory(story) {
+            if (!story) {
+                alert('暂无故事内容');
+                return;
+            }
             document.getElementById('storyText').textContent = story;
             document.getElementById('storyModal').classList.add('visible');
+        }
+
+        function viewStoryDetail(storyId) {
+            // 从缓存的stories中查找
+            const story = window.cachedStories?.find(s => s.id === storyId);
+            if (story && story.content) {
+                showStory(story.content);
+            } else {
+                // 如果缓存中没有，显示Loading并重新获取
+                document.getElementById('loadingOverlay').classList.add('visible');
+                fetch('/api/story/logs?limit=50')
+                    .then(res => res.json())
+                    .then(stories => {
+                        document.getElementById('loadingOverlay').classList.remove('visible');
+                        const found = stories.find(s => s.id === storyId);
+                        if (found && found.content) {
+                            showStory(found.content);
+                        } else {
+                            alert('无法获取故事内容');
+                        }
+                    })
+                    .catch(() => {
+                        document.getElementById('loadingOverlay').classList.remove('visible');
+                        alert('加载失败');
+                    });
+            }
         }
 
         function closeStoryModal() {
@@ -1070,8 +1101,11 @@
         // ======== 加载日志 ========
         async function loadLogs() {
             try {
-                const res = await fetch('/api/story/logs?limit=10');
+                const res = await fetch('/api/story/logs?limit=20');
                 const stories = await res.json();
+
+                // 缓存stories
+                window.cachedStories = stories;
 
                 const container = document.getElementById('logsList');
                 if (!stories || stories.length === 0) {
@@ -1082,10 +1116,11 @@
                 container.innerHTML = stories.map(s => {
                     const date = new Date(s.created_at);
                     const dateStr = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+                    const preview = s.content ? s.content.substring(0, 50) + (s.content.length > 50 ? '...' : '') : '暂无内容';
                     return `
-                        <div class="log-item" onclick="showStory('${(s.content || '').replace(/'/g, "\\'")}')">
+                        <div class="log-item" data-story-id="${s.id}" onclick="viewStoryDetail(${s.id})">
                             <div class="log-time">${dateStr} · ${s.duration || 25}分钟</div>
-                            <div class="log-preview">${s.content || '暂无内容'}</div>
+                            <div class="log-preview">${preview}</div>
                         </div>
                     `;
                 }).join('');

@@ -1778,7 +1778,7 @@
                 const isMobile = window.innerWidth <= 768;
                 if (isMobile) {
                     // 移动端：使用 vw/vh 单位，基于屏幕中心
-                    const distance = Math.min(c.distance, 80); // 限制最大距离
+                    const distance = Math.min(c.distance, 40); // 限制最大距离，让头像靠近火堆
                     camper.style.left = `calc(50vw + ${Math.cos(rad) * distance}px)`;
                     camper.style.top = `calc(50vh + ${Math.sin(rad) * distance}px)`;
                 } else {

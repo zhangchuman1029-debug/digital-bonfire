@@ -2854,13 +2854,7 @@
             selectedAction = action;
             selectedActionIcon = icon;
             closeModal('action');
-            // 隐藏专注面板，显示计时器
-            document.getElementById('focusPanel').style.display = 'none';
-            document.getElementById('focusUI').style.display = 'block';
-            // 显示 Agent 动作
-            document.getElementById('focusAgentAction').innerHTML =
-                `你的 Agent 正在 <span style="font-size:1.2em">${icon}</span> ${action}...<br><small style="opacity:0.6">它正替你在篝火旁社交</small>`;
-            // 开始专注
+            // 开始专注（选择动作后立即开始）
             beginFocus();
         }
 

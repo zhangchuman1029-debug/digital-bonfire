@@ -893,6 +893,15 @@
     <div class="mobile-drawer" id="mobileDrawer">
         <div class="mobile-drawer-section" id="mobileMbtiSection"></div>
         <div class="mobile-drawer-section" id="mobileAgentsSection"></div>
+        <div class="mobile-drawer-section" style="border-color: rgba(34, 197, 94, 0.4);">
+            <h3 style="color: #22c55e;">🎯 专注模式</h3>
+            <div style="margin: 10px 0;">
+                <input type="number" id="focusDurationMobile" value="25" min="1" max="180" style="width:60px;padding:6px;background:rgba(255,255,255,0.1);border:1px solid rgba(34,197,94,0.3);color:white;border-radius:5px;text-align:center;" onchange="document.getElementById('focusDuration').value=this.value;updateFocusTimerDisplay(this.value*60);">
+                <span style="color:rgba(255,255,255,0.6);font-size:12px;">分钟</span>
+            </div>
+            <button onclick="startFocus()" id="mobileFocusBtn" style="width:100%;padding:10px;background:linear-gradient(135deg, #22c55e, #16a34a);border:none;color:white;border-radius:8px;margin-top:8px;font-size:14px;cursor:pointer;">开始专注</button>
+            <button onclick="quitFocus()" id="mobileQuitFocusBtn" style="display:none;width:100%;padding:10px;background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.4);color:#ef4444;border-radius:8px;margin-top:8px;font-size:14px;cursor:pointer;">退出专注</button>
+        </div>
         <div class="mobile-drawer-section">
             <h3>📖 故事日志</h3>
             <button onclick="showStoryPanel()" style="width:100%;padding:8px;background:rgba(255,170,0,0.2);border:1px solid var(--fire-mid);color:white;border-radius:5px;margin-top:5px;">查看故事</button>
@@ -1204,6 +1213,12 @@
             // 显示专注 UI
             document.getElementById('focusUI').style.display = 'block';
 
+            // 切换移动端按钮
+            const mobileFocusBtn = document.getElementById('mobileFocusBtn');
+            const mobileQuitFocusBtn = document.getElementById('mobileQuitFocusBtn');
+            if (mobileFocusBtn) mobileFocusBtn.style.display = 'none';
+            if (mobileQuitFocusBtn) mobileQuitFocusBtn.style.display = 'block';
+
             // 添加 .focus-hide 类隐藏所有干扰项
             document.querySelectorAll('.sidebar, .right-sidebar, .header, .mobile-menu-btn, .login-container, .camper, .story-panel, .focusing-indicator').forEach(el => {
                 el.classList.add('focus-hide');
@@ -1283,6 +1298,12 @@
 
             // 显示专注 UI
             document.getElementById('focusUI').style.display = 'block';
+
+            // 切换移动端按钮
+            const mobileFocusBtn = document.getElementById('mobileFocusBtn');
+            const mobileQuitFocusBtn = document.getElementById('mobileQuitFocusBtn');
+            if (mobileFocusBtn) mobileFocusBtn.style.display = 'none';
+            if (mobileQuitFocusBtn) mobileQuitFocusBtn.style.display = 'block';
 
             // 添加 .focus-hide 类隐藏所有干扰项
             document.querySelectorAll('.sidebar, .right-sidebar, .header, .mobile-menu-btn, .login-container, .camper, .story-panel, .focusing-indicator').forEach(el => {
@@ -1490,6 +1511,12 @@
 
             // 隐藏专注 UI
             document.getElementById('focusUI').style.display = 'none';
+
+            // 切换移动端按钮
+            const mobileFocusBtn = document.getElementById('mobileFocusBtn');
+            const mobileQuitFocusBtn = document.getElementById('mobileQuitFocusBtn');
+            if (mobileFocusBtn) mobileFocusBtn.style.display = 'block';
+            if (mobileQuitFocusBtn) mobileQuitFocusBtn.style.display = 'none';
 
             // 移除火焰放大效果
             document.getElementById('campground').classList.remove('focus-active');

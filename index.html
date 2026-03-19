@@ -80,6 +80,78 @@
             transform: scale(1.5);
         }
 
+        /* 中央行动区域 - 专注模式 */
+        .central-action-area {
+            position: fixed;
+            bottom: 8%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        #focusPanel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            padding: 20px 35px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        #focusPanel input {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-bottom: 2px solid rgba(255, 165, 0, 0.5);
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            width: 70px;
+            text-align: center;
+            margin-right: 10px;
+            outline: none;
+        }
+
+        #focusPanel input::-webkit-inner-spin-button,
+        #focusPanel input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .burn-btn {
+            margin-top: 15px;
+            background: linear-gradient(45deg, #ff5500, #ffaa00);
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            letter-spacing: 2px;
+            box-shadow: 0 4px 15px rgba(255, 85, 0, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 14px;
+        }
+
+        .burn-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 85, 0, 0.6);
+        }
+
+        /* 专注模式时隐藏设置面板，显示计时 */
+        body.focus-mode #focusPanel {
+            display: none;
+        }
+
+        body.focus-mode #focusUI {
+            display: block !important;
+        }
+
         /* 简约火焰 - 旋转椭圆 */
         .flame {
             position: absolute;
@@ -1043,12 +1115,7 @@
         专注中
     </div>
 
-    <!-- 专注模式 UI（独立于侧边栏） -->
-    <div id="focusUI" style="display:none; position:fixed; top:70%; left:50%; transform:translateX(-50%); z-index:9999; text-align:center;">
-        <div id="focusTimerDisplay" style="font-size: 4rem; color: white; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 20px rgba(255,165,0,0.8);">00:00</div>
-        <button id="quitFocusBtn" onclick="quitFocus()" style="background:none; border:1px solid rgba(255,255,255,0.3); color:rgba(255,255,255,0.6); cursor:pointer; padding:8px 20px; border-radius:20px; margin-top:20px; font-size:14px;">退出专注</button>
-    </div>
-
+    <!-- 火堆容器 -->
     <div class="fire-container" id="campground">
         <div class="fire-glow"></div>
         <div class="flame"></div>
@@ -1057,6 +1124,26 @@
         <div class="fire-particle"></div>
         <div class="fire-particle"></div>
         <!-- Logs removed -->
+    </div>
+
+    <!-- 中央行动区域 - 专注模式 -->
+    <div class="central-action-area" id="centralActionArea">
+        <!-- 专注设置面板 -->
+        <div id="focusPanel">
+            <div style="color: rgba(255,165,0,0.9); font-size: 14px; margin-bottom: 15px; letter-spacing: 3px;">🎯 专注模式</div>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <input type="number" id="focusDuration" value="25" min="1" max="180"
+                    style="background: rgba(255,255,255,0.1); border: none; border-bottom: 2px solid rgba(255,165,0,0.5); color: #fff; font-family: 'Orbitron', sans-serif; font-size: 1.5rem; width: 70px; text-align: center; outline: none;">
+                <span style="color: rgba(255,255,255,0.6);">分钟</span>
+            </div>
+            <button onclick="startFocus()" class="burn-btn">开始专注</button>
+        </div>
+
+        <!-- 专注计时显示（专注时显示） -->
+        <div id="focusUI" style="display: none; text-align: center;">
+            <div id="focusTimerDisplay" style="font-size: 4rem; color: white; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 30px rgba(255,165,0,0.8);">00:00</div>
+            <button onclick="quitFocus()" style="background: none; border: 1px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.6); cursor: pointer; padding: 8px 20px; border-radius: 20px; margin-top: 20px; font-size: 14px;">退出专注</button>
+        </div>
     </div>
 
     <div class="status" id="status"></div>

@@ -1261,7 +1261,6 @@
         }
 
         // 添加专注模式额外粒子
-        let focusParticleInterval = null;
         function addFocusParticles() {
             const fireContainer = document.getElementById('campground');
 
@@ -2020,17 +2019,19 @@
 
         // 专注时长输入框事件监听
         const focusDurationInput = document.getElementById('focusDuration');
-        focusDurationInput.addEventListener('input', function() {
-            const value = parseInt(this.value) || 25;
-            updateFocusTimerDisplay(value * 60);
-        });
-        focusDurationInput.addEventListener('change', function() {
-            let value = parseInt(this.value) || 25;
-            if (value < 1) value = 1;
-            if (value > 180) value = 180;
-            this.value = value;
-            updateFocusTimerDisplay(value * 60);
-        });
+        if (focusDurationInput) {
+            focusDurationInput.addEventListener('input', function() {
+                const value = parseInt(this.value) || 25;
+                updateFocusTimerDisplay(value * 60);
+            });
+            focusDurationInput.addEventListener('change', function() {
+                let value = parseInt(this.value) || 25;
+                if (value < 1) value = 1;
+                if (value > 180) value = 180;
+                this.value = value;
+                updateFocusTimerDisplay(value * 60);
+            });
+        }
 
         setInterval(fetchCampers, 3000);
         setInterval(fetchStatusCounts, 5000);

@@ -1391,6 +1391,7 @@
             clearInterval(focusInterval);
             clearInterval(focusParticleInterval);
             focusInterval = null;
+            focusParticleInterval = null;
             isFocusing = false;
 
             // 清除专注粒子
@@ -1416,9 +1417,19 @@
             // 退出沉浸模式
             document.body.classList.remove('focus-mode');
 
+            // 切换移动端按钮
+            const mobileFocusBtn = document.getElementById('mobileFocusBtn');
+            const mobileQuitFocusBtn = document.getElementById('mobileQuitFocusBtn');
+            if (mobileFocusBtn) mobileFocusBtn.style.display = 'block';
+            if (mobileQuitFocusBtn) mobileQuitFocusBtn.style.display = 'none';
+
             // 重置计时器显示
             const durationInput = document.getElementById('focusDuration');
-            updateFocusTimerDisplay((parseInt(durationInput.value) || 25) * 60);
+            if (durationInput) {
+                updateFocusTimerDisplay((parseInt(durationInput.value) || 25) * 60);
+            } else {
+                updateFocusTimerDisplay(25 * 60);
+            }
 
             // 调用后端 API 结束专注，获取故事
             try {
@@ -1460,6 +1471,7 @@
             clearInterval(focusInterval);
             clearInterval(focusParticleInterval);
             focusInterval = null;
+            focusParticleInterval = null;
             isFocusing = false;
 
             // 清除专注粒子
@@ -1470,9 +1482,12 @@
             localStorage.removeItem('campfire_focus_duration');
             localStorage.removeItem('campfire_focus_active');
 
+            // 隐藏专注 UI
+            const focusUI = document.getElementById('focusUI');
+            if (focusUI) focusUI.style.display = 'none';
+
             // 移除所有专注模式类
             document.getElementById('campground').classList.remove('focus-active');
-            document.querySelector('.focus-timer').classList.remove('focus-active');
             document.querySelectorAll('.focus-hide').forEach(el => {
                 el.classList.remove('focus-hide');
             });
@@ -1480,11 +1495,21 @@
             // 退出沉浸模式
             document.body.classList.remove('focus-mode');
 
+            // 切换移动端按钮
+            const mobileFocusBtn = document.getElementById('mobileFocusBtn');
+            const mobileQuitFocusBtn = document.getElementById('mobileQuitFocusBtn');
+            if (mobileFocusBtn) mobileFocusBtn.style.display = 'block';
+            if (mobileQuitFocusBtn) mobileQuitFocusBtn.style.display = 'none';
+
             // 重置计时器显示
             const durationInput = document.getElementById('focusDuration');
-            updateFocusTimerDisplay((parseInt(durationInput.value) || 25) * 60);
+            if (durationInput) {
+                updateFocusTimerDisplay((parseInt(durationInput.value) || 25) * 60);
+            } else {
+                updateFocusTimerDisplay(25 * 60);
+            }
 
-            showStatus('专注已放弃');
+            showStatus('已退出专注模式');
         }
 
         // 退出专注按钮调用的函数
@@ -1494,7 +1519,7 @@
                 return;
             }
 
-            // 清除定时器
+            // 1. 停止后台逻辑
             clearInterval(focusInterval);
             clearInterval(focusParticleInterval);
             focusInterval = null;
@@ -1509,26 +1534,39 @@
             localStorage.removeItem('campfire_focus_duration');
             localStorage.removeItem('campfire_focus_active');
 
-            // 隐藏专注 UI
-            document.getElementById('focusUI').style.display = 'none';
+            // 2. 恢复 UI 显示
 
-            // 切换移动端按钮
+            // 隐藏专注 UI
+            const focusUI = document.getElementById('focusUI');
+            if (focusUI) focusUI.style.display = 'none';
+
+            // 移除火焰放大效果
+            const campground = document.getElementById('campground');
+            if (campground) campground.classList.remove('focus-active');
+
+            // 退出沉浸模式（解除 CSS 的全屏隐藏效果）
+            document.body.classList.remove('focus-mode');
+
+            // 移除 focus-hide 类，恢复所有被隐藏的元素（侧边栏、header、登录按钮等）
+            document.querySelectorAll('.focus-hide').forEach(el => {
+                el.classList.remove('focus-hide');
+            });
+
+            // 3. 切换移动端按钮
             const mobileFocusBtn = document.getElementById('mobileFocusBtn');
             const mobileQuitFocusBtn = document.getElementById('mobileQuitFocusBtn');
             if (mobileFocusBtn) mobileFocusBtn.style.display = 'block';
             if (mobileQuitFocusBtn) mobileQuitFocusBtn.style.display = 'none';
 
-            // 移除火焰放大效果
-            document.getElementById('campground').classList.remove('focus-active');
-
-            // 退出沉浸模式
-            document.body.classList.remove('focus-mode');
-
-            // 重置计时器显示
+            // 4. 重置计时器显示
             const durationInput = document.getElementById('focusDuration');
-            updateFocusTimerDisplay((parseInt(durationInput.value) || 25) * 60);
+            if (durationInput) {
+                updateFocusTimerDisplay((parseInt(durationInput.value) || 25) * 60);
+            } else {
+                updateFocusTimerDisplay(25 * 60);
+            }
 
-            showStatus('专注已放弃');
+            showStatus('已退出专注模式');
         }
 
         function closeFocusPopup() {

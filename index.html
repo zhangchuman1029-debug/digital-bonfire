@@ -1083,6 +1083,134 @@
             display: none !important;
         }
 
+        /* ==================== 左侧在线营员面板 ==================== */
+        .left-sidebar {
+            position: fixed;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 200px;
+            max-height: 60vh;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 0 12px 12px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 40;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .left-sidebar.collapsed {
+            width: 40px;
+        }
+
+        .left-sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+        }
+
+        .left-sidebar-header h3 {
+            margin: 0;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        .left-sidebar-toggle {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        .left-sidebar.collapsed .left-sidebar-toggle {
+            transform: rotate(180deg);
+        }
+
+        .left-sidebar-content {
+            padding: 10px;
+            max-height: calc(60vh - 50px);
+            overflow-y: auto;
+        }
+
+        .left-sidebar.collapsed .left-sidebar-content {
+            display: none;
+        }
+
+        .online-user-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            margin-bottom: 5px;
+        }
+
+        .online-user-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .online-user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: white;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .online-user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .online-user-name {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.9);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .online-user-status {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .online-user-status.focusing {
+            color: rgba(255, 165, 0, 0.8);
+        }
+
+        .online-user-status .action-icon {
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .left-sidebar {
+                display: none;
+            }
+        }
+
+        /* 专注模式隐藏侧边栏 */
+        body.focus-mode .left-sidebar {
+            display: none !important;
+        }
+
         /* ==================== 右下角悬浮菜单 ==================== */
         .floating-menu {
             position: fixed;
@@ -1389,6 +1517,17 @@
         <button class="enter-btn" id="loginBtn">进入数字篝火</button>
     </div>
 
+    <!-- 左侧在线营员面板 -->
+    <div class="left-sidebar" id="leftSidebar">
+        <div class="left-sidebar-header" onclick="toggleLeftSidebar()">
+            <h3>🔥 在线营员</h3>
+            <span class="left-sidebar-toggle">◀</span>
+        </div>
+        <div class="left-sidebar-content" id="onlineUsersList">
+            <!-- 动态渲染在线用户 -->
+        </div>
+    </div>
+
     <!-- 右下角悬浮菜单 -->
     <div class="floating-menu" id="floatingMenu">
         <div class="menu-item" onclick="openModal('status')" title="状态">👤</div>
@@ -1662,6 +1801,44 @@
             document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
         }
 
+        // 切换左侧面板收起/展开
+        function toggleLeftSidebar() {
+            const sidebar = document.getElementById('leftSidebar');
+            sidebar.classList.toggle('collapsed');
+        }
+
+        // 渲染在线用户到左侧面板
+        function renderOnlineUsers(campers) {
+            const container = document.getElementById('onlineUsersList');
+            if (!container) return;
+
+            const otherCampers = campers.filter(c => c.id != currentUser?.id);
+            if (otherCampers.length === 0) {
+                container.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-size:0.8rem;text-align:center;padding:20px;">暂无其他营员</div>';
+                return;
+            }
+
+            container.innerHTML = otherCampers.map(c => {
+                const isFocusing = c.status === 'focusing';
+                const actionIcon = c.focus_action_icon || '🍢';
+                const actionName = c.focus_action || '烤棉花糖';
+
+                return `
+                    <div class="online-user-item" onclick="generateStoryForUser(${JSON.stringify(c).replace(/"/g, '&quot;')})">
+                        <div class="online-user-avatar" style="background:${c.color || '#666'};box-shadow:0 0 10px ${c.color || '#666'}66;">
+                            ${c.name.charAt(0)}
+                        </div>
+                        <div class="online-user-info">
+                            <div class="online-user-name">${c.name}</div>
+                            <div class="online-user-status ${isFocusing ? 'focusing' : ''}">
+                                ${isFocusing ? `<span class="action-icon">${actionIcon}</span> 正在${actionName}...` : `<span>${c.mbti || '?'}</span>`}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
         // ==================== 分身动作按钮事件 ====================
         document.querySelectorAll('.action-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -1810,43 +1987,48 @@
         let selectedFocusDuration = 25;     // 选中的专注时长
         let isFocusing = false;            // 是否正在专注
 
-        // 页面加载时检查专注状态
+        // 页面加载时检查专注状态（不自动恢复专注模式）
         function checkFocusStatus() {
             const userId = localStorage.getItem('campfire_user_id');
             if (!userId) return;
 
             const savedFocusStart = localStorage.getItem('campfire_focus_start_time');
             const savedFocusDuration = localStorage.getItem('campfire_focus_duration');
-            const savedFocusActive = localStorage.getItem('campfire_focus_active');
 
+            // 如果有保存的专注数据，检查是否已过期，过期则清理
             if (savedFocusStart && savedFocusDuration) {
                 const startTime = parseInt(savedFocusStart);
                 const duration = parseInt(savedFocusDuration);
                 const elapsed = Math.floor((Date.now() - startTime) / 1000);
                 const remaining = duration * 60 - elapsed;
 
-                if (remaining > 0) {
-                    // 恢复专注模式 UI
-                    restoreFocusModeUI();
-
-                    // 继续之前的专注
-                    startFocusTimer(remaining);
-                } else {
-                    // 专注时间已过，调用 finishFocus 生成故事
-                    finishFocus();
+                if (remaining <= 0) {
+                    // 专注时间已过，清理旧数据
+                    localStorage.removeItem('campfire_focus_start_time');
+                    localStorage.removeItem('campfire_focus_duration');
+                    localStorage.removeItem('campfire_focus_active');
                 }
+                // 注意：不自动恢复专注模式！用户需要手动点击开始
             }
 
-            // 获取后端专注状态
+            // 获取后端专注状态（仅检查，不自动恢复）
             fetch(`/api/focus/status?user_id=${userId}`)
                 .then(res => res.json())
                 .then(data => {
-                    if (data.focusing && data.remaining_seconds > 0) {
+                    // 如果后端显示正在专注但前端没有启动，才恢复
+                    if (data.focusing && data.remaining_seconds > 0 && !isFocusing) {
+                        // 从后端获取动作信息
+                        const action = data.focus_action || '烤棉花糖';
+                        const actionIcon = data.focus_action_icon || '🍢';
+                        localStorage.setItem('focusAction', action);
+                        localStorage.setItem('focusActionIcon', actionIcon);
                         restoreFocusModeUI();
                         startFocusTimer(data.remaining_seconds);
                     } else if (!data.focusing && savedFocusStart && savedFocusDuration) {
-                        // 后端已结束但前端还在检查，调用 finishFocus
-                        finishFocus();
+                        // 后端已结束，清理前端数据
+                        localStorage.removeItem('campfire_focus_start_time');
+                        localStorage.removeItem('campfire_focus_duration');
+                        localStorage.removeItem('campfire_focus_active');
                     }
                 })
                 .catch(e => console.error('Failed to get focus status:', e));
@@ -1948,6 +2130,8 @@
 
             // 调用后端 API 开始专注
             try {
+                const action = selectedAction || '烤棉花糖';
+                const actionIcon = selectedActionIcon || '🍢';
                 const res = await fetch('/api/focus/start', {
                     method: 'POST',
                     headers: {
@@ -1956,7 +2140,9 @@
                     },
                     body: JSON.stringify({
                         user_id: parseInt(userId),
-                        duration: focusDuration
+                        duration: focusDuration,
+                        action: action,
+                        action_icon: actionIcon
                     })
                 });
                 const data = await res.json();
@@ -2665,8 +2851,10 @@
         function renderAgents(campers) {
             const container = document.getElementById('agentsList');
             const modalContainer = document.getElementById('onlineUsersList');
+            const leftSidebarContainer = document.getElementById('onlineUsersList');
             container.innerHTML = '';
             if (modalContainer) modalContainer.innerHTML = '';
+            if (leftSidebarContainer) leftSidebarContainer.innerHTML = '';
 
             if (campers.length === 0) {
                 container.innerHTML = '<div style="color: var(--text-secondary); font-size: 10px; text-align: center; padding: 10px;">暂无 Agents</div>';
@@ -2712,6 +2900,27 @@
                         const li = document.createElement('li');
                         li.innerHTML = `<span style="color:${c.color || color}">●</span> ${c.name} <small style="color:rgba(255,255,255,0.4)">${c.mbti || '?'}</small>`;
                         modalContainer.appendChild(li);
+                    }
+
+                    // 左侧边栏用户列表
+                    if (leftSidebarContainer && c.id !== currentUser?.id) {
+                        const isFocusing = c.status === 'focusing';
+                        const actionIcon = c.focus_action_icon || '🍢';
+                        const actionName = c.focus_action || '烤棉花糖';
+                        const userDiv = document.createElement('div');
+                        userDiv.className = 'online-user-item';
+                        userDiv.innerHTML = `
+                            <div class="online-user-avatar" style="background:${c.color || color};box-shadow:0 0 10px ${c.color || color}66;">
+                                ${c.name.charAt(0)}
+                            </div>
+                            <div class="online-user-info">
+                                <div class="online-user-name">${c.name}</div>
+                                <div class="online-user-status ${isFocusing ? 'focusing' : ''}">
+                                    ${isFocusing ? `<span class="action-icon">${actionIcon}</span> 正在${actionName}...` : `<span>${c.mbti || '?'}</span>`}
+                                </div>
+                            </div>
+                        `;
+                        leftSidebarContainer.appendChild(userDiv);
                     }
                 });
             });

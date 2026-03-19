@@ -721,6 +721,8 @@ async def get_user_info(token: str):
 class FocusStartRequest(BaseModel):
     user_id: int
     duration: int  # 专注时长（分钟）
+    action: str = "烤棉花糖"  # 专注动作
+    action_icon: str = "🍢"  # 动作图标
 
 class FocusEndRequest(BaseModel):
     user_id: int
@@ -753,6 +755,8 @@ async def start_focus(request: FocusStartRequest):
     camper["status"] = "focusing"
     camper["focus_start_time"] = datetime.now().isoformat()
     camper["focus_duration"] = request.duration
+    camper["focus_action"] = request.action
+    camper["focus_action_icon"] = request.action_icon
     camper["focus_participants"] = participants_info
 
     # 初始化专注会话记录
@@ -760,6 +764,8 @@ async def start_focus(request: FocusStartRequest):
         "user_id": request.user_id,
         "start_time": datetime.now().isoformat(),
         "duration": request.duration,
+        "action": request.action,
+        "action_icon": request.action_icon,
         "participants": participants_info,
         "status": "active"
     })
@@ -884,7 +890,9 @@ async def get_focus_status(user_id: int):
         "focusing": is_focusing,
         "start_time": focus_start,
         "duration": focus_duration,
-        "remaining_seconds": int(remaining)
+        "remaining_seconds": int(remaining),
+        "focus_action": camper.get("focus_action", "烤棉花糖"),
+        "focus_action_icon": camper.get("focus_action_icon", "🍢")
     }
 
 @app.post("/api/focus-story")

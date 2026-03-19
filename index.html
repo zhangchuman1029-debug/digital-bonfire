@@ -993,9 +993,337 @@
         }
         .mobile-menu-btn, .mobile-drawer, .mobile-drawer-overlay { display: none; }
         .mobile-status-bar { display: none !important; }
+    /* ==================== 登录界面 ==================== */
+        #loginScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #0a0a1a 0%, #1a1a2e 50%, #16213e 100%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        #loginScreen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        #loginScreen h1 {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 8px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(255, 165, 0, 0.3);
+        }
+
+        #loginScreen .subtitle {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            letter-spacing: 4px;
+            margin-bottom: 60px;
+        }
+
+        #loginScreen .enter-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 15px 40px;
+            font-size: 1rem;
+            letter-spacing: 3px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        #loginScreen .enter-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: scale(1.02);
+        }
+
+        /* 登录后隐藏的元素 */
+        body.not-logged-in .sidebar,
+        body.not-logged-in .right-sidebar,
+        body.not-logged-in .central-action-area,
+        body.not-logged-in #campground,
+        body.not-logged-in .modal-trigger {
+            display: none !important;
+        }
+
+        /* ==================== 弹窗触发器 ==================== */
+        .modal-trigger {
+            position: fixed;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.75rem;
+            cursor: pointer;
+            z-index: 50;
+            padding: 8px 12px;
+            transition: color 0.3s ease;
+            letter-spacing: 1px;
+        }
+
+        .modal-trigger:hover {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        #triggerLeft {
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        #triggerRight {
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        #triggerTop {
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* ==================== 弹窗系统 ==================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: rgba(20, 20, 35, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px 10px;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .modal-title {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        /* 弹窗内容区 */
+        .modal-body {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.8;
+        }
+
+        .modal-section {
+            margin-bottom: 20px;
+        }
+
+        .modal-section h3 {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        /* 弹窗内列表样式 */
+        .modal-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .modal-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* 弹窗内按钮 */
+        .modal-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            margin: 4px;
+        }
+
+        .modal-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .modal-btn.active {
+            background: rgba(255, 165, 0, 0.2);
+            border-color: rgba(255, 165, 0, 0.5);
+            color: rgba(255, 165, 0, 0.9);
+        }
+
+        /* 专注模式隐藏触发器 */
+        body.focus-mode .modal-trigger {
+            display: none !important;
+        }
+
+        body.focus-mode .modal-overlay {
+            display: none !important;
+        }
+
+        /* 移动端弹窗 */
+        @media (max-width: 768px) {
+            .modal-content {
+                padding: 20px;
+                border-radius: 12px;
+            }
+
+            .modal-trigger {
+                font-size: 0.65rem;
+                padding: 6px 8px;
+            }
+
+            #loginScreen h1 {
+                font-size: 1.8rem;
+                letter-spacing: 4px;
+            }
+
+            #loginScreen .subtitle {
+                font-size: 0.75rem;
+            }
+
+            #loginScreen .enter-btn {
+                padding: 12px 30px;
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- 登录界面 -->
+    <div id="loginScreen">
+        <h1>数字篝火</h1>
+        <p class="subtitle">DIGITAL BONFIRE</p>
+        <button class="enter-btn" id="loginBtn">进入数字篝火</button>
+    </div>
+
+    <!-- 弹窗触发器 -->
+    <span class="modal-trigger" id="triggerLeft" onclick="openModal('left')">功能</span>
+    <span class="modal-trigger" id="triggerRight" onclick="openModal('right')">状态</span>
+    <span class="modal-trigger" id="triggerTop" onclick="openModal('help')">?</span>
+
+    <!-- 左侧弹窗 - 功能区 -->
+    <div class="modal-overlay" id="modalLeft">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('left')">&times;</button>
+            <div class="modal-title">功能</div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h3>选择你的状态</h3>
+                    <div id="activityButtonsContainer"></div>
+                </div>
+                <div class="modal-section">
+                    <h3>专注历史</h3>
+                    <div id="focusHistoryContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右侧弹窗 - 状态区 -->
+    <div class="modal-overlay" id="modalRight">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('right')">&times;</button>
+            <div class="modal-title">在线营员</div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h3>在线用户</h3>
+                    <ul class="modal-list" id="onlineUsersList"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 顶部弹窗 - 帮助 -->
+    <div class="modal-overlay" id="modalHelp">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('help')">&times;</button>
+            <div class="modal-title">使用说明</div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h3>关于数字篝火</h3>
+                    <p>这是一个基于 MBTI 的陌生人社交应用。在星空下围坐篝火，与志同道合的旅者相遇。</p>
+                </div>
+                <div class="modal-section">
+                    <h3>如何开始</h3>
+                    <p>1. 点击右上角登录<br>2. 选择你的 MBTI 类型<br>3. 选择当前状态<br>4. 开始社交</p>
+                </div>
+                <div class="modal-section">
+                    <h3>专注模式</h3>
+                    <p>设置专注时长，AI 会记录你在专注时与营员的互动，生成温暖的故事。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="stars" id="stars"></div>
 
     <!-- 移动端状态栏 -->
@@ -1178,11 +1506,55 @@
 
     <div class="status" id="status"></div>
 
-    <div class="login-container">
-        <button id="loginBtn">开始相遇 (Connect via SecondMe)</button>
-    </div>
-
     <script>
+        // ==================== 登录拦截逻辑 ====================
+        const token = localStorage.getItem('campfire_token');
+        const userId = localStorage.getItem('campfire_user_id');
+
+        if (!token || !userId) {
+            document.body.classList.add('not-logged-in');
+        } else {
+            // 已登录，隐藏登录界面
+            document.getElementById('loginScreen').classList.add('hidden');
+        }
+
+        // 登录按钮事件
+        document.getElementById('loginBtn').addEventListener('click', () => {
+            window.location.href = '/api/login';
+        });
+
+        // ==================== 弹窗系统 ====================
+        function openModal(type) {
+            // 关闭其他弹窗
+            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+
+            const modal = document.getElementById('modal' + type.charAt(0).toUpperCase() + type.slice(1));
+            if (modal) {
+                modal.classList.add('active');
+            }
+        }
+
+        function closeModal(type) {
+            const modal = document.getElementById('modal' + type.charAt(0).toUpperCase() + type.slice(1));
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        // 点击遮罩关闭弹窗
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('active');
+                }
+            });
+        });
+
+        // ==================== 专注模式关闭弹窗 ====================
+        function closeAllModals() {
+            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+        }
+
         const campground = document.getElementById('campground');
         const centerX = 50, centerY = 50;
         let currentUser = null;
@@ -1241,6 +1613,10 @@
 
             // 清除 URL 参数
             window.history.replaceState({}, document.title, window.location.pathname);
+
+            // 隐藏登录界面，显示主应用
+            document.body.classList.remove('not-logged-in');
+            document.getElementById('loginScreen').classList.add('hidden');
 
             // 直接设置 currentUser，不等待 fetchCampers
             currentUser = {
@@ -1449,6 +1825,9 @@
             startFocusTimer(focusDuration * 60);
 
             // 进入沉浸模式
+            // 关闭所有弹窗
+            closeAllModals();
+
             document.body.classList.add('focus-mode');
 
             showStatus(`开始专注 ${focusDuration} 分钟`);
@@ -1861,14 +2240,17 @@
                 const data = await res.json();
 
                 const historyContainer = document.getElementById('focusHistory');
+                const modalContainer = document.getElementById('focusHistoryContainer');
                 const userStories = data.stories ? data.stories.filter(s => s.user_id == userId) : [];
 
                 if (userStories.length === 0) {
-                    historyContainer.innerHTML = '<div class="focus-history-title">暂无专注记录</div>';
+                    if (historyContainer) historyContainer.innerHTML = '<div class="focus-history-title">暂无专注记录</div>';
+                    if (modalContainer) modalContainer.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-size:12px;text-align:center;">暂无记录</div>';
                     return;
                 }
 
                 let html = '<div class="focus-history-title">专注记录</div>';
+                let modalHtml = '';
                 userStories.slice(0, 10).forEach(story => {
                     const date = new Date(story.created_at);
                     const dateStr = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
@@ -1878,8 +2260,12 @@
                             <div class="focus-history-duration">${story.duration} 分钟专注</div>
                         </div>
                     `;
+                    modalHtml += `<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:12px;">
+                        <span style="color:rgba(255,255,255,0.4)">${dateStr}</span> · ${story.duration}分钟
+                    </div>`;
                 });
-                historyContainer.innerHTML = html;
+                if (historyContainer) historyContainer.innerHTML = html;
+                if (modalContainer) modalContainer.innerHTML = modalHtml;
             } catch (e) {
                 console.error('Failed to load focus history:', e);
             }
@@ -2097,7 +2483,9 @@
         // 渲染 Agents 面板
         function renderAgents(campers) {
             const container = document.getElementById('agentsList');
+            const modalContainer = document.getElementById('onlineUsersList');
             container.innerHTML = '';
+            if (modalContainer) modalContainer.innerHTML = '';
 
             if (campers.length === 0) {
                 container.innerHTML = '<div style="color: var(--text-secondary); font-size: 10px; text-align: center; padding: 10px;">暂无 Agents</div>';
@@ -2137,6 +2525,13 @@
                         </div>
                     `;
                     container.appendChild(div);
+
+                    // 弹窗内用户列表
+                    if (modalContainer) {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<span style="color:${c.color || color}">●</span> ${c.name} <small style="color:rgba(255,255,255,0.4)">${c.mbti || '?'}</small>`;
+                        modalContainer.appendChild(li);
+                    }
                 });
             });
 
@@ -2163,10 +2558,14 @@
 
         function renderActivities(activityList) {
             const container = document.getElementById('activityList');
+            const modalContainer = document.getElementById('activityButtonsContainer');
             container.innerHTML = '';
+            if (modalContainer) modalContainer.innerHTML = '';
 
             activities.forEach(act => {
                 const count = activityList.filter(a => a.name === act.name).length;
+
+                // 侧边栏
                 const div = document.createElement('div');
                 div.className = 'activity-item';
                 div.innerHTML = `
@@ -2179,6 +2578,15 @@
                 `;
                 div.onclick = () => joinActivity(act.name);
                 container.appendChild(div);
+
+                // 弹窗内按钮
+                if (modalContainer) {
+                    const btn = document.createElement('button');
+                    btn.className = 'modal-btn';
+                    btn.innerHTML = `${act.emoji} ${act.name}`;
+                    btn.onclick = () => joinActivity(act.name);
+                    modalContainer.appendChild(btn);
+                }
             });
         }
 

@@ -3896,9 +3896,7 @@
 
             // 显示持续 Loading 提示
             const loadingOverlay = document.getElementById('storyLoadingOverlay');
-            const loadingText = document.getElementById('storyLoadingText');
-            if (loadingOverlay && loadingText) {
-                loadingText.textContent = '正在读取 ' + user.name + ' 的心声...';
+            if (loadingOverlay) {
                 loadingOverlay.style.display = 'flex';
             }
 

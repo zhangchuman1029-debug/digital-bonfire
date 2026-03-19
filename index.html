@@ -134,22 +134,24 @@
             font-size: 0.9rem;
         }
 
-        /* 开始计时文字链接 */
+        /* 开始计时按钮 */
         #startFocusText {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.8rem;
             cursor: pointer;
-            padding: 4px 12px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
+            padding: 20px 40px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
             transition: all 0.3s ease;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            display: inline-block;
         }
 
         #startFocusText:hover {
             color: rgba(255, 255, 255, 1);
-            border-color: rgba(255, 255, 255, 0.5);
-            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.02);
         }
 
         /* 专注模式时隐藏设置面板，显示计时 */
@@ -160,25 +162,31 @@
         /* 移动端适配 */
         @media (max-width: 768px) {
             .central-action-area {
-                bottom: 12%;
+                bottom: 15%;
             }
 
             #focusPanel {
-                gap: 8px;
+                gap: 10px;
+                flex-direction: column;
             }
 
             #focusPanel .duration-input {
-                width: 40px;
-                font-size: 0.9rem;
+                width: 60px;
+                font-size: 1.2rem;
             }
 
             #focusPanel .unit {
-                font-size: 0.8rem;
+                font-size: 1rem;
             }
 
             #startFocusText {
-                font-size: 0.8rem;
-                padding: 3px 10px;
+                font-size: 1.4rem;
+                padding: 15px 30px;
+                margin-top: 15px;
+            }
+
+            #focusTimerDisplay {
+                font-size: 3rem !important;
             }
         }
 
@@ -1054,34 +1062,58 @@
         body.not-logged-in .right-sidebar,
         body.not-logged-in .central-action-area,
         body.not-logged-in #campground,
-        body.not-logged-in .bottom-triggers {
+        body.not-logged-in .floating-menu {
             display: none !important;
         }
 
-        /* ==================== 底部极简图标按钮 ==================== */
-        .bottom-triggers {
+        /* ==================== 右下角悬浮菜单 ==================== */
+        .floating-menu {
             position: fixed;
             bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            right: 20px;
             display: flex;
-            gap: 20px;
+            flex-direction: column;
+            gap: 15px;
             z-index: 50;
         }
 
-        .bottom-trigger {
-            color: rgba(255, 255, 255, 0.3);
-            font-size: 1.2rem;
+        .floating-menu .menu-item {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 1.5rem;
             cursor: pointer;
-            padding: 8px 12px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
-            opacity: 0.5;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .bottom-trigger:hover {
-            color: rgba(255, 255, 255, 0.8);
-            opacity: 1;
+        .floating-menu .menu-item:hover {
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
             transform: scale(1.1);
+        }
+
+        /* 移动端 */
+        @media (max-width: 768px) {
+            .floating-menu {
+                bottom: 15px;
+                right: 15px;
+                gap: 10px;
+            }
+
+            .floating-menu .menu-item {
+                width: 42px;
+                height: 42px;
+                font-size: 1.2rem;
+                padding: 10px;
+            }
         }
 
         /* ==================== 弹窗系统 ==================== */
@@ -1213,7 +1245,7 @@
         }
 
         /* 专注模式隐藏触发器 */
-        body.focus-mode .bottom-triggers {
+        body.focus-mode .floating-menu {
             display: none !important;
         }
 
@@ -1257,12 +1289,11 @@
         <button class="enter-btn" id="loginBtn">进入数字篝火</button>
     </div>
 
-    <!-- 弹窗触发器 -->
-    <!-- 底部极简图标按钮 -->
-    <div class="bottom-triggers" id="bottomTriggers">
-        <span class="bottom-trigger" onclick="openModal('status')" title="状态">⚙️</span>
-        <span class="bottom-trigger" onclick="openModal('logs')" title="日志">📜</span>
-        <span class="bottom-trigger" onclick="openModal('guide')" title="帮助">❓</span>
+    <!-- 右下角悬浮菜单 -->
+    <div class="floating-menu" id="floatingMenu">
+        <div class="menu-item" onclick="openModal('status')" title="状态">👤</div>
+        <div class="menu-item" onclick="openModal('logs')" title="日志">📜</div>
+        <div class="menu-item" onclick="openModal('guide')" title="帮助">❓</div>
     </div>
 
     <!-- 状态弹窗 -->
@@ -1896,6 +1927,8 @@
                     // 显示故事弹窗（使用新的Modal系统）
                     showStoryModal(data.story);
                     showStatus('专注结束！');
+                    // 刷新故事日志
+                    fetchStoryLogs();
                 } else {
                     console.warn('故事生成失败:', data);
                     showStatus(data.message || '专注结束');

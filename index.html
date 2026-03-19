@@ -1416,6 +1416,172 @@
             justify-content: center;
         }
 
+        /* ==================== 右侧在线营员面板 ==================== */
+        .right-sidebar {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, rgba(20, 20, 35, 0.95) 0%, rgba(10, 10, 20, 0.98) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255, 255, 255, 0.08);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+            overflow: hidden;
+        }
+
+        .right-sidebar.collapsed {
+            transform: translateX(240px);
+        }
+
+        .right-sidebar-toggle-btn {
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 8px 0 0 8px;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .right-sidebar-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .right-sidebar.collapsed .right-sidebar-toggle-btn {
+            left: -30px;
+        }
+
+        .right-sidebar-section {
+            padding: 15px;
+            flex: 1;
+            overflow-y: auto;
+            border-bottom: 1px solid rgba(168, 85, 247, 0.15);
+            background: rgba(168, 85, 247, 0.05);
+        }
+
+        .right-sidebar-title {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .right-sidebar .online-user-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: background 0.2s ease;
+            cursor: pointer;
+        }
+
+        .right-sidebar .online-user-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .right-sidebar .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .right-sidebar .info {
+            flex: 1;
+        }
+
+        .right-sidebar .name {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .right-sidebar .status {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .right-sidebar .status.focusing {
+            color: rgba(255, 165, 0, 0.8);
+        }
+
+        /* 专注模式隐藏右侧面板 */
+        body.focus-mode .right-sidebar {
+            transform: translateX(100%) !important;
+        }
+
+        /* 右侧面板唤回按钮 */
+        .rightSidebarRecallBtn {
+            position: fixed;
+            right: 15px;
+            bottom: 20px;
+            width: 44px;
+            height: 44px;
+            background: rgba(168, 85, 247, 0.8);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+            z-index: 90;
+            display: none;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .rightSidebarRecallBtn:hover {
+            transform: scale(1.1);
+            background: rgba(168, 85, 247, 1);
+        }
+
+        body.focus-mode .rightSidebarRecallBtn {
+            display: none;
+        }
+
+        body:not(.focus-mode) .right-sidebar.collapsed + .rightSidebarRecallBtn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 768px) {
+            .right-sidebar {
+                width: 260px;
+                transform: translateX(100%);
+            }
+
+            .right-sidebar.expanded {
+                transform: translateX(0);
+            }
+
+            .right-sidebar-toggle-btn {
+                left: -35px;
+                width: 35px;
+            }
+        }
+
         /* ==================== 右下角悬浮菜单 ==================== */
         .floating-menu {
             position: fixed;
@@ -1761,19 +1927,22 @@
             <button class="start-focus-btn" id="startFocusBtn" onclick="showActionSelector()">开始专注</button>
         </div>
 
-        <!-- 在线名单 -->
-        <div class="sidebar-section online-users">
-            <div class="sidebar-section-title">🔥 在线营员</div>
-            <div id="onlineUsersList">
-                <div style="color:rgba(255,255,255,0.4);font-size:0.8rem;text-align:center;padding:20px;">暂无其他营员</div>
-            </div>
-        </div>
-
         <!-- 分身日志 -->
         <div class="sidebar-section stories">
             <div class="sidebar-section-title">📜 分身日志</div>
             <div id="storyLogsList">
                 <div style="color:rgba(255,255,255,0.4);font-size:0.8rem;text-align:center;padding:20px;">暂无故事</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右侧在线营员面板 -->
+    <div class="right-sidebar" id="rightSidebar">
+        <button class="right-sidebar-toggle-btn" onclick="toggleRightSidebar()">▶</button>
+        <div class="right-sidebar-section">
+            <div class="right-sidebar-title">🔥 在线营员</div>
+            <div id="onlineUsersListRight">
+                <div style="color:rgba(255,255,255,0.4);font-size:0.8rem;text-align:center;padding:20px;">暂无营员</div>
             </div>
         </div>
     </div>
@@ -2064,6 +2233,12 @@
             sidebar.classList.toggle('collapsed');
         }
 
+        // 切换右侧面板收起/展开
+        function toggleRightSidebar() {
+            const rightSidebar = document.getElementById('rightSidebar');
+            rightSidebar.classList.toggle('collapsed');
+        }
+
         // 渲染侧边栏用户信息
         function updateSidebarUserInfo() {
             const userName = localStorage.getItem('campfire_user_name') || '未登录';
@@ -2097,14 +2272,16 @@
             });
         });
 
-        // 渲染在线用户到侧边栏
+        // 渲染在线用户到右侧面板
         function renderOnlineUsers(campers) {
-            const container = document.getElementById('onlineUsersList');
+            const container = document.getElementById('onlineUsersListRight');
             if (!container) return;
 
-            const otherCampers = campers.filter(c => c.id != currentUser?.id);
+            // 渲染到右侧面板
+            const userId = localStorage.getItem('campfire_user_id');
+            const otherCampers = campers.filter(c => c.id != userId);
             if (otherCampers.length === 0) {
-                container.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-size:0.8rem;text-align:center;padding:20px;">暂无其他营员</div>';
+                container.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-size:0.8rem;text-align:center;padding:20px;">暂无营员</div>';
                 return;
             }
 
@@ -2120,8 +2297,8 @@
                         </div>
                         <div class="info">
                             <div class="name">${c.name}</div>
-                            <div class="online-user-status ${isFocusing ? 'focusing' : ''}">
-                                ${isFocusing ? `<span class="action-icon">${actionIcon}</span> 正在${actionName}...` : `<span>${c.mbti || '?'}</span>`}
+                            <div class="status ${isFocusing ? 'focusing' : ''}">
+                                ${isFocusing ? `<span class="action-icon">${actionIcon}</span> ${actionName}` : `<span>${c.mbti || '?'}</span>`}
                             </div>
                         </div>
                     </div>
@@ -2290,6 +2467,7 @@
 
             const savedFocusStart = localStorage.getItem('campfire_focus_start_time');
             const savedFocusDuration = localStorage.getItem('campfire_focus_duration');
+            const focusShouldAutoRestore = localStorage.getItem('campfire_focus_should_restore');
 
             // 如果有保存的专注数据，检查是否已过期，过期则清理
             if (savedFocusStart && savedFocusDuration) {
@@ -2303,16 +2481,19 @@
                     localStorage.removeItem('campfire_focus_start_time');
                     localStorage.removeItem('campfire_focus_duration');
                     localStorage.removeItem('campfire_focus_active');
+                    localStorage.removeItem('campfire_focus_should_restore');
                 }
-                // 注意：不自动恢复专注模式！用户需要手动点击开始
             }
 
             // 获取后端专注状态（仅检查，不自动恢复）
             fetch(`/api/focus/status?user_id=${userId}`)
                 .then(res => res.json())
                 .then(data => {
-                    // 如果后端显示正在专注但前端没有启动，才恢复
-                    if (data.focusing && data.remaining_seconds > 0 && !isFocusing) {
+                    // 只有明确标记需要恢复（用户主动开始）且剩余时间大于0时才恢复
+                    // 防止刷新页面后自动开始倒计时
+                    const shouldRestore = focusShouldAutoRestore === 'true' && data.focusing && data.remaining_seconds > 0 && !isFocusing;
+
+                    if (shouldRestore) {
                         // 从后端获取动作信息
                         const action = data.focus_action || '烤棉花糖';
                         const actionIcon = data.focus_action_icon || '🍢';
@@ -2320,17 +2501,34 @@
                         localStorage.setItem('focusActionIcon', actionIcon);
                         restoreFocusModeUI();
                         startFocusTimer(data.remaining_seconds);
-                    } else if (!data.focusing && savedFocusStart && savedFocusDuration) {
+                        // 恢复后清除标记
+                        localStorage.removeItem('campfire_focus_should_restore');
+                    } else if (!data.focusing) {
                         // 后端已结束，清理前端数据
                         localStorage.removeItem('campfire_focus_start_time');
                         localStorage.removeItem('campfire_focus_duration');
                         localStorage.removeItem('campfire_focus_active');
+                        localStorage.removeItem('campfire_focus_should_restore');
+                        // 确保界面显示"开始计时"按钮
+                        resetFocusUI();
                     }
                 })
                 .catch(e => console.error('Failed to get focus status:', e));
 
             // 加载专注历史
             loadFocusHistory();
+        }
+
+        // 重置专注 UI 到初始状态
+        function resetFocusUI() {
+            document.body.classList.remove('focus-mode');
+            document.getElementById('focusPanel').style.display = 'flex';
+            document.getElementById('focusUI').style.display = 'none';
+            const fireContainer = document.getElementById('campground');
+            if (fireContainer) {
+                fireContainer.classList.remove('focus-active');
+            }
+            isFocusing = false;
         }
 
         // 恢复专注模式 UI（用于页面刷新后）
@@ -2455,6 +2653,8 @@
             localStorage.setItem('campfire_focus_start_time', Date.now().toString());
             localStorage.setItem('campfire_focus_duration', focusDuration.toString());
             localStorage.setItem('campfire_focus_active', 'true');
+            // 标记应该恢复专注模式（用户主动开始）
+            localStorage.setItem('campfire_focus_should_restore', 'true');
 
             // 添加 .focus-active 类到火焰容器（中心化放大）
             const fireContainer = document.getElementById('campground');
@@ -3537,6 +3737,19 @@
         fetchStatusCounts();
         fetchStoryLogs();
         checkFocusStatus(); // 检查专注状态
+
+        // 首次访问自动弹出帮助说明（使用 sessionStorage，刷新不重复弹出）
+        window.addEventListener('DOMContentLoaded', () => {
+            const userId = localStorage.getItem('campfire_user_id');
+            const token = localStorage.getItem('campfire_token');
+            // 用户已登录且未看过引导
+            if (userId && token && !sessionStorage.getItem('hasSeenGuide')) {
+                setTimeout(() => {
+                    openModal('guide');
+                    sessionStorage.setItem('hasSeenGuide', 'true');
+                }, 1500); // 延迟1.5秒弹出，等待页面完全加载
+            }
+        });
 
         // 专注时长输入框事件监听
         const focusDurationInput = document.getElementById('focusDuration');

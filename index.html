@@ -80,7 +80,7 @@
             transform: scale(1.5);
         }
 
-        /* 中央行动区域 - 专注模式 */
+        /* 中央行动区域 - 极致极简 */
         .central-action-area {
             position: fixed;
             bottom: 8%;
@@ -90,62 +90,96 @@
             width: 100%;
             display: flex;
             justify-content: center;
+            font-family: 'Noto Sans SC', sans-serif;
         }
 
+        /* 极简专注面板 - 悬浮纯白文字 */
         #focusPanel {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 165, 0, 0.3);
-            padding: 20px 35px;
-            border-radius: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0;
+            background: transparent;
             text-align: center;
-            transition: all 0.3s ease;
         }
 
-        #focusPanel input {
-            background: rgba(255, 255, 255, 0.1);
+        /* 输入框 - 极致简约 */
+        #focusPanel .duration-input {
+            width: 48px;
+            background: transparent;
             border: none;
-            border-bottom: 2px solid rgba(255, 165, 0, 0.5);
-            color: #fff;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
-            width: 70px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
             text-align: center;
-            margin-right: 10px;
+            font-family: 'Noto Sans SC', sans-serif;
             outline: none;
+            transition: border-color 0.3s ease;
+            -moz-appearance: textfield;
         }
 
-        #focusPanel input::-webkit-inner-spin-button,
-        #focusPanel input::-webkit-outer-spin-button {
+        #focusPanel .duration-input::-webkit-inner-spin-button,
+        #focusPanel .duration-input::-webkit-outer-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
 
-        .burn-btn {
-            margin-top: 15px;
-            background: linear-gradient(45deg, #ff5500, #ffaa00);
-            color: white;
-            border: none;
-            padding: 12px 35px;
-            border-radius: 50px;
-            font-weight: bold;
-            cursor: pointer;
-            letter-spacing: 2px;
-            box-shadow: 0 4px 15px rgba(255, 85, 0, 0.4);
-            transition: transform 0.2s, box-shadow 0.2s;
-            font-size: 14px;
+        #focusPanel .duration-input:focus {
+            border-bottom-color: rgba(255, 255, 255, 0.8);
         }
 
-        .burn-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(255, 85, 0, 0.6);
+        /* 单位文字 */
+        #focusPanel .unit {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        /* 开始计时文字链接 */
+        #startFocusText {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 4px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }
+
+        #startFocusText:hover {
+            color: rgba(255, 255, 255, 1);
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         /* 专注模式时隐藏设置面板，显示计时 */
         body.focus-mode #focusPanel {
             display: none;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .central-action-area {
+                bottom: 12%;
+            }
+
+            #focusPanel {
+                gap: 8px;
+            }
+
+            #focusPanel .duration-input {
+                width: 40px;
+                font-size: 0.9rem;
+            }
+
+            #focusPanel .unit {
+                font-size: 0.8rem;
+            }
+
+            #startFocusText {
+                font-size: 0.8rem;
+                padding: 3px 10px;
+            }
         }
 
         body.focus-mode #focusUI {
@@ -1128,15 +1162,11 @@
 
     <!-- 中央行动区域 - 专注模式 -->
     <div class="central-action-area" id="centralActionArea">
-        <!-- 专注设置面板 -->
+        <!-- 专注设置面板 - 极致极简 -->
         <div id="focusPanel">
-            <div style="color: rgba(255,165,0,0.9); font-size: 14px; margin-bottom: 15px; letter-spacing: 3px;">🎯 专注模式</div>
-            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
-                <input type="number" id="focusDurationCentral" value="25" min="1" max="180"
-                    style="background: rgba(255,255,255,0.1); border: none; border-bottom: 2px solid rgba(255,165,0,0.5); color: #fff; font-family: 'Orbitron', sans-serif; font-size: 1.5rem; width: 70px; text-align: center; outline: none;">
-                <span style="color: rgba(255,255,255,0.6);">分钟</span>
-            </div>
-            <button onclick="startFocus()" class="burn-btn">开始专注</button>
+            <input type="number" id="focusDurationCentral" class="duration-input" value="25" min="1" max="180">
+            <span class="unit">分钟</span>
+            <span id="startFocusText" onclick="startFocus()">开始计时</span>
         </div>
 
         <!-- 专注计时显示（专注时显示） -->

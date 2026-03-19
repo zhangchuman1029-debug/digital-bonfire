@@ -876,6 +876,46 @@
 
         .story-refresh:hover { background: var(--fire-mid); }
 
+        /* 生成故事 Loading 提示 */
+        .story-loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .story-loading-content {
+            text-align: center;
+            color: white;
+        }
+
+        .story-loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #ffaa00;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .story-loading-text {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            letter-spacing: 1px;
+        }
+
         /* 日志 - 移到侧边栏 */
         .sidebar-section.logs { border-color: rgba(168, 85, 247, 0.4); }
         .sidebar-section.logs .sidebar-header h3 { color: #a855f7; }
@@ -1644,7 +1684,12 @@
 
         .right-sidebar .name {
             font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.9);
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .right-sidebar .name.focusing-name {
+            color: #ffaa00;
+            font-weight: bold;
         }
 
         .right-sidebar .status {
@@ -2242,6 +2287,14 @@
         <button class="story-refresh" onclick="generateStory()">换一换</button>
     </div>
 
+    <!-- 生成故事 Loading 提示 -->
+    <div class="story-loading-overlay" id="storyLoadingOverlay" style="display: none;">
+        <div class="story-loading-content">
+            <div class="story-loading-spinner"></div>
+            <p class="story-loading-text" id="storyLoadingText">正在读取分身的心声...</p>
+        </div>
+    </div>
+
     <!-- 专注模式弹窗 -->
     <div class="focus-popup" id="focusPopup">
         <div class="focus-popup-content">
@@ -2394,19 +2447,18 @@
         });
 
         // 渲染在线用户到右侧面板
+        // 渲染所有营员到右侧面板（包含历史登记的所有营员）
         function renderOnlineUsers(campers) {
             const container = document.getElementById('onlineUsersListRight');
             if (!container) return;
 
-            // 渲染到右侧面板
-            const userId = localStorage.getItem('campfire_user_id');
-            const otherCampers = campers.filter(c => c.id != userId);
-            if (otherCampers.length === 0) {
+            // 显示所有营员（包括当前用户），不过滤
+            if (!campers || campers.length === 0) {
                 container.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-size:0.8rem;text-align:center;padding:20px;">暂无营员</div>';
                 return;
             }
 
-            container.innerHTML = otherCampers.map(c => {
+            container.innerHTML = campers.map(c => {
                 const isFocusing = c.status === 'focusing';
                 const actionIcon = c.focus_action_icon || '🍢';
                 const actionName = c.focus_action || '烤棉花糖';
@@ -2417,7 +2469,7 @@
                             ${c.name.charAt(0)}
                         </div>
                         <div class="info">
-                            <div class="name">${c.name}</div>
+                            <div class="name ${isFocusing ? 'focusing-name' : ''}">${c.name}</div>
                             <div class="status ${isFocusing ? 'focusing' : ''}">
                                 ${isFocusing ? `<span class="action-icon">${actionIcon}</span> ${actionName}` : `<span>${c.mbti || '?'}</span>`}
                             </div>
@@ -3844,7 +3896,15 @@
                 showStatus('该用户暂无 MBTI 信息');
                 return;
             }
-            showStatus(`正在为 ${user.name} 生成故事...`);
+
+            // 显示持续 Loading 提示
+            const loadingOverlay = document.getElementById('storyLoadingOverlay');
+            const loadingText = document.getElementById('storyLoadingText');
+            if (loadingOverlay && loadingText) {
+                loadingText.textContent = '正在读取 ' + user.name + ' 的心声...';
+                loadingOverlay.style.display = 'flex';
+            }
+
             try {
                 const res = await fetch('/api/story/generate', {
                     method: 'POST',
@@ -3855,6 +3915,12 @@
                     })
                 });
                 const data = await res.json();
+
+                // 隐藏 Loading 提示
+                if (loadingOverlay) {
+                    loadingOverlay.style.display = 'none';
+                }
+
                 const storyContent = document.getElementById('storyContent');
 
                 // 使用打字机效果呈现
@@ -3863,6 +3929,10 @@
                 fetchStoryLogs();
             } catch (e) {
                 console.error(e);
+                // 隐藏 Loading 提示
+                if (loadingOverlay) {
+                    loadingOverlay.style.display = 'none';
+                }
                 showStatus('生成故事失败');
             }
         }

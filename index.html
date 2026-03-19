@@ -93,6 +93,60 @@
             font-family: 'Noto Sans SC', sans-serif;
         }
 
+        /* 极简动态主按钮 */
+        .focus-main-btn {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            padding: 20px 60px;
+            cursor: pointer;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.4);
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+
+        .focus-main-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 30px rgba(255, 107, 53, 0.5);
+        }
+
+        .focus-main-btn:disabled {
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .focus-main-btn.focusing {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            font-size: 1.5rem;
+            padding: 18px 50px;
+        }
+
+        .focus-agent-hint {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            margin-top: 15px;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 768px) {
+            .focus-main-btn {
+                font-size: 1.4rem;
+                padding: 15px 40px;
+            }
+
+            .focus-main-btn.focusing {
+                font-size: 1.2rem;
+                padding: 14px 35px;
+            }
+        }
+
         /* 极简专注面板 - 悬浮纯白文字 */
         #focusPanel {
             display: flex;
@@ -1474,12 +1528,87 @@
             background: rgba(168, 85, 247, 0.05);
         }
 
+        .right-sidebar-section.time-setting {
+            flex: none;
+            background: rgba(255, 165, 0, 0.08);
+            border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+        }
+
+        .right-sidebar-section.online-section {
+            flex: 1;
+        }
+
         .right-sidebar-title {
             font-size: 0.75rem;
             color: rgba(255, 255, 255, 0.5);
             letter-spacing: 2px;
             margin-bottom: 12px;
             text-transform: uppercase;
+        }
+
+        /* 时间设置相关样式 */
+        .time-setting-content {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .duration-input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .duration-input-right {
+            width: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 1.2rem;
+            text-align: center;
+            padding: 8px;
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+
+        .duration-input-right:focus {
+            outline: none;
+            border-color: rgba(255, 165, 0, 0.6);
+        }
+
+        .duration-input-right::-webkit-inner-spin-button,
+        .duration-input-right::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .time-setting .unit {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        .preset-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .preset-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+            padding: 8px 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+
+        .preset-btn:hover {
+            background: rgba(255, 165, 0, 0.2);
+            border-color: rgba(255, 165, 0, 0.5);
+            color: white;
         }
 
         .right-sidebar .online-user-card {
@@ -1936,10 +2065,29 @@
         </div>
     </div>
 
-    <!-- 右侧在线营员面板 -->
+    <!-- 右侧复合边栏：时间设置 + 在线营员 -->
     <div class="right-sidebar" id="rightSidebar">
         <button class="right-sidebar-toggle-btn" onclick="toggleRightSidebar()">▶</button>
-        <div class="right-sidebar-section">
+
+        <!-- 时间设置面板 -->
+        <div class="right-sidebar-section time-setting">
+            <div class="right-sidebar-title">⏱️ 专注时长</div>
+            <div class="time-setting-content">
+                <div class="duration-input-group">
+                    <input type="number" id="focusDurationRight" class="duration-input-right" value="25" min="1" max="180">
+                    <span class="unit">分钟</span>
+                </div>
+                <div class="preset-buttons">
+                    <button class="preset-btn" onclick="setDuration(15)">15分钟</button>
+                    <button class="preset-btn" onclick="setDuration(25)">25分钟</button>
+                    <button class="preset-btn" onclick="setDuration(45)">45分钟</button>
+                    <button class="preset-btn" onclick="setDuration(60)">60分钟</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 在线营员名单 -->
+        <div class="right-sidebar-section online-section">
             <div class="right-sidebar-title">🔥 在线营员</div>
             <div id="onlineUsersListRight">
                 <div style="color:rgba(255,255,255,0.4);font-size:0.8rem;text-align:center;padding:20px;">暂无营员</div>
@@ -2145,20 +2293,16 @@
         <!-- Logs removed -->
     </div>
 
-    <!-- 中央行动区域 - 专注模式 -->
+    <!-- 中央行动区域 - 极简动态按钮 -->
     <div class="central-action-area" id="centralActionArea">
-        <!-- 专注设置面板 - 极致极简 -->
-        <div id="focusPanel">
-            <input type="number" id="focusDurationCentral" class="duration-input" value="25" min="1" max="180">
-            <span class="unit">分钟</span>
-            <span id="startFocusText" onclick="showActionSelector()">开始计时</span>
-        </div>
-
-        <!-- 专注计时显示（专注时显示） -->
-        <div id="focusUI" style="display: none; text-align: center;">
-            <div id="focusTimerDisplay" style="font-size: 4rem; color: white; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 30px rgba(255,165,0,0.8);">00:00</div>
-            <div id="focusAgentAction"></div>
-            <button onclick="quitFocus()" style="background: none; border: 1px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.6); cursor: pointer; padding: 8px 20px; border-radius: 20px; margin-top: 20px; font-size: 14px;">退出专注</button>
+        <!-- 单一动态按钮：未专注时显示开始，专注中显示倒计时+停止 -->
+        <div id="focusButtonContainer" style="text-align: center;">
+            <button id="focusMainButton" class="focus-main-btn" onclick="handleFocusButtonClick()">
+                开始专注
+            </button>
+            <div id="focusAgentHint" class="focus-agent-hint" style="display: none;">
+                你的 Agent 正在 <span id="focusHintAction"></span>...
+            </div>
         </div>
     </div>
 
@@ -2459,6 +2603,65 @@
         let focusParticleInterval = null;   // 粒子效果定时器
         let selectedFocusDuration = 25;     // 选中的专注时长
         let isFocusing = false;            // 是否正在专注
+        let isProcessing = false;          // 防止重复点击
+
+        // 设置右侧边栏时长
+        function setDuration(minutes) {
+            document.getElementById('focusDurationRight').value = minutes;
+            selectedFocusDuration = minutes;
+        }
+
+        // 处理主按钮点击
+        function handleFocusButtonClick() {
+            if (isProcessing) return;
+
+            if (isFocusing) {
+                // 专注中，点击停止
+                quitFocus();
+            } else {
+                // 未专注，点击开始
+                // 从右侧边栏获取时长
+                const rightDuration = document.getElementById('focusDurationRight')?.value;
+                if (rightDuration) {
+                    selectedFocusDuration = parseInt(rightDuration) || 25;
+                }
+                showActionSelector();
+            }
+        }
+
+        // 更新主按钮状态
+        function updateFocusButton() {
+            const btn = document.getElementById('focusMainButton');
+            const hint = document.getElementById('focusAgentHint');
+            const hintAction = document.getElementById('focusHintAction');
+
+            if (!btn) return;
+
+            if (isFocusing) {
+                // 专注中，显示倒计时
+                const minutes = Math.floor(focusRemainingSeconds / 60);
+                const seconds = focusRemainingSeconds % 60;
+                btn.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} | 停止`;
+                btn.classList.add('focusing');
+                btn.disabled = false;
+
+                // 显示 Agent 动作提示
+                const action = localStorage.getItem('focusAction') || '烤棉花糖';
+                const actionIcon = localStorage.getItem('focusActionIcon') || '🍢';
+                if (hint) {
+                    hint.style.display = 'block';
+                    if (hintAction) hintAction.textContent = `${actionIcon} ${action}`;
+                }
+            } else {
+                // 未专注，显示开始按钮
+                btn.textContent = '开始专注';
+                btn.classList.remove('focusing');
+                btn.disabled = false;
+
+                // 隐藏 Agent 动作提示
+                if (hint) hint.style.display = 'none';
+            }
+        }
 
         // 页面加载时检查专注状态（不自动恢复专注模式）
         function checkFocusStatus() {
@@ -2522,13 +2725,48 @@
         // 重置专注 UI 到初始状态
         function resetFocusUI() {
             document.body.classList.remove('focus-mode');
-            document.getElementById('focusPanel').style.display = 'flex';
-            document.getElementById('focusUI').style.display = 'none';
             const fireContainer = document.getElementById('campground');
             if (fireContainer) {
                 fireContainer.classList.remove('focus-active');
             }
+
+            // 清除计时器
+            if (focusInterval) {
+                clearInterval(focusInterval);
+                focusInterval = null;
+            }
+            if (focusParticleInterval) {
+                clearInterval(focusParticleInterval);
+                focusParticleInterval = null;
+            }
+
+            // 清除专注粒子
+            document.querySelectorAll('.focus-spark').forEach(p => p.remove());
+
+            // 移除 focus-hide 类
+            document.querySelectorAll('.focus-hide').forEach(el => el.classList.remove('focus-hide'));
+
+            // 重置状态
             isFocusing = false;
+            isProcessing = false;
+            focusRemainingSeconds = 0;
+
+            // 清理 localStorage
+            localStorage.removeItem('campfire_focus_start_time');
+            localStorage.removeItem('campfire_focus_duration');
+            localStorage.removeItem('campfire_focus_active');
+            localStorage.removeItem('campfire_focus_should_restore');
+            localStorage.removeItem('focusAction');
+            localStorage.removeItem('focusActionIcon');
+
+            // 更新按钮状态
+            updateFocusButton();
+
+            // 隐藏旧的 UI 元素（兼容旧代码）
+            const focusPanel = document.getElementById('focusPanel');
+            const focusUI = document.getElementById('focusUI');
+            if (focusPanel) focusPanel.style.display = 'none';
+            if (focusUI) focusUI.style.display = 'none';
         }
 
         // 恢复专注模式 UI（用于页面刷新后）
@@ -2599,11 +2837,15 @@
 
         // 开始专注（动作选择后）
         async function beginFocus() {
+            if (isProcessing) return; // 防止重复点击
+            isProcessing = true;
+
             const userId = localStorage.getItem('campfire_user_id');
             const token = localStorage.getItem('campfire_token');
 
             if (!userId) {
                 alert('请先登录后再开始专注');
+                isProcessing = false;
                 return;
             }
 
@@ -2611,14 +2853,15 @@
             localStorage.setItem('focusAction', selectedAction || '烤棉花糖');
             localStorage.setItem('focusActionIcon', selectedActionIcon || '🍢');
 
-            // 从输入框获取专注时长
-            const centralInput = document.getElementById('focusDurationCentral');
-            const durationInput = centralInput;
-            const focusDuration = parseInt(durationInput?.value) || 25;
+            // 从右侧边栏获取专注时长（优先）
+            const rightDurationInput = document.getElementById('focusDurationRight');
+            let focusDuration = rightDurationInput ? parseInt(rightDurationInput.value) : 25;
+            if (!focusDuration || focusDuration < 1) focusDuration = 25;
             selectedFocusDuration = focusDuration;
 
             if (focusDuration < 1 || focusDuration > 180) {
                 alert('请输入 1-180 之间的分钟数');
+                isProcessing = false;
                 return;
             }
 
@@ -2643,50 +2886,35 @@
 
                 if (data.error) {
                     alert(data.error);
+                    isProcessing = false;
                     return;
                 }
+
+                // 保存到 localStorage（用于页面刷新后恢复状态）
+                localStorage.setItem('campfire_focus_start_time', Date.now().toString());
+                localStorage.setItem('campfire_focus_duration', focusDuration.toString());
+                localStorage.setItem('campfire_focus_active', 'true');
+                localStorage.setItem('campfire_focus_should_restore', 'true');
+
+                // 添加 .focus-active 类到火焰容器
+                const fireContainer = document.getElementById('campground');
+                fireContainer.classList.add('focus-active');
+
+                // 添加 .focus-hide 类隐藏干扰项
+                document.querySelectorAll('.sidebar, .right-sidebar, .header, .mobile-menu-btn, .login-container, .camper, .story-panel, .focusing-indicator').forEach(el => {
+                    el.classList.add('focus-hide');
+                });
+
+                // 启动计时器
+                startFocusTimer(focusDuration * 60);
+
+                // 更新按钮状态
+                updateFocusButton();
+
             } catch (e) {
                 console.error('Focus start error:', e);
+                isProcessing = false;
             }
-
-            // 保存到 localStorage（用于页面刷新后恢复状态）
-            localStorage.setItem('campfire_focus_start_time', Date.now().toString());
-            localStorage.setItem('campfire_focus_duration', focusDuration.toString());
-            localStorage.setItem('campfire_focus_active', 'true');
-            // 标记应该恢复专注模式（用户主动开始）
-            localStorage.setItem('campfire_focus_should_restore', 'true');
-
-            // 添加 .focus-active 类到火焰容器（中心化放大）
-            const fireContainer = document.getElementById('campground');
-            fireContainer.classList.add('focus-active');
-
-            // 显示专注 UI
-            document.getElementById('focusUI').style.display = 'block';
-
-            // 切换移动端按钮
-            const mobileFocusBtn = document.getElementById('mobileFocusBtn');
-            const mobileQuitFocusBtn = document.getElementById('mobileQuitFocusBtn');
-            if (mobileFocusBtn) mobileFocusBtn.style.display = 'none';
-            if (mobileQuitFocusBtn) mobileQuitFocusBtn.style.display = 'block';
-
-            // 添加 .focus-hide 类隐藏所有干扰项
-            document.querySelectorAll('.sidebar, .right-sidebar, .header, .mobile-menu-btn, .login-container, .camper, .story-panel, .focusing-indicator').forEach(el => {
-                el.classList.add('focus-hide');
-            });
-
-            // 添加额外的粒子效果（专注模式）
-            addFocusParticles();
-
-            // 开始计时器
-            startFocusTimer(focusDuration * 60);
-
-            // 进入沉浸模式
-            // 关闭所有弹窗
-            closeAllModals();
-
-            document.body.classList.add('focus-mode');
-
-            showStatus(`开始专注 ${focusDuration} 分钟`);
         }
 
         // 添加专注模式额外粒子
@@ -2743,11 +2971,15 @@
             focusRemainingSeconds = seconds;
             isFocusing = true;
 
+            // 更新按钮状态
+            updateFocusButton();
+
             // CSS focus-mode 会自动处理火焰增强效果
             console.log('🔥 计时器启动，秒数:', seconds);
             focusInterval = setInterval(() => {
                 focusRemainingSeconds--;
                 updateFocusTimerDisplay(focusRemainingSeconds);
+                updateFocusButton(); // 更新按钮倒计时
                 console.log('⏱️ 剩余秒数:', focusRemainingSeconds);
 
                 if (focusRemainingSeconds <= 0) {
@@ -3019,54 +3251,19 @@
                 return;
             }
 
-            // 1. 停止后台逻辑
-            clearInterval(focusInterval);
-            clearInterval(focusParticleInterval);
-            focusInterval = null;
-            focusParticleInterval = null;
-            isFocusing = false;
-
-            // 清除专注粒子
-            document.querySelectorAll('.focus-spark').forEach(p => p.remove());
+            // 重置状态
+            isProcessing = false;
 
             // 清除 localStorage
             localStorage.removeItem('campfire_focus_start_time');
             localStorage.removeItem('campfire_focus_duration');
             localStorage.removeItem('campfire_focus_active');
+            localStorage.removeItem('campfire_focus_should_restore');
+            localStorage.removeItem('focusAction');
+            localStorage.removeItem('focusActionIcon');
 
-            // 2. 恢复 UI 显示
-
-            // 隐藏专注 UI
-            const focusUI = document.getElementById('focusUI');
-            if (focusUI) focusUI.style.display = 'none';
-
-            // 移除火焰放大效果
-            const campground = document.getElementById('campground');
-            if (campground) campground.classList.remove('focus-active');
-
-            // 退出沉浸模式（解除 CSS 的全屏隐藏效果）
-            document.body.classList.remove('focus-mode');
-
-            // 移除 focus-hide 类，恢复所有被隐藏的元素（侧边栏、header、登录按钮等）
-            document.querySelectorAll('.focus-hide').forEach(el => {
-                el.classList.remove('focus-hide');
-            });
-
-            // 3. 切换移动端按钮
-            const mobileFocusBtn = document.getElementById('mobileFocusBtn');
-            const mobileQuitFocusBtn = document.getElementById('mobileQuitFocusBtn');
-            if (mobileFocusBtn) mobileFocusBtn.style.display = 'block';
-            if (mobileQuitFocusBtn) mobileQuitFocusBtn.style.display = 'none';
-
-            // 4. 重置计时器显示
-            const durationInput = document.getElementById('focusDuration');
-            if (durationInput) {
-                updateFocusTimerDisplay((parseInt(durationInput.value) || 25) * 60);
-            } else {
-                updateFocusTimerDisplay(25 * 60);
-            }
-
-            showStatus('已退出专注模式');
+            // 调用 resetFocusUI 统一重置
+            resetFocusUI();
         }
 
         function closeFocusPopup() {

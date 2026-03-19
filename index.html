@@ -64,191 +64,21 @@
 
         .header .subtitle { font-size: 0.7rem; color: var(--accent-logic); letter-spacing: 3px; opacity: 0.8; }
 
+        /* ======== 恒定火焰 - 大小固定 ======== */
         .fire-container {
             position: absolute;
-            top: 280px;
+            top: 35%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             width: 100px;
             height: 100px;
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 10;
-            transition: all 1s ease-in-out;
+            transition: all 0.5s ease;
         }
 
-        .fire-container.zoomed {
-            transform: scale(1.0);
-        }
-
-        /* 中央行动区域 - 极致极简 */
-        .central-action-area {
-            position: fixed;
-            bottom: 8%;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 100;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            font-family: 'Noto Sans SC', sans-serif;
-        }
-
-        /* 极简动态主按钮 */
-        .focus-main-btn {
-            background: linear-gradient(135deg, #ff6b35, #f7931e);
-            border: none;
-            border-radius: 50px;
-            color: white;
-            font-size: 1.8rem;
-            font-weight: bold;
-            padding: 20px 60px;
-            cursor: pointer;
-            letter-spacing: 2px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.4);
-            font-family: 'Noto Sans SC', sans-serif;
-        }
-
-        .focus-main-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 30px rgba(255, 107, 53, 0.5);
-        }
-
-        .focus-main-btn:disabled {
-            background: rgba(255, 255, 255, 0.2);
-            color: rgba(255, 255, 255, 0.5);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .focus-main-btn.focusing {
-            background: linear-gradient(135deg, #dc2626, #b91c1c);
-            font-size: 1.5rem;
-            padding: 18px 50px;
-        }
-
-        .focus-agent-hint {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.9rem;
-            margin-top: 15px;
-            letter-spacing: 1px;
-        }
-
-        @media (max-width: 768px) {
-            .focus-main-btn {
-                font-size: 1.4rem;
-                padding: 15px 40px;
-            }
-
-            .focus-main-btn.focusing {
-                font-size: 1.2rem;
-                padding: 14px 35px;
-            }
-        }
-
-        /* 极简专注面板 - 悬浮纯白文字 */
-        #focusPanel {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 0;
-            background: transparent;
-            text-align: center;
-        }
-
-        /* 输入框 - 极致简约 */
-        #focusPanel .duration-input {
-            width: 48px;
-            background: transparent;
-            border: none;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 1rem;
-            text-align: center;
-            font-family: 'Noto Sans SC', sans-serif;
-            outline: none;
-            transition: border-color 0.3s ease;
-            -moz-appearance: textfield;
-        }
-
-        #focusPanel .duration-input::-webkit-inner-spin-button,
-        #focusPanel .duration-input::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        #focusPanel .duration-input:focus {
-            border-bottom-color: rgba(255, 255, 255, 0.8);
-        }
-
-        /* 单位文字 */
-        #focusPanel .unit {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.9rem;
-        }
-
-        /* 开始计时按钮 */
-        #startFocusText {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 1.8rem;
-            cursor: pointer;
-            padding: 20px 40px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50px;
-            transition: all 0.3s ease;
-            letter-spacing: 2px;
-            display: inline-block;
-        }
-
-        #startFocusText:hover {
-            color: rgba(255, 255, 255, 1);
-            border-color: rgba(255, 255, 255, 0.6);
-            background: rgba(255, 255, 255, 0.1);
-            transform: scale(1.02);
-        }
-
-        /* 专注模式时隐藏设置面板，显示计时 */
-        body.focus-mode #focusPanel {
-            display: none;
-        }
-
-        /* 移动端适配 */
-        @media (max-width: 768px) {
-            .central-action-area {
-                bottom: 15%;
-            }
-
-            #focusPanel {
-                gap: 10px;
-                flex-direction: column;
-            }
-
-            #focusPanel .duration-input {
-                width: 60px;
-                font-size: 1.2rem;
-            }
-
-            #focusPanel .unit {
-                font-size: 1rem;
-            }
-
-            #startFocusText {
-                font-size: 1.4rem;
-                padding: 15px 30px;
-                margin-top: 15px;
-            }
-
-            #focusTimerDisplay {
-                font-size: 3rem !important;
-            }
-        }
-
-        body.focus-mode #focusUI {
-            display: block !important;
-        }
-
-        /* 简约火焰 - 旋转椭圆 */
         .flame {
             position: absolute;
             bottom: 20px;
@@ -271,1247 +101,83 @@
             to { transform: translateX(-50%) rotate(-45deg) scale(1.1) skew(3deg, 3deg); }
         }
 
-        /* 火星粒子 */
-        .fire-particle {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            width: 4px;
-            height: 4px;
-            background: #ffcc00;
-            border-radius: 50%;
-            opacity: 0;
-            animation: rise 1.5s infinite ease-out;
+        /* ======== 专注模式火焰放大 ======== */
+        body.focusing .fire-container {
+            transform: translate(-50%, -50%) scale(1.8);
         }
 
-        .fire-particle:nth-child(2) { left: 45%; animation-delay: 0.3s; }
-        .fire-particle:nth-child(3) { left: 55%; animation-delay: 0.7s; width: 3px; }
-        .fire-particle:nth-child(4) { left: 40%; animation-delay: 1.1s; }
-        .fire-particle:nth-child(5) { left: 60%; animation-delay: 0.5s; width: 2px; }
-
-        @keyframes rise {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-150px) translateX(20px) scale(0); opacity: 0; }
-        }
-
-        /* 专注模式 - 火焰中心化与放大 */
-        .fire-container.focus-active {
-            position: fixed !important;
-            top: 50% !important;
-            left: 50% !important;
-            transform: translate(-50%, -50%) scale(2.0) !important;
-            transition: all 0.8s ease-in-out !important;
-            z-index: 50 !important;
-        }
-
-        .fire-container.focus-active .flame {
-            width: 100px !important;
-            height: 100px !important;
+        body.focusing .flame {
+            width: 80px !important;
+            height: 80px !important;
             box-shadow:
-                0 0 50px #ff5e00,
-                0 0 100px #ff5e00,
-                0 0 150px #ffaa00,
-                0 0 30px #fefcc9 inset !important;
-            animation: burn 0.12s infinite alternate !important;
+                0 0 40px #ff5e00,
+                0 0 80px #ff5e00,
+                0 0 120px #ffaa00,
+                0 0 20px #fefcc9 inset !important;
         }
 
-        .fire-container.focus-active .fire-particle {
-            animation: rise-intense 0.8s infinite ease-out !important;
-            width: 7px !important;
-            height: 7px !important;
-        }
-
-        @keyframes rise-intense {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-400px) translateX(50px) scale(0); opacity: 0; }
-        }
-
-        .fire-container.focus-active .fire-particle:nth-child(2) { animation-delay: 0.1s; }
-        .fire-container.focus-active .fire-particle:nth-child(3) { animation-delay: 0.2s; }
-        .fire-container.focus-active .fire-particle:nth-child(4) { animation-delay: 0.3s; }
-        .fire-container.focus-active .fire-particle:nth-child(5) { animation-delay: 0.15s; }
-
-        /* 专注模式 - 背景加深 */
-        body.focus-mode {
-            background: radial-gradient(ellipse at 50% 50%, #000000 0%, #000000 70%, #0a0500 100%) !important;
-        }
-
-        /* 进入专注模式时，隐藏所有干扰元素 */
-        body.focus-mode .sidebar,
-        body.focus-mode .right-sidebar,
-        body.focus-mode .glass-panel,
-        body.focus-mode .header,
-        body.focus-mode .mobile-menu-btn,
-        body.focus-mode .login-container,
-        body.focus-mode .story-panel {
-            opacity: 0 !important;
-            pointer-events: none !important;
-            transition: opacity 0.8s ease;
-        }
-
-        /* 只有专注 UI 显示 */
-        body.focus-mode #focusUI {
-            display: block !important;
-        }
-
-        /* 火焰放大效果 */
-        .fire-container.focus-active {
-            transform: translate(-50%, -50%) scale(2) !important;
-            transition: transform 1.5s ease-in-out !important;
-            position: fixed !important;
-            top: 50% !important;
-            left: 50% !important;
-        }
-
-        /* 专注模式 - 隐藏干扰项 (平滑消失) */
-        .focus-hide,
-        body.focus-mode .camper {
-            opacity: 0 !important;
-            pointer-events: none !important;
-            transition: all 0.8s ease !important;
-        }
-
-        /* 专注模式 - 倒计时位置重排到火焰下方 */
-        .focus-timer.focus-active,
-        #timerContainer.focus-active {
-            position: fixed !important;
-            top: 70% !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            z-index: 100 !important;
-            padding: 30px 60px !important;
-            background: rgba(0, 0, 0, 0.7) !important;
-            border-radius: 24px !important;
-            border: 1px solid rgba(34, 197, 94, 0.4) !important;
-            backdrop-filter: blur(15px) !important;
-            box-shadow: 0 0 40px rgba(34, 197, 94, 0.2) !important;
-        }
-
-        .focus-timer.focus-active .focus-timer-display {
-            font-size: 5rem !important;
-            font-weight: 700 !important;
-            color: rgba(255, 255, 255, 0.95) !important;
-            text-shadow: 0 0 30px rgba(34, 197, 94, 0.8), 0 0 60px rgba(34, 197, 94, 0.4) !important;
-            animation: breathe 2s ease-in-out infinite !important;
-        }
-
-        @keyframes breathe {
-            0%, 100% { opacity: 0.7; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.05); }
-        }
-
-        /* 专注时隐藏输入框和开始按钮，显示放弃按钮 */
-        .focus-timer.focus-active .focus-duration-input-wrap,
-        .focus-timer.focus-active .focus-start-btn {
-            display: none !important;
-        }
-
-        .focus-timer.focus-active .focus-cancel-btn {
-            display: block !important;
-            margin-top: 20px !important;
-            width: 100%;
-            padding: 10px 20px;
-            font-size: 12px;
-            background: transparent !important;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: var(--text-secondary);
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            opacity: 0.6;
-        }
-
-        .focus-timer.focus-active .focus-cancel-btn:hover {
-            background: rgba(255, 255, 255, 0.1) !important;
-            border-color: rgba(255, 255, 255, 0.4);
-            color: rgba(255, 255, 255, 0.9);
-            opacity: 1;
-        }
-
-        .fire-glow {
-            display: none;
-        }
-
-        @keyframes pulse-glow { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.1); opacity: 1; } }
-
-        .particle { position: absolute; border-radius: 50%; pointer-events: none; }
-        .spark { background: #ffcc00; box-shadow: 0 0 6px #ff6600; }
-        .ember { background: #ff4400; box-shadow: 0 0 4px #ff0000; }
-
-        .camper {
-            position: absolute; display: flex; flex-direction: column; align-items: center;
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; z-index: 20;
-        }
-
-        .camper-avatar {
-            width: 16px; height: 16px; border-radius: 50%; position: relative;
-            transition: all 0.3s ease;
-        }
-
-        .camper:hover .camper-avatar { transform: scale(1.5); }
-
-        .camper-avatar::after {
-            content: ''; position: absolute; inset: -4px; border-radius: 50%;
-            background: inherit; filter: blur(8px); opacity: 0.6; z-index: -1;
-        }
-
-        .camper-name {
-            color: var(--text-secondary); font-size: 10px; letter-spacing: 2px; margin-top: 8px;
-            white-space: nowrap; text-transform: uppercase; transition: all 0.3s ease;
-        }
-
-        .camper:hover .camper-name { color: var(--text-primary); text-shadow: 0 0 10px currentColor; }
-
-        .camper-mbti {
-            font-size: 9px; color: var(--accent-logic); margin-top: 4px; opacity: 0;
-            transition: all 0.3s ease;
-        }
-
-        .camper:hover .camper-mbti, .camper.has-activity .camper-mbti { opacity: 1; }
-
-        .camper-activity {
-            font-size: 8px; color: var(--fire-mid); margin-top: 2px; opacity: 0;
-            background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 4px;
-            transition: all 0.3s ease; white-space: nowrap;
-        }
-
-        .camper:hover .camper-activity, .camper.has-activity .camper-activity { opacity: 1; }
-
-        /* 统一侧边栏 */
-        .sidebar {
-            position: absolute; left: 15px; top: 100px; width: 220px; z-index: 100;
-            display: flex; flex-direction: column; gap: 8px;
-        }
-
-        /* 右侧 Agents 面板 */
-        .right-sidebar {
-            position: absolute; right: 15px; top: 100px; width: 200px; z-index: 100;
-            display: flex; flex-direction: column; gap: 8px;
-        }
-
-        .sidebar-section {
-            background: rgba(10, 14, 20, 0.85); border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            overflow: hidden; backdrop-filter: blur(10px);
-        }
-
-        /* Agents 面板特殊样式 */
-        .sidebar-section.agents { border-color: rgba(251, 191, 36, 0.4); }
-        .sidebar-section.agents .sidebar-header h3 { color: #fbbf24; }
-
-        /* 说明书面板 */
-        .sidebar-section.help { border-color: rgba(255, 255, 255, 0.2); }
-        .sidebar-section.help .sidebar-header h3 { color: #fff; }
-
-        .help-content {
-            font-size: 10px; color: var(--text-secondary); line-height: 1.6;
-            padding: 0 5px 10px;
-        }
-
-        .help-content h4 {
-            color: var(--text-primary); font-size: 11px; margin: 10px 0 5px;
-        }
-
-        .help-content p { margin: 4px 0; }
-
-        .help-content .key {
-            display: inline-block; background: rgba(255,255,255,0.1);
-            padding: 2px 6px; border-radius: 4px; font-size: 9px; margin: 2px;
-        }
-
-        /* 专注模式样式 */
-        .sidebar-section.focus { border-color: rgba(34, 197, 94, 0.4); }
-        .sidebar-section.focus .sidebar-header h3 { color: #22c55e; }
-
-        .focus-timer {
-            text-align: center; padding: 10px 0;
-        }
-
-        .focus-timer-display {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2.5rem;
-            color: rgba(255, 255, 255, 0.9);
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-            margin: 10px 0;
-        }
-
-        /* 自定义时间输入 */
-        .focus-duration-input-wrap {
-            display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px;
-        }
-
-        .focus-duration-input {
-            width: 80px;
-            padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-            border-radius: 8px;
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 16px;
-            text-align: center;
-            outline: none;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-
-        .focus-duration-input:focus {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(34, 197, 94, 0.6);
-            box-shadow: 0 0 15px rgba(34, 197, 94, 0.2);
-        }
-
-        .focus-duration-input::-webkit-inner-spin-button,
-        .focus-duration-input::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        .focus-duration-unit {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 14px;
-        }
-
-        .focus-start-btn {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            border: none;
-            color: white;
-            padding: 10px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-
-        .focus-start-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
-        }
-
-        .focus-start-btn:disabled {
-            background: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.3);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .focus-cancel-btn {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.4);
-            color: #ef4444;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            margin-top: 8px;
-            width: 100%;
-            transition: all 0.3s ease;
-        }
-
-        .focus-cancel-btn:hover { background: rgba(239, 68, 68, 0.3); }
-
-        .focus-history {
-            margin-top: 15px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .focus-history-title {
-            font-size: 11px; color: var(--text-secondary);
-            margin-bottom: 8px; text-align: center;
-        }
-
-        .focus-history-item {
-            background: rgba(34, 197, 94, 0.08);
-            border: 1px solid rgba(34, 197, 94, 0.15);
-            border-radius: 6px;
-            padding: 8px 10px;
-            margin-bottom: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .focus-history-item:hover {
-            background: rgba(34, 197, 94, 0.15);
-            border-color: rgba(34, 197, 94, 0.3);
-        }
-
-        .focus-history-time {
-            font-size: 10px; color: var(--text-secondary);
-        }
-
-        .focus-history-duration {
-            font-size: 11px; color: #22c55e;
-            margin-top: 2px;
-        }
-
-        /* 专注模式弹窗 */
-        .focus-popup {
-            display: none;
+        /* ======== 中央按钮区域 ======== */
+        .central-area {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .focus-popup.show { display: flex; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .focus-popup-content {
-            background: linear-gradient(145deg, #1a1a2e, #16213e);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-            border-radius: 16px;
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            position: relative;
-            animation: slideUp 0.5s ease;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .focus-popup-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.3rem;
-            color: #22c55e;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .focus-popup-story {
-            font-size: 14px;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.9);
-            text-align: left;
-            white-space: pre-wrap;
-        }
-
-        .focus-popup-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-            justify-content: center;
-        }
-
-        .focus-popup-btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.3s ease;
-        }
-
-        .focus-popup-close {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-        }
-
-        .focus-popup-close:hover { background: rgba(255, 255, 255, 0.2); }
-
-        .focus-popup-share {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            border: none;
-            color: white;
-        }
-
-        .focus-popup-share:hover {
-            box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
-        }
-
-        /* 专注中状态指示 */
-        .focusing-indicator {
-            display: none;
-            position: absolute;
-            top: 10px; right: 10px;
-            background: rgba(34, 197, 94, 0.2);
-            border: 1px solid #22c55e;
-            border-radius: 20px;
-            padding: 6px 14px;
-            font-size: 11px;
-            color: #22c55e;
-            z-index: 50;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .focusing-indicator.active { display: flex; }
-
-        .focusing-indicator::before {
-            content: ''; width: 8px; height: 8px;
-            background: #22c55e; border-radius: 50%;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-
-        .agent-item {
-            display: flex; align-items: center; gap: 8px; padding: 8px 10px;
-            border-radius: 8px; transition: all 0.3s ease; cursor: pointer;
-        }
-
-        .agent-item:hover { background: rgba(255, 255, 255, 0.08); }
-
-        .agent-avatar {
-            width: 24px; height: 24px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 12px; font-weight: bold;
-        }
-
-        .agent-info { flex: 1; min-width: 0; }
-
-        .agent-name {
-            font-size: 11px; color: var(--text-primary); white-space: nowrap;
-            overflow: hidden; text-overflow: ellipsis;
-        }
-
-        .agent-mbti {
-            font-size: 9px; color: var(--text-secondary);
-        }
-
-        .sidebar-header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 15px; cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        .sidebar-header:hover { background: rgba(255, 255, 255, 0.05); }
-
-        .sidebar-header h3 {
-            font-size: 12px; letter-spacing: 2px; margin: 0;
-        }
-
-        .sidebar-toggle {
-            font-size: 10px; color: var(--text-secondary); transition: transform 0.3s ease;
-        }
-
-        .sidebar-section.collapsed .sidebar-toggle { transform: rotate(-90deg); }
-        .sidebar-section.collapsed .sidebar-content { display: none; }
-
-        .sidebar-content { padding: 0 12px 12px; }
-
-        /* MBTI 群组 */
-        .sidebar-section.mbti { border-color: rgba(255, 170, 0, 0.3); }
-        .sidebar-section.mbti .sidebar-header h3 { color: #ffaa00; }
-
-        .mbti-group {
-            margin-bottom: 8px; padding: 8px 10px; border-radius: 8px;
-            background: transparent; cursor: pointer; transition: all 0.3s ease;
-        }
-
-        .mbti-group:hover { background: rgba(255, 255, 255, 0.08); transform: translateX(3px); }
-
-        .mbti-group-name { font-size: 11px; color: var(--text-primary); margin-bottom: 3px; }
-        .mbti-group-members { font-size: 9px; color: var(--text-secondary); }
-
-        /* 状态选择 */
-        .sidebar-section.activity { border-color: rgba(0, 212, 255, 0.3); }
-        .sidebar-section.activity .sidebar-header h3 { color: #00d4ff; }
-
-        .activity-item {
-            display: flex; align-items: center; gap: 8px; padding: 10px; margin-bottom: 6px;
-            border-radius: 8px; background: transparent; cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .activity-item:hover { background: rgba(255, 255, 255, 0.08); }
-
-        .activity-emoji { font-size: 18px; }
-        .activity-name { font-size: 11px; color: var(--text-primary); }
-        .activity-desc { font-size: 8px; color: var(--text-secondary); }
-
-        .activity-count {
-            margin-left: auto; font-size: 10px; color: var(--accent-logic);
-            background: rgba(0,212,255,0.2); padding: 2px 6px; border-radius: 10px;
-        }
-
-        /* 故事面板 */
-        .story-panel {
-            position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%);
-            width: 400px; max-width: 90vw; z-index: 100;
-            background: rgba(10, 14, 20, 0.85); padding: 15px 20px; border-radius: 16px;
-            border: 1px solid rgba(255, 170, 0, 0.3);
-            backdrop-filter: blur(10px);
-        }
-
-        .story-panel h3 {
-            font-size: 11px; color: var(--fire-mid); margin-bottom: 10px; letter-spacing: 2px;
-        }
-        .story-panel h3 span {
-            float: right;
-            cursor: pointer;
-            color: rgba(255,255,255,0.5);
-        }
-        .story-panel h3 span:hover {
-            color: white;
-        }
-
-        .story-content {
-            font-size: 12px; color: var(--text-primary); line-height: 1.6;
-            font-style: italic;
-        }
-
-        .story-refresh {
-            margin-top: 10px; padding: 6px 12px; font-size: 10px;
-            background: var(--fire-outer); border: none; color: white;
-            border-radius: 4px; cursor: pointer; transition: all 0.3s ease;
-        }
-
-        .story-refresh:hover { background: var(--fire-mid); }
-
-        /* 生成故事 Loading 提示 */
-        .story-loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            backdrop-filter: blur(5px);
-        }
-
-        .story-loading-content {
-            text-align: center;
-            color: white;
-        }
-
-        .story-loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid rgba(255, 255, 255, 0.2);
-            border-top-color: #ffaa00;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .story-loading-text {
-            font-size: 1.1rem;
-            color: rgba(255, 255, 255, 0.9);
-            letter-spacing: 1px;
-        }
-
-        /* 日志 - 移到侧边栏 */
-        .sidebar-section.logs { border-color: rgba(168, 85, 247, 0.4); }
-        .sidebar-section.logs .sidebar-header h3 { color: #a855f7; }
-
-        .log-list {
-            max-height: 150px; overflow-y: auto; scrollbar-width: thin;
-            scrollbar-color: rgba(168, 85, 247, 0.5) transparent;
-        }
-
-        .log-list::-webkit-scrollbar { width: 4px; }
-        .log-list::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.5); border-radius: 2px; }
-
-        .log-item {
-            padding: 8px; margin-bottom: 6px; border-radius: 8px;
-            background: rgba(255,255,255,0.03); cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .log-item:hover { background: rgba(168, 85, 247, 0.15); transform: translateX(-2px); }
-
-        .log-story {
-            font-size: 10px; color: var(--text-primary); line-height: 1.4;
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-        }
-
-        .log-meta {
-            font-size: 8px; color: var(--text-secondary); margin-top: 4px;
-            display: flex; justify-content: space-between;
-        }
-
-        .log-group { color: #a855f7; }
-
-        /* 登录按钮 */
-        .login-container {
-            position: absolute; bottom: 30px; z-index: 100; text-align: center;
-        }
-
-        #loginBtn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none; color: white; padding: 16px 35px; border-radius: 50px;
-            cursor: pointer; font-weight: 500; font-size: 15px; letter-spacing: 2px;
-            transition: all 0.3s ease;
-            font-family: 'Noto Sans SC', sans-serif;
-        }
-
-        #loginBtn:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6); }
-
-        .status {
-            position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
-            color: var(--text-secondary); font-size: 14px; opacity: 0;
-            transition: opacity 0.3s ease; pointer-events: none; z-index: 200;
-            white-space: nowrap;
-        }
-
-        .status.visible { opacity: 1; }
-
-        @media (max-width: 768px) {
-            .sidebar, .right-sidebar { display: none; }
-            /* 移动端火堆容器 - 居中定位 */
-            .fire-container {
-                position: fixed !important;
-                top: 50% !important;
-                left: 50% !important;
-                width: 100px !important;
-                height: 100px !important;
-                transform: translate(-50%, -50%) !important;
-                overflow: visible !important;
-                z-index: 10 !important;
-            }
-            .header { top: 80px !important; padding: 5px; }
-            .header h1 { font-size: 1.5rem !important; letter-spacing: 2px !important; }
-            .header .subtitle { font-size: 0.5rem !important; }
-            body { background: radial-gradient(ellipse at 50% 50%, #1a0a00 0%, #0a0e14 40%, #030508 100%) !important; }
-            .login-container { bottom: 80px; }
-            #loginBtn { padding: 10px 20px; font-size: 12px; }
-            /* 移动端菜单按钮 */
-            .mobile-menu-btn {
-                display: flex !important;
-                position: fixed;
-                top: 110px;
-                left: 10px;
-                z-index: 200;
-                width: 40px;
-                height: 40px;
-                background: rgba(255,170,0,0.3);
-                border: 1px solid var(--fire-mid);
-                border-radius: 8px;
-                color: white;
-                font-size: 20px;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-            }
-            .mobile-menu-btn:active { background: rgba(255,170,0,0.5); }
-            /* 移动端专注模式 */
-            #focusUI {
-                top: 65% !important;
-                width: 90% !important;
-                padding: 20px !important;
-            }
-            #focusTimerDisplay {
-                font-size: 3rem !important;
-            }
-            /* 移动端侧边抽屉 */
-            .mobile-drawer {
-                display: block !important;
-                position: fixed;
-                top: 0;
-                left: -280px;
-                width: 280px;
-                height: 100%;
-                background: rgba(10,14,20,0.95);
-                z-index: 150;
-                transition: left 0.3s ease;
-                padding: 60px 15px 80px 15px;
-                overflow-y: auto;
-                border-right: 1px solid rgba(255,170,0,0.3);
-            }
-            .mobile-drawer.open { left: 0; }
-            .mobile-drawer-overlay {
-                display: none !important;
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0,0,0,0.5);
-                z-index: 140;
-            }
-            .mobile-drawer-overlay.open { display: block !important; }
-            .mobile-drawer-section {
-                margin-bottom: 15px;
-                padding: 10px;
-                background: rgba(255,255,255,0.05);
-                border-radius: 8px;
-            }
-            .mobile-drawer-section h3 {
-                color: var(--fire-mid);
-                font-size: 14px;
-                margin-bottom: 8px;
-                border-bottom: 1px solid rgba(255,170,0,0.3);
-                padding-bottom: 5px;
-            }
-            .mobile-drawer-section {
-                color: white !important;
-            }
-            .mobile-drawer-section * {
-                color: white !important;
-            }
-            /* 移动端底部状态栏 */
-            .mobile-status-bar {
-                display: flex !important;
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                background: rgba(0,0,0,0.8);
-                padding: 10px;
-                overflow-x: auto;
-                z-index: 100;
-            }
-            .mobile-status-bar::-webkit-scrollbar { display: none; }
-            .mobile-status-item {
-                flex: 0 0 auto;
-                padding: 8px 12px;
-                margin: 0 4px;
-                border-radius: 20px;
-                background: rgba(255,255,255,0.1);
-                color: white;
-                font-size: 12px;
-                white-space: nowrap;
-            }
-            .mobile-status-item.active {
-                background: var(--fire-mid);
-                color: black;
-            }
-        }
-        .mobile-menu-btn, .mobile-drawer, .mobile-drawer-overlay { display: none; }
-        .mobile-status-bar { display: none !important; }
-    /* ==================== 登录界面 ==================== */
-        #loginScreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(180deg, #0a0a1a 0%, #1a1a2e 50%, #16213e 100%);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.8s ease, visibility 0.8s ease;
-        }
-
-        #loginScreen.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        #loginScreen h1 {
-            color: rgba(255, 255, 255, 0.95);
-            font-size: 3rem;
-            font-weight: 300;
-            letter-spacing: 12px;
-            margin-bottom: 20px;
-            text-shadow: 0 0 40px rgba(255, 165, 0, 0.5);
-        }
-
-        #loginScreen .subtitle {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 1rem;
-            letter-spacing: 6px;
-            margin-bottom: 50px;
-        }
-
-        /* 欢迎词 - 呼吸灯特效 */
-        #loginScreen .welcome-text {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 1.2rem;
-            letter-spacing: 2px;
-            margin-bottom: 60px;
-            max-width: 600px;
-            text-align: center;
-            line-height: 1.8;
-            animation: breathe 4s ease-in-out infinite;
-        }
-
-        @keyframes breathe {
-            0%, 100% { opacity: 0.6; text-shadow: 0 0 20px rgba(255, 165, 0, 0.2); }
-            50% { opacity: 1; text-shadow: 0 0 40px rgba(255, 165, 0, 0.5); }
-        }
-
-        #loginScreen .enter-btn {
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: rgba(255, 255, 255, 0.8);
-            padding: 15px 40px;
-            font-size: 1rem;
-            letter-spacing: 3px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-        }
-
-        #loginScreen .enter-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.6);
-            transform: scale(1.02);
-        }
-
-        /* 登录后隐藏的元素 */
-        body.not-logged-in .sidebar,
-        body.not-logged-in .sidebarRecallBtn,
-        body.not-logged-in .right-sidebar,
-        body.not-logged-in .central-action-area,
-        body.not-logged-in #campground,
-        body.not-logged-in .floating-menu {
-            display: none !important;
-        }
-
-        /* 登录后隐藏悬浮菜单（使用侧边栏） */
-        body.logged-in .floating-menu {
-            display: none !important;
-        }
-
-        /* ==================== 侧边栏布局 ==================== */
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 300px;
-            height: 100vh;
-            background: linear-gradient(180deg, rgba(20, 20, 35, 0.95) 0%, rgba(10, 10, 20, 0.98) 100%);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 100;
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s ease;
-            overflow: hidden;
-        }
-
-        .sidebar.collapsed {
-            transform: translateX(-260px);
-        }
-
-        /* 侧边栏切换按钮 */
-        .sidebar-toggle-btn {
-            position: absolute;
-            right: -30px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 30px;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 0 8px 8px 0;
-            color: rgba(255, 255, 255, 0.6);
-            cursor: pointer;
-            display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            transition: all 0.3s ease;
+            gap: 20px;
         }
 
-        .sidebar-toggle-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: rgba(255, 255, 255, 0.9);
+        /* 倒计时显示 */
+        .timer-overlay {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            color: #ffaa00;
+            text-shadow: 0 0 20px rgba(255, 170, 0, 0.8);
+            display: none;
         }
 
-        .sidebar.collapsed .sidebar-toggle-btn {
-            right: -30px;
-        }
-
-        /* 侧边栏内部区域 */
-        .sidebar-section {
-            padding: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .sidebar-section.user-info {
-            background: rgba(255, 165, 0, 0.1);
-            border-bottom: 1px solid rgba(255, 165, 0, 0.2);
-        }
-
-        .sidebar-section.activities {
-            background: rgba(0, 212, 255, 0.05);
-            border-bottom: 1px solid rgba(0, 212, 255, 0.15);
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        .sidebar-section.online-users {
-            background: rgba(168, 85, 247, 0.05);
-            border-bottom: 1px solid rgba(168, 85, 247, 0.15);
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .sidebar-section.stories {
-            background: rgba(34, 197, 94, 0.05);
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        .sidebar-section-title {
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.5);
-            letter-spacing: 2px;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-        }
-
-        /* 用户信息 */
-        .user-info-content {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .user-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ff6b35, #f7931e);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: white;
-            box-shadow: 0 0 20px rgba(255, 165, 0, 0.4);
-        }
-
-        .user-details {
-            flex: 1;
-        }
-
-        .user-name {
-            font-size: 1.1rem;
-            color: white;
-            font-weight: bold;
-        }
-
-        .user-mbti {
-            font-size: 0.85rem;
-            color: rgba(255, 165, 0, 0.9);
-            margin-top: 2px;
-        }
-
-        /* 动作/状态按钮 */
-        .action-btn-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-        }
-
-        .action-btn-item {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 10px 8px;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: center;
-        }
-
-        .action-btn-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .action-btn-item .icon {
-            font-size: 1.5rem;
+        .timer-overlay.visible {
             display: block;
-            margin-bottom: 4px;
         }
 
-        .action-btn-item.selected {
-            background: rgba(255, 165, 0, 0.2);
-            border-color: rgba(255, 165, 0, 0.5);
-        }
-
-        /* 开始专注按钮 */
-        .start-focus-btn {
-            width: 100%;
+        .focus-btn {
             background: linear-gradient(135deg, #ff6b35, #f7931e);
             border: none;
-            border-radius: 10px;
-            padding: 15px;
+            border-radius: 50px;
             color: white;
-            font-size: 1rem;
+            font-size: 1.5rem;
             font-weight: bold;
+            padding: 18px 50px;
             cursor: pointer;
-            margin-top: 12px;
             letter-spacing: 2px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.4);
+            font-family: 'Noto Sans SC', sans-serif;
         }
 
-        .start-focus-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+        .focus-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 30px rgba(255, 107, 53, 0.5);
         }
 
-        .start-focus-btn:disabled {
-            background: rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.3);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
+        .focus-btn.stop {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
         }
 
-        /* 在线用户列表 */
-        .online-user-card {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.2s ease;
-            margin-bottom: 5px;
-        }
-
-        .online-user-card:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .online-user-card .avatar {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            color: white;
-            font-weight: bold;
-        }
-
-        .online-user-card .info {
-            flex: 1;
-        }
-
-        .online-user-card .name {
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .online-user-card .status {
-            font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        .online-user-card .status.focusing {
-            color: rgba(255, 165, 0, 0.8);
-        }
-
-        /* 故事列表 */
-        .story-item {
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 8px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
-
-        .story-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .story-item .time {
-            font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        .story-item .duration {
-            font-size: 0.75rem;
-            color: rgba(255, 165, 0, 0.7);
-        }
-
-        .story-item .preview {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.6);
-            margin-top: 5px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 280px;
-                transform: translateX(-100%);
-            }
-
-            .sidebar.expanded {
-                transform: translateX(0);
-            }
-
-            .sidebar-toggle-btn {
-                right: -35px;
-                width: 35px;
-            }
-        }
-
-        /* 专注模式隐藏侧边栏 */
-        body.focus-mode .sidebar {
-            transform: translateX(-100%) !important;
-        }
-
-        /* 右下角唤回按钮 */
-        .sidebarRecallBtn {
-            position: fixed;
-            left: 15px;
-            bottom: 20px;
-            width: 44px;
-            height: 44px;
-            background: rgba(255, 165, 0, 0.8);
-            border: none;
-            border-radius: 50%;
-            color: white;
-            font-size: 1.3rem;
-            cursor: pointer;
-            z-index: 90;
-            display: none;
-            box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4);
-            transition: all 0.3s ease;
-        }
-
-        .sidebarRecallBtn:hover {
-            transform: scale(1.1);
-            background: rgba(255, 165, 0, 1);
-        }
-
-        body.focus-mode .sidebarRecallBtn {
+        .focus-hint {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
             display: none;
         }
 
-        body:not(.focus-mode) .sidebar.collapsed + .sidebarRecallBtn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .focus-hint.visible {
+            display: block;
         }
 
-        /* ==================== 右侧在线营员面板 ==================== */
-        .right-sidebar {
+        /* ======== 右侧面板 ======== */
+        .right-panel {
             position: fixed;
             right: 0;
             top: 0;
@@ -1519,20 +185,18 @@
             height: 100vh;
             background: linear-gradient(180deg, rgba(20, 20, 35, 0.95) 0%, rgba(10, 10, 20, 0.98) 100%);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border-left: 1px solid rgba(255, 255, 255, 0.08);
             z-index: 100;
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s ease;
             overflow: hidden;
         }
 
-        .right-sidebar.collapsed {
+        .right-panel.collapsed {
             transform: translateX(240px);
         }
 
-        .right-sidebar-toggle-btn {
+        .panel-toggle {
             position: absolute;
             left: -30px;
             top: 50%;
@@ -1547,38 +211,24 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1rem;
-            transition: all 0.3s ease;
         }
 
-        .right-sidebar-toggle-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .right-sidebar.collapsed .right-sidebar-toggle-btn {
-            left: -30px;
-        }
-
-        .right-sidebar-section {
+        .panel-section {
             padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .panel-section.time-setting {
+            background: rgba(255, 165, 0, 0.08);
+        }
+
+        .panel-section.campers-list {
             flex: 1;
             overflow-y: auto;
-            border-bottom: 1px solid rgba(168, 85, 247, 0.15);
             background: rgba(168, 85, 247, 0.05);
         }
 
-        .right-sidebar-section.time-setting {
-            flex: none;
-            background: rgba(255, 165, 0, 0.08);
-            border-bottom: 1px solid rgba(255, 165, 0, 0.2);
-        }
-
-        .right-sidebar-section.online-section {
-            flex: 1;
-        }
-
-        .right-sidebar-title {
+        .panel-title {
             font-size: 0.75rem;
             color: rgba(255, 255, 255, 0.5);
             letter-spacing: 2px;
@@ -1586,20 +236,7 @@
             text-transform: uppercase;
         }
 
-        /* 时间设置相关样式 */
-        .time-setting-content {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .duration-input-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .duration-input-right {
+        .duration-input {
             width: 60px;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -1608,29 +245,18 @@
             font-size: 1.2rem;
             text-align: center;
             padding: 8px;
-            font-family: 'Noto Sans SC', sans-serif;
         }
 
-        .duration-input-right:focus {
+        .duration-input:focus {
             outline: none;
             border-color: rgba(255, 165, 0, 0.6);
         }
 
-        .duration-input-right::-webkit-inner-spin-button,
-        .duration-input-right::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        .time-setting .unit {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.9rem;
-        }
-
-        .preset-buttons {
+        .preset-btns {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 8px;
+            margin-top: 10px;
         }
 
         .preset-btn {
@@ -1639,34 +265,31 @@
             border-radius: 6px;
             color: rgba(255, 255, 255, 0.7);
             font-size: 0.8rem;
-            padding: 8px 4px;
+            padding: 8px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: 'Noto Sans SC', sans-serif;
         }
 
         .preset-btn:hover {
             background: rgba(255, 165, 0, 0.2);
             border-color: rgba(255, 165, 0, 0.5);
-            color: white;
         }
 
-        .right-sidebar .online-user-card {
+        .camper-item {
             display: flex;
             align-items: center;
             gap: 10px;
             padding: 10px;
             border-radius: 8px;
             margin-bottom: 5px;
-            transition: background 0.2s ease;
             cursor: pointer;
+            transition: background 0.2s;
         }
 
-        .right-sidebar .online-user-card:hover {
+        .camper-item:hover {
             background: rgba(255, 255, 255, 0.05);
         }
 
-        .right-sidebar .avatar {
+        .camper-avatar {
             width: 28px;
             height: 28px;
             border-radius: 50%;
@@ -1678,781 +301,712 @@
             font-weight: bold;
         }
 
-        .right-sidebar .info {
-            flex: 1;
-        }
-
-        .right-sidebar .name {
+        .camper-name {
             font-size: 0.85rem;
             color: rgba(255, 255, 255, 0.5);
         }
 
-        .right-sidebar .name.focusing-name {
+        .camper-name.focusing {
             color: #ffaa00;
             font-weight: bold;
         }
 
-        .right-sidebar .status {
+        .camper-status {
             font-size: 0.7rem;
             color: rgba(255, 255, 255, 0.4);
         }
 
-        .right-sidebar .status.focusing {
-            color: rgba(255, 165, 0, 0.8);
+        .camper-status.focusing {
+            color: #ffaa00;
         }
 
-        /* 专注模式隐藏右侧面板 */
-        body.focus-mode .right-sidebar {
-            transform: translateX(100%) !important;
-        }
-
-        /* 右侧面板唤回按钮 */
-        .rightSidebarRecallBtn {
+        /* ======== 左侧面板 ======== */
+        .left-panel {
             position: fixed;
-            right: 15px;
-            bottom: 20px;
-            width: 44px;
-            height: 44px;
-            background: rgba(168, 85, 247, 0.8);
-            border: none;
-            border-radius: 50%;
-            color: white;
-            font-size: 1.3rem;
-            cursor: pointer;
-            z-index: 90;
-            display: none;
-            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
-            transition: all 0.3s ease;
-        }
-
-        .rightSidebarRecallBtn:hover {
-            transform: scale(1.1);
-            background: rgba(168, 85, 247, 1);
-        }
-
-        body.focus-mode .rightSidebarRecallBtn {
-            display: none;
-        }
-
-        body:not(.focus-mode) .right-sidebar.collapsed + .rightSidebarRecallBtn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        @media (max-width: 768px) {
-            .right-sidebar {
-                width: 260px;
-                transform: translateX(100%);
-            }
-
-            .right-sidebar.expanded {
-                transform: translateX(0);
-            }
-
-            .right-sidebar-toggle-btn {
-                left: -35px;
-                width: 35px;
-            }
-        }
-
-        /* ==================== 右下角悬浮菜单 ==================== */
-        .floating-menu {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, rgba(20, 20, 35, 0.95) 0%, rgba(10, 10, 20, 0.98) 100%);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            z-index: 100;
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            z-index: 50;
+            overflow: hidden;
         }
 
-        .floating-menu .menu-item {
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .left-panel.collapsed {
+            transform: translateX(-240px);
         }
 
-        .floating-menu .menu-item:hover {
-            color: rgba(255, 255, 255, 0.9);
+        .left-toggle {
+            position: absolute;
+            right: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 60px;
             background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.3);
-            transform: scale(1.1);
-        }
-
-        /* 移动端 */
-        @media (max-width: 768px) {
-            .floating-menu {
-                bottom: 15px;
-                right: 15px;
-                gap: 10px;
-            }
-
-            .floating-menu .menu-item {
-                width: 42px;
-                height: 42px;
-                font-size: 1.2rem;
-                padding: 10px;
-            }
-        }
-
-        /* 首次引导气泡 */
-        .menu-tooltip {
-            position: absolute;
-            right: 60px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255, 255, 255, 0.95);
-            color: #333;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            white-space: nowrap;
-            animation: tooltip-fade 0.5s ease;
-        }
-
-        .menu-tooltip::after {
-            content: '';
-            position: absolute;
-            right: -6px;
-            top: 50%;
-            transform: translateY(-50%);
-            border: 6px solid transparent;
-            border-left-color: rgba(255, 255, 255, 0.95);
-        }
-
-        @keyframes tooltip-fade {
-            from { opacity: 0; transform: translateY(-50%) translateX(10px); }
-            to { opacity: 1; transform: translateY(-50%) translateX(0); }
-        }
-
-        /* 分身动作按钮 */
-        .action-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 16px;
-            padding: 20px 15px;
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 2rem;
+            border: none;
+            border-radius: 0 8px 8px 0;
+            color: rgba(255, 255, 255, 0.6);
             cursor: pointer;
-            transition: all 0.3s ease;
+        }
+
+        .user-info {
+            padding: 20px;
+            background: rgba(255, 165, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 165, 0, 0.2);
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 8px;
-            min-width: 90px;
+            gap: 12px;
         }
 
-        .action-btn span {
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .user-name {
+            font-size: 1.1rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .user-mbti {
             font-size: 0.85rem;
-            opacity: 0.7;
+            color: #ffaa00;
         }
 
-        .action-btn:hover {
-            background: rgba(255, 165, 0, 0.2);
-            border-color: rgba(255, 165, 0, 0.5);
-            transform: scale(1.05);
+        .logs-section {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
         }
 
-        /* 专注中 Agent 动作显示 */
-        #focusAgentAction {
-            color: rgba(255, 255, 255, 0.7);
+        .log-item {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .log-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .log-time {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .log-preview {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 5px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* ======== 故事弹窗 ======== */
+        .story-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .story-modal.visible {
+            display: flex;
+        }
+
+        .story-content {
+            background: rgba(20, 20, 35, 0.95);
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255, 170, 0, 0.3);
+        }
+
+        .story-title {
+            font-size: 1.2rem;
+            color: #ffaa00;
+            margin-bottom: 20px;
+        }
+
+        .story-text {
             font-size: 1rem;
-            margin-top: 10px;
-            text-align: center;
-            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.8;
+            font-style: italic;
         }
 
-        /* Canvas 用户标注 */
-        .camper-label {
-            position: absolute;
-            transform: translateX(-50%);
-            white-space: nowrap;
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.8);
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-            pointer-events: none;
+        .story-close {
+            margin-top: 20px;
+            padding: 10px 30px;
+            background: #ff6b35;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
         }
 
-        .camper-label.focusing {
-            color: rgba(255, 165, 0, 0.9);
-        }
-
-        /* ==================== 弹窗系统 ==================== */
-        .modal-overlay {
+        /* ======== Loading ======== */
+        .loading-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
             z-index: 1000;
+        }
+
+        .loading-overlay.visible {
+            display: flex;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #ffaa00;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ======== 专注模式隐藏 ======== */
+        body.focusing .left-panel,
+        body.focusing .right-panel,
+        body.focusing .header {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* ======== 登录界面 ======== */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
             display: flex;
             align-items: center;
             justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
+            z-index: 2000;
         }
 
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
+        .login-screen.hidden {
+            display: none;
         }
 
-        .modal-content {
-            background: rgba(20, 20, 35, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 30px;
-            max-width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            position: relative;
-            transform: scale(0.9) translateY(20px);
-            transition: transform 0.3s ease;
-        }
-
-        .modal-overlay.active .modal-content {
-            transform: scale(1) translateY(0);
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 5px 10px;
-            transition: color 0.3s ease;
-        }
-
-        .modal-close:hover {
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .modal-title {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            letter-spacing: 2px;
+        .login-box {
             text-align: center;
         }
 
-        /* 弹窗内容区 */
-        .modal-body {
-            color: rgba(255, 255, 255, 0.7);
-            line-height: 1.8;
-        }
-
-        .modal-section {
+        .login-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            color: #ffaa00;
             margin-bottom: 20px;
         }
 
-        .modal-section h3 {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.95rem;
-            margin-bottom: 10px;
-            letter-spacing: 1px;
+        .login-btn {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.2rem;
+            padding: 15px 40px;
+            cursor: pointer;
         }
 
-        /* 弹窗内列表样式 */
-        .modal-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .modal-list li {
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            display: flex;
+        /* ======== 动作选择弹窗 ======== */
+        .action-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            z-index: 1000;
         }
 
-        .modal-list li:last-child {
-            border-bottom: none;
+        .action-modal.visible {
+            display: flex;
         }
 
-        /* 弹窗内按钮 */
-        .modal-btn {
+        .action-content {
+            background: rgba(20, 20, 35, 0.95);
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .action-title {
+            color: #ffaa00;
+            margin-bottom: 20px;
+        }
+
+        .action-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .action-btn {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            color: rgba(255, 255, 255, 0.8);
-            padding: 8px 16px;
-            border-radius: 6px;
+            border-radius: 12px;
+            padding: 15px 20px;
+            color: white;
             cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.3s ease;
-            margin: 4px;
+            font-size: 1rem;
         }
 
-        .modal-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.4);
-        }
-
-        .modal-btn.active {
+        .action-btn:hover {
             background: rgba(255, 165, 0, 0.2);
             border-color: rgba(255, 165, 0, 0.5);
-            color: rgba(255, 165, 0, 0.9);
         }
 
-        /* 专注模式隐藏触发器 */
-        body.focus-mode .floating-menu {
-            display: none !important;
-        }
-
-        body.focus-mode .modal-overlay {
-            display: none !important;
-        }
-
-        /* 移动端弹窗 */
         @media (max-width: 768px) {
-            .modal-content {
-                padding: 20px;
-                border-radius: 12px;
+            .right-panel, .left-panel {
+                width: 260px;
+                transform: translateX(100%);
             }
-
-            .modal-trigger {
-                font-size: 0.65rem;
-                padding: 6px 8px;
+            .right-panel.expanded, .left-panel.expanded {
+                transform: translateX(0);
             }
-
-            #loginScreen h1 {
-                font-size: 1.8rem;
-                letter-spacing: 4px;
+            .focus-btn {
+                font-size: 1.2rem;
+                padding: 14px 30px;
             }
-
-            #loginScreen .subtitle {
-                font-size: 0.75rem;
-            }
-
-            #loginScreen .enter-btn {
-                padding: 12px 30px;
-                font-size: 0.9rem;
+            .timer-overlay {
+                font-size: 2rem;
             }
         }
     </style>
 </head>
 <body>
+    <!-- 星空背景 -->
+    <div class="stars" id="stars"></div>
+
     <!-- 登录界面 -->
-    <div id="loginScreen">
-        <h1>数字篝火</h1>
-        <p class="subtitle">DIGITAL BONFIRE</p>
-        <p class="welcome-text">深夜里的每一团火，都是为了等待一个同频率的灵魂。靠近一点，分享你的光。</p>
-        <button class="enter-btn" id="loginBtn">进入数字篝火</button>
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <h1 class="login-title">数字篝火</h1>
+            <p style="color:rgba(255,255,255,0.6);margin-bottom:30px;">深夜里的每一团火，都是为了等待一个同频率的灵魂</p>
+            <button class="login-btn" onclick="goLogin()">进入篝火</button>
+        </div>
     </div>
 
-    <!-- 左侧边栏：个人信息 + 状态选择 + 故事日志 -->
-    <div class="sidebar" id="sidebar">
-        <button class="sidebar-toggle-btn" onclick="toggleSidebar()">◀</button>
+    <!-- 标题 -->
+    <div class="header">
+        <h1>DIGITAL BONFIRE</h1>
+        <p class="subtitle">数字篝火</p>
+    </div>
 
-        <!-- 用户信息 -->
-        <div class="sidebar-section user-info">
-            <div class="sidebar-section-title">个人信息</div>
-            <div class="user-info-content" id="userInfoContent">
-                <div class="user-avatar" id="userAvatar">?</div>
-                <div class="user-details">
-                    <div class="user-name" id="userName">未登录</div>
-                    <div class="user-mbti" id="userMbti">---</div>
-                </div>
+    <!-- 火焰容器 -->
+    <div class="fire-container" id="fireContainer">
+        <div class="flame"></div>
+    </div>
+
+    <!-- 中央区域：倒计时 + 按钮 -->
+    <div class="central-area">
+        <div class="timer-overlay" id="timerOverlay">00:00</div>
+        <button class="focus-btn" id="mainFocusBtn" onclick="handleFocusClick()">开始专注</button>
+        <div class="focus-hint" id="focusHint">你的 Agent 正在 🍢 烤棉花糖...</div>
+    </div>
+
+    <!-- 左侧面板：个人信息 + 日志 -->
+    <div class="left-panel" id="leftPanel">
+        <button class="left-toggle" onclick="toggleLeftPanel()">◀</button>
+        <div class="user-info">
+            <div class="user-avatar" id="userAvatar">?</div>
+            <div>
+                <div class="user-name" id="userName">未登录</div>
+                <div class="user-mbti" id="userMbti">---</div>
             </div>
         </div>
-
-        <!-- 分身日志 -->
-        <div class="sidebar-section stories">
-            <div class="sidebar-section-title">📜 分身日志</div>
-            <div id="storyLogsList">
+        <div class="logs-section">
+            <div class="panel-title">📜 分身日志</div>
+            <div id="logsList">
                 <div style="color:rgba(255,255,255,0.4);font-size:0.8rem;text-align:center;padding:20px;">暂无故事</div>
             </div>
         </div>
     </div>
 
-    <!-- 右侧复合边栏：时间设置 + 在线营员 -->
-    <div class="right-sidebar" id="rightSidePanel">
-        <button class="right-sidebar-toggle-btn" onclick="toggleRightSidePanel()">▶</button>
+    <!-- 右侧面板：时间设置 + 营员名录 -->
+    <div class="right-panel" id="rightPanel">
+        <button class="panel-toggle" onclick="toggleRightPanel()">▶</button>
 
-        <!-- 时间设置面板 -->
-        <div class="right-sidebar-section time-setting">
-            <div class="right-sidebar-title">⏱️ 专注时长</div>
-            <div class="time-setting-content">
-                <div class="duration-input-group">
-                    <input type="number" id="focusDurationRight" class="duration-input-right" value="25" min="1" max="180">
-                    <span class="unit">分钟</span>
-                </div>
-                <div class="preset-buttons">
-                    <button class="preset-btn" onclick="setDuration(15)">15分钟</button>
-                    <button class="preset-btn" onclick="setDuration(25)">25分钟</button>
-                    <button class="preset-btn" onclick="setDuration(45)">45分钟</button>
-                    <button class="preset-btn" onclick="setDuration(60)">60分钟</button>
-                </div>
+        <!-- 时间设置 -->
+        <div class="panel-section time-setting">
+            <div class="panel-title">⏱️ 专注时长</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <input type="number" id="durationInput" class="duration-input" value="25" min="1" max="180">
+                <span style="color:rgba(255,255,255,0.6)">分钟</span>
+            </div>
+            <div class="preset-btns">
+                <button class="preset-btn" onclick="setDuration(15)">15分钟</button>
+                <button class="preset-btn" onclick="setDuration(25)">25分钟</button>
+                <button class="preset-btn" onclick="setDuration(45)">45分钟</button>
+                <button class="preset-btn" onclick="setDuration(60)">60分钟</button>
             </div>
         </div>
 
-        <!-- 在线营员名单 -->
-        <div class="right-sidebar-section online-section">
-            <div class="right-sidebar-title">🔥 在线营员</div>
-            <div id="onlineUsersListRight">
+        <!-- 营员名录 -->
+        <div class="panel-section campers-list">
+            <div class="panel-title">🔥 在线营员</div>
+            <div id="campersList">
                 <div style="color:rgba(255,255,255,0.4);font-size:0.8rem;text-align:center;padding:20px;">暂无营员</div>
             </div>
         </div>
     </div>
 
-    <!-- 侧边栏唤回按钮 -->
-    <button class="sidebarRecallBtn" onclick="toggleSidebar()">⚙️</button>
-
-    <!-- 右下角悬浮菜单 -->
-    <div class="floating-menu" id="floatingMenu">
-        <div class="menu-item" onclick="openModal('status')" title="状态">👤</div>
-        <div class="menu-item" onclick="openModal('logs')" title="日志">📜</div>
-        <div class="menu-item" onclick="openModal('guide')" title="帮助">❓</div>
-    </div>
-
-    <!-- 首次登录引导弹窗 -->
-    <div class="modal-overlay" id="modalTutorial">
-        <div class="modal-content" style="max-width: 500px; text-align: center;">
-            <div class="modal-title">🌟 欢迎来到数字篝火</div>
-            <div class="modal-body" style="text-align: left;">
-                <div class="modal-section">
-                    <h3>📖 使用说明</h3>
-                    <p>左侧边栏包含：</p>
-                    <p>• <b>个人信息</b> - 你的头像和 MBTI</p>
-                    <p>• <b>动作选择</b> - 选择专注时让分身做什么</p>
-                    <p>• <b>在线营员</b> - 当前火堆旁的其他人</p>
-                    <p>• <b>分身日志</b> - 专注后 AI 生成的故事</p>
-                </div>
-                <div class="modal-section">
-                    <h3>🎭 分身社交玩法</h3>
-                    <p>选择一项专注动作，点击"开始专注"。你的 AI 分身会代替你坐在篝火旁，与其他旅者互动。</p>
-                    <p>专注结束后，会生成一篇温暖的社交见闻故事。</p>
-                </div>
-                <div class="modal-section">
-                    <h3>🕯️ 动作选择</h3>
-                    <p>🍢 烤棉花糖 - 甜蜜社交</p>
-                    <p>🎣 湖边钓鱼 - 静心交流</p>
-                    <p>📖 翻阅古籍 - 知识分享</p>
-                    <p>🎸 拨弄琴弦 - 音乐共鸣</p>
-                    <p>🌌 仰望星空 - 哲思对话</p>
-                </div>
-            </div>
-            <div style="text-align: center; margin-top: 20px;">
-                <button class="modal-btn" onclick="closeModal('tutorial'); localStorage.setItem('hasSeenTutorial', 'true');">我知道了</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 分身动作选择弹窗 -->
-    <div class="modal-overlay" id="modalAction">
-        <div class="modal-content" style="max-width: 400px; text-align: center;">
-            <button class="modal-close" onclick="closeModal('action')">&times;</button>
-            <div class="modal-title">🎭 选择专注动作</div>
-            <div class="modal-body">
-                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;">
-                    <button class="action-btn" data-action="棉花糖" data-icon="🍢">🍢<br><span>烤棉花糖</span></button>
-                    <button class="action-btn" data-action="钓鱼" data-icon="🎣">🎣<br><span>湖边钓鱼</span></button>
-                    <button class="action-btn" data-action="古籍" data-icon="📖">📖<br><span>翻阅古籍</span></button>
-                    <button class="action-btn" data-action="琴弦" data-icon="🎸">🎸<br><span>拨弄琴弦</span></button>
-                    <button class="action-btn" data-action="星空" data-icon="🌌">🌌<br><span>仰望星空</span></button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 状态弹窗 -->
-    <div class="modal-overlay" id="modalStatus">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('status')">&times;</button>
-            <div class="modal-title">⚙️ 状态与专注</div>
-            <div class="modal-body">
-                <div class="modal-section">
-                    <h3>选择你的状态</h3>
-                    <div id="activityButtonsContainer"></div>
-                </div>
-                <div class="modal-section">
-                    <h3>专注历史</h3>
-                    <div id="focusHistoryContainer"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 日志弹窗 -->
-    <div class="modal-overlay" id="modalLogs">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('logs')">&times;</button>
-            <div class="modal-title">📜 故事日志</div>
-            <div class="modal-body">
-                <div class="modal-section">
-                    <ul class="modal-list" id="logListContainer"></ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 帮助弹窗 -->
-    <div class="modal-overlay" id="modalGuide">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('guide')">&times;</button>
-            <div class="modal-title">❓ 使用说明</div>
-            <div class="modal-body">
-                <div class="modal-section">
-                    <h3>关于数字篝火</h3>
-                    <p>在星空下围坐篝火，与志同道合的旅者相遇。AI 会记录你的专注时光，生成温暖的故事。</p>
-                </div>
-                <div class="modal-section">
-                    <h3>操作指南</h3>
-                    <p>• 点击头像 - 与营员互动<br>• 底部图标 - 打开功能面板<br>• 专注计时 - 开启沉浸工作</p>
-                </div>
+    <!-- 动作选择弹窗 -->
+    <div class="action-modal" id="actionModal">
+        <div class="action-content">
+            <h2 class="action-title">🎭 选择专注动作</h2>
+            <div class="action-btns">
+                <button class="action-btn" onclick="selectAction('烤棉花糖', '🍢')">🍢 烤棉花糖</button>
+                <button class="action-btn" onclick="selectAction('湖边钓鱼', '🎣')">🎣 湖边钓鱼</button>
+                <button class="action-btn" onclick="selectAction('翻阅古籍', '📖')">📖 翻阅古籍</button>
+                <button class="action-btn" onclick="selectAction('拨弄琴弦', '🎸')">🎸 拨弄琴弦</button>
+                <button class="action-btn" onclick="selectAction('仰望星空', '🌌')">🌌 仰望星空</button>
             </div>
         </div>
     </div>
 
     <!-- 故事弹窗 -->
-    <div class="modal-overlay" id="modalStory">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('story')">&times;</button>
-            <div class="modal-title">🌟 专注故事</div>
-            <div class="modal-body">
-                <div class="modal-section">
-                    <p id="storyModalContent" style="line-height:1.8;white-space:pre-wrap;"></p>
-                </div>
-                <div style="text-align:center;margin-top:20px;">
-                    <button class="modal-btn" onclick="saveStoryToHistory()">收录</button>
-                </div>
-            </div>
+    <div class="story-modal" id="storyModal">
+        <div class="story-content">
+            <h2 class="story-title">📖 见闻记录</h2>
+            <p class="story-text" id="storyText"></p>
+            <button class="story-close" onclick="closeStoryModal()">关闭</button>
         </div>
     </div>
 
-    <div class="stars" id="stars"></div>
-
-    <!-- 移动端状态栏 -->
-    <div class="mobile-status-bar" id="mobileStatusBar"></div>
-
-    <!-- 移动端菜单按钮 -->
-    <button class="mobile-menu-btn" onclick="toggleMobileDrawer()">☰</button>
-
-    <!-- 移动端侧边抽屉 -->
-    <div class="mobile-drawer-overlay" id="mobileDrawerOverlay" onclick="toggleMobileDrawer()"></div>
-    <div class="mobile-drawer" id="mobileDrawer">
-        <div class="mobile-drawer-section" id="mobileMbtiSection"></div>
-        <div class="mobile-drawer-section" id="mobileAgentsSection"></div>
-        <div class="mobile-drawer-section" style="border-color: rgba(34, 197, 94, 0.4);">
-            <h3 style="color: #22c55e;">🎯 专注模式</h3>
-            <div style="margin: 10px 0;">
-                <input type="number" id="focusDurationMobile" value="25" min="1" max="180" style="width:60px;padding:6px;background:rgba(255,255,255,0.1);border:1px solid rgba(34,197,94,0.3);color:white;border-radius:5px;text-align:center;" onchange="document.getElementById('focusDurationCentral').value=this.value;document.getElementById('focusDuration').value=this.value;updateFocusTimerDisplay(this.value*60);">
-                <span style="color:rgba(255,255,255,0.6);font-size:12px;">分钟</span>
-            </div>
-            <button onclick="startFocus()" id="mobileFocusBtn" style="width:100%;padding:10px;background:linear-gradient(135deg, #22c55e, #16a34a);border:none;color:white;border-radius:8px;margin-top:8px;font-size:14px;cursor:pointer;">开始专注</button>
-            <button onclick="quitFocus()" id="mobileQuitFocusBtn" style="display:none;width:100%;padding:10px;background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.4);color:#ef4444;border-radius:8px;margin-top:8px;font-size:14px;cursor:pointer;">退出专注</button>
-        </div>
-        <div class="mobile-drawer-section">
-            <h3>📖 故事日志</h3>
-            <button onclick="showStoryPanel()" style="width:100%;padding:8px;background:rgba(255,170,0,0.2);border:1px solid var(--fire-mid);color:white;border-radius:5px;margin-top:5px;">查看故事</button>
-        </div>
-        <div class="mobile-drawer-section">
-            <h3>📜 说明书</h3>
-            <button onclick="showInstructions()" style="width:100%;padding:8px;background:rgba(168,85,247,0.2);border:1px solid #a855f7;color:white;border-radius:5px;margin-top:5px;">使用说明</button>
+    <!-- Loading -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>Agent 正在记录火堆旁的所见所闻...</p>
         </div>
     </div>
-
-    <div class="header">
-        <h1>DIGITAL BONFIRE</h1>
-        <p class="subtitle">◈ MBTI 篝火社群 ◈</p>
-    </div>
-
-
-    <!-- 故事面板 -->
-    <div class="story-panel" id="storyPanel" style="display: none;">
-        <h3>📖 篝火故事 <span onclick="closeStoryPanel()" style="float:right;cursor:pointer;font-size:16px;">✕</span></h3>
-        <p class="story-content" id="storyContent"></p>
-        <button class="story-refresh" onclick="generateStory()">换一换</button>
-    </div>
-
-    <!-- 生成故事 Loading 提示 -->
-    <div class="story-loading-overlay" id="storyLoadingOverlay" style="display: none;">
-        <div class="story-loading-content">
-            <div class="story-loading-spinner"></div>
-            <p class="story-loading-text" id="storyLoadingText">Agent 正在记录火堆旁的所见所闻...</p>
-        </div>
-    </div>
-
-    <!-- 专注模式弹窗 -->
-    <div class="focus-popup" id="focusPopup">
-        <div class="focus-popup-content">
-            <h2 class="focus-popup-title">🌟 专注结束</h2>
-            <div class="focus-popup-story" id="focusPopupStory"></div>
-            <div class="focus-popup-actions">
-                <button class="focus-popup-btn focus-popup-close" onclick="closeFocusPopup()">关闭</button>
-                <button class="focus-popup-btn focus-popup-share" onclick="shareFocusStory()">分享故事</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 专注中状态指示 -->
-    <div class="focusing-indicator" id="focusingIndicator">
-        专注中
-    </div>
-
-    <!-- 火堆容器 -->
-    <div class="fire-container" id="campground">
-        <div class="fire-glow"></div>
-        <div class="flame"></div>
-        <div class="fire-particle"></div>
-        <div class="fire-particle"></div>
-        <div class="fire-particle"></div>
-        <div class="fire-particle"></div>
-        <!-- Logs removed -->
-    </div>
-
-    <!-- 中央行动区域 - 极简动态按钮 -->
-    <div class="central-action-area" id="centralActionArea">
-        <!-- 单一动态按钮：未专注时显示开始，专注中显示倒计时+停止 -->
-        <div id="focusButtonContainer" style="text-align: center;">
-            <button id="mainFocusBtn" class="focus-main-btn" onclick="handleFocusButtonClick()">
-                开始专注
-            </button>
-            <div id="focusAgentHint" class="focus-agent-hint" style="display: none;">
-                你的 Agent 正在 <span id="focusHintAction"></span>...
-            </div>
-        </div>
-    </div>
-
-    <div class="status" id="status"></div>
 
     <script>
-        // ==================== 登录拦截逻辑 ====================
+        // ======== 全局状态 ========
+        let isFocusing = false;
+        let focusInterval = null;
+        let focusRemaining = 0;
+        let selectedAction = '烤棉花糖';
+        let selectedActionIcon = '🍢';
+        let campers = [];
+
+        // ======== 初始化 ========
         const token = localStorage.getItem('campfire_token');
         const userId = localStorage.getItem('campfire_user_id');
 
-        if (!token || !userId) {
-            document.body.classList.add('not-logged-in');
-        } else {
-            // 已登录，隐藏登录界面
+        if (token && userId) {
             document.getElementById('loginScreen').classList.add('hidden');
+            initApp();
         }
 
-        // 登录按钮事件
-        document.getElementById('loginBtn').addEventListener('click', () => {
+        function goLogin() {
             window.location.href = '/api/login';
-        });
-
-        // ==================== 弹窗系统 ====================
-        function openModal(type) {
-            // 关闭其他弹窗
-            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
-
-            const modalId = 'modal' + type.charAt(0).toUpperCase() + type.slice(1);
-            const modal = document.getElementById(modalId);
-            if (modal) {
-                modal.classList.add('active');
-            }
         }
 
-        function closeModal(type) {
-            const modalId = 'modal' + type.charAt(0).toUpperCase() + type.slice(1);
-            const modal = document.getElementById(modalId);
-            if (modal) {
-                modal.classList.remove('active');
-            }
-        }
-
-        // 点击遮罩关闭弹窗
-        document.querySelectorAll('.modal-overlay').forEach(overlay => {
-            overlay.addEventListener('click', (e) => {
-                if (e.target === overlay) {
-                    overlay.classList.remove('active');
-                }
-            });
-        });
-
-        // 显示故事弹窗
-        function showStoryModal(content) {
-            document.getElementById('storyModalContent').textContent = content;
-            document.getElementById('modalStory').classList.add('active');
-        }
-
-        function saveStoryToHistory() {
-            closeModal('story');
-            showStatus('已收录到故事日志');
-            loadFocusHistory();
-        }
-
-        // ==================== 专注模式关闭弹窗 ====================
-        function closeAllModals() {
-            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
-        }
-
-        // 切换侧边栏收起/展开
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('collapsed');
-        }
-
-        // 切换右侧面板收起/展开
-        function toggleRightSidePanel() {
-            const rightSidePanel = document.getElementById('rightSidePanel');
-            rightSidePanel.classList.toggle('collapsed');
-        }
-
-        // 渲染侧边栏用户信息
-        function updateSidebarUserInfo() {
-            const userName = localStorage.getItem('campfire_user_name') || '未登录';
-            const userId = localStorage.getItem('campfire_user_id');
-
+        async function initApp() {
+            // 更新用户信息
+            const userName = localStorage.getItem('campfire_user_name') || '旅者';
             document.getElementById('userName').textContent = userName;
             document.getElementById('userAvatar').textContent = userName.charAt(0);
 
-            // 尝试获取用户MBTI
-            if (userId) {
-                const token = localStorage.getItem('campfire_token');
-                fetch(`/api/campers`)
-                    .then(res => res.json())
-                    .then(data => {
-                        const user = data.campers?.find(c => c.id == userId);
-                        if (user) {
-                            document.getElementById('userMbti').textContent = user.mbti || '---';
-                        }
-                    })
-                    .catch(() => {});
+            // 获取营员数据
+            await fetchCampers();
+
+            // 检查专注状态
+            await checkFocusStatus();
+
+            // 加载日志
+            loadLogs();
+
+            // 自动弹出帮助
+            if (!sessionStorage.getItem('guideShown')) {
+                setTimeout(() => {
+                    alert('欢迎来到数字篝火！\n\n• 点击"开始专注"选择动作\n• 你的 Agent 会代替你社交\n• 点击右侧营员查看见闻记录');
+                    sessionStorage.setItem('guideShown', 'true');
+                }, 1000);
             }
         }
 
-        // 动作选择按钮事件
-        document.querySelectorAll('.action-btn-item').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.action-btn-item').forEach(b => b.classList.remove('selected'));
-                btn.classList.add('selected');
-                selectedAction = btn.dataset.action;
-                selectedActionIcon = btn.dataset.icon;
-            });
-        });
+        // ======== 面板切换 ========
+        function toggleLeftPanel() {
+            document.getElementById('leftPanel').classList.toggle('collapsed');
+        }
 
-        // 渲染在线用户到右侧面板
-        // 渲染所有营员到右侧面板（包含历史登记的所有营员）
-        function renderOnlineUsers(campers) {
-            const container = document.getElementById('onlineUsersListRight');
-            if (!container) return;
+        function toggleRightPanel() {
+            document.getElementById('rightPanel').classList.toggle('collapsed');
+        }
 
-            // 显示所有营员（包括当前用户），不过滤
+        function setDuration(min) {
+            document.getElementById('durationInput').value = min;
+        }
+
+        // ======== 核心：开始/停止专注 ========
+        function handleFocusClick() {
+            if (isFocusing) {
+                // 停止专注
+                stopFocus();
+            } else {
+                // 显示动作选择
+                document.getElementById('actionModal').classList.add('visible');
+            }
+        }
+
+        function selectAction(action, icon) {
+            selectedAction = action;
+            selectedActionIcon = icon;
+            document.getElementById('actionModal').classList.remove('visible');
+            startFocus();
+        }
+
+        async function startFocus() {
+            const userId = localStorage.getItem('campfire_user_id');
+            const token = localStorage.getItem('campfire_token');
+            const duration = parseInt(document.getElementById('durationInput').value) || 25;
+
+            if (!userId) {
+                alert('请先登录');
+                return;
+            }
+
+            try {
+                // 调用后端开始专注
+                await fetch('/api/focus/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({
+                        user_id: parseInt(userId),
+                        duration: duration,
+                        action: selectedAction,
+                        action_icon: selectedActionIcon
+                    })
+                });
+
+                // 保存状态
+                localStorage.setItem('campfire_focus_start', Date.now());
+                localStorage.setItem('campfire_focus_duration', duration);
+                localStorage.setItem('focusAction', selectedAction);
+                localStorage.setItem('focusActionIcon', selectedActionIcon);
+
+                // 启动计时器
+                startTimer(duration * 60);
+
+            } catch (e) {
+                console.error(e);
+                alert('开始专注失败');
+            }
+        }
+
+        function startTimer(seconds) {
+            focusRemaining = seconds;
+            isFocusing = true;
+
+            // 更新UI
+            updateFocusUI();
+
+            // 启动计时器
+            focusInterval = setInterval(() => {
+                focusRemaining--;
+                updateTimerDisplay();
+
+                if (focusRemaining <= 0) {
+                    finishFocus();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(focusRemaining / 60);
+            const secs = focusRemaining % 60;
+            document.getElementById('timerOverlay').textContent =
+                `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateFocusUI() {
+            const btn = document.getElementById('mainFocusBtn');
+            const timer = document.getElementById('timerOverlay');
+            const hint = document.getElementById('focusHint');
+
+            if (isFocusing) {
+                btn.textContent = '停止专注';
+                btn.classList.add('stop');
+                timer.classList.add('visible');
+                hint.classList.add('visible');
+                hint.innerHTML = `你的 Agent 正在 ${selectedActionIcon} ${selectedAction}...`;
+                document.body.classList.add('focusing');
+            } else {
+                btn.textContent = '开始专注';
+                btn.classList.remove('stop');
+                timer.classList.remove('visible');
+                hint.classList.remove('visible');
+                document.body.classList.remove('focusing');
+            }
+        }
+
+        // ======== 核心：强制重置 ========
+        function forceReset() {
+            // 清除计时器
+            if (focusInterval) {
+                clearInterval(focusInterval);
+                focusInterval = null;
+            }
+
+            // 重置状态
+            isFocusing = false;
+            focusRemaining = 0;
+
+            // 清除localStorage
+            localStorage.removeItem('campfire_focus_start');
+            localStorage.removeItem('campfire_focus_duration');
+            localStorage.removeItem('focusAction');
+            localStorage.removeItem('focusActionIcon');
+
+            // 更新UI
+            updateFocusUI();
+        }
+
+        // ======== 停止专注 ========
+        async function stopFocus() {
+            const userId = localStorage.getItem('campfire_user_id');
+            const token = localStorage.getItem('campfire_token');
+
+            try {
+                await fetch('/api/focus/end', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ user_id: parseInt(userId), action: selectedAction })
+                });
+            } catch (e) {
+                console.error(e);
+            }
+
+            forceReset();
+            loadLogs();
+        }
+
+        // ======== 专注结束 ========
+        async function finishFocus() {
+            const userId = localStorage.getItem('campfire_user_id');
+            const token = localStorage.getItem('campfire_token');
+            const duration = parseInt(localStorage.getItem('campfire_focus_duration')) || 25;
+
+            try {
+                const res = await fetch('/api/focus/end', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ user_id: parseInt(userId), action: selectedAction })
+                });
+                const data = await res.json();
+
+                if (data.story) {
+                    showStory(data.story);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+
+            forceReset();
+            loadLogs();
+        }
+
+        // ======== 检查专注状态 ========
+        async function checkFocusStatus() {
+            const userId = localStorage.getItem('campfire_user_id');
+            if (!userId) return;
+
+            const savedStart = localStorage.getItem('campfire_focus_start');
+            const savedDuration = localStorage.getItem('campfire_focus_duration');
+
+            // 检查本地是否过期
+            if (savedStart && savedDuration) {
+                const elapsed = Math.floor((Date.now() - parseInt(savedStart)) / 1000);
+                const remaining = parseInt(savedDuration) * 60 - elapsed;
+
+                if (remaining > 0) {
+                    // 从后端确认状态
+                    try {
+                        const res = await fetch(`/api/focus/status?user_id=${userId}`);
+                        const data = await res.json();
+
+                        if (data.focusing && data.remaining_seconds > 0) {
+                            selectedAction = data.focus_action || '烤棉花糖';
+                            selectedActionIcon = data.focus_action_icon || '🍢';
+                            startTimer(data.remaining_seconds);
+                        } else {
+                            forceReset();
+                        }
+                    } catch (e) {
+                        forceReset();
+                    }
+                } else {
+                    forceReset();
+                }
+            }
+        }
+
+        // ======== 加载营员 ========
+        async function fetchCampers() {
+            try {
+                const res = await fetch('/api/campers');
+                campers = await res.json();
+                renderCampers();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function renderCampers() {
+            const container = document.getElementById('campersList');
             if (!campers || campers.length === 0) {
                 container.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-size:0.8rem;text-align:center;padding:20px;">暂无营员</div>';
                 return;
@@ -2464,14 +1018,14 @@
                 const actionName = c.focus_action || '烤棉花糖';
 
                 return `
-                    <div class="online-user-card" onclick="generateStoryForUser(${JSON.stringify(c).replace(/"/g, '&quot;')})">
-                        <div class="avatar" style="background:${c.color || '#666'};box-shadow:0 0 8px ${c.color || '#666'}66;">
+                    <div class="camper-item" onclick="generateStory('${c.name}', '${c.mbti || '?'}', ${c.id})">
+                        <div class="camper-avatar" style="background:${c.color || '#666'};box-shadow:0 0 8px ${c.color || '#666'}66;">
                             ${c.name.charAt(0)}
                         </div>
-                        <div class="info">
-                            <div class="name ${isFocusing ? 'focusing-name' : ''}">${c.name}</div>
-                            <div class="status ${isFocusing ? 'focusing' : ''}">
-                                ${isFocusing ? `<span class="action-icon">${actionIcon}</span> ${actionName}` : `<span>${c.mbti || '?'}</span>`}
+                        <div style="flex:1">
+                            <div class="camper-name ${isFocusing ? 'focusing' : ''}">${c.name}</div>
+                            <div class="camper-status ${isFocusing ? 'focusing' : ''}">
+                                ${isFocusing ? `${actionIcon} ${actionName}` : c.mbti || '?'}
                             </div>
                         </div>
                     </div>
@@ -2479,1544 +1033,85 @@
             }).join('');
         }
 
-        // ==================== 分身动作按钮事件 ====================
-        document.querySelectorAll('.action-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const action = btn.dataset.action;
-                const icon = btn.dataset.icon;
-                selectAction(action, icon);
-            });
-        });
+        // ======== 生成见闻故事 ========
+        async function generateStory(name, mbti, userId) {
+            // 显示Loading
+            document.getElementById('loadingOverlay').classList.add('visible');
 
-        // ==================== 首次登录引导 ====================
-        function checkFirstTime() {
-            const hasSeen = localStorage.getItem('hasSeenTutorial');
-            const storedToken = localStorage.getItem('campfire_token');
-            const storedUserId = localStorage.getItem('campfire_user_id');
-            if (!hasSeen && storedToken && storedUserId) {
-                openModal('tutorial');
-            }
-        }
-
-        // ==================== 首次引导气泡 ====================
-        function showMenuTooltip() {
-            const hasSeenTooltip = localStorage.getItem('hasSeenTooltip');
-            if (!hasSeenTooltip && token && userId) {
-                const tooltip = document.createElement('div');
-                tooltip.className = 'menu-tooltip';
-                tooltip.textContent = '在这里切换分身动作或查看日志';
-                document.getElementById('floatingMenu').appendChild(tooltip);
-                // 5秒后消失
-                setTimeout(() => {
-                    tooltip.style.opacity = '0';
-                    setTimeout(() => tooltip.remove(), 300);
-                    localStorage.setItem('hasSeenTooltip', 'true');
-                }, 5000);
-            }
-        }
-
-        const campground = document.getElementById('campground');
-        const centerX = 50, centerY = 50;
-        let currentUser = null;
-
-        // 行为列表
-        const activities = [
-            { name: "钓鱼", emoji: "🎣", desc: "静心垂钓", mbti: ["INTJ", "INTP", "ISTP", "ISFP"] },
-            { name: "煮茶", emoji: "🍵", desc: "品茶论道", mbti: ["INFJ", "INFP", "ENFJ", "ENFP"] },
-            { name: "围炉夜话", emoji: "💬", desc: "畅所欲言", mbti: ["ALL"] },
-            { name: "烤棉花糖", emoji: "🍡", desc: "甜蜜时光", mbti: ["ESFP", "ISFJ", "ISTJ", "ESTP"] },
-            { name: "篝火舞会", emoji: "💃", desc: "尽情起舞", mbti: ["ALL"] },
-        ];
-
-        // MBTI 分组
-        const mbtiGroups = {
-            "智识之火": { color: "#00d4ff", mbtis: ["INTJ", "INTP", "ENTJ", "ENTP"] },
-            "灵感之火": { color: "#a855f7", mbtis: ["INFJ", "INFP", "ENFJ", "ENFP"] },
-            "秩序之火": { color: "#22c55e", mbtis: ["ISTJ", "ISFJ", "ESTJ", "ESFJ"] },
-            "实践之火": { color: "#f59e0b", mbtis: ["ISTP", "ISFP", "ESTP", "ESFP"] },
-        };
-
-        document.getElementById('loginBtn').addEventListener('click', () => {
-            // 隐藏登录按钮
-            const btn = document.getElementById('loginBtn');
-            btn.style.opacity = '0';
-            btn.style.transform = 'scale(0.8)';
-            btn.style.pointerEvents = 'none';
-
-            // 篝火放大
-            setTimeout(() => {
-                document.getElementById('campground').classList.add('zoomed');
-            }, 300);
-
-            // 跳转登录
-            window.location.href = '/api/login';
-        });
-
-        // 检查 URL 参数（必须在使用 urlParams 之前定义）
-        const urlParams = new URLSearchParams(window.location.search);
-
-        // 检查是否已登录，如果是则隐藏按钮并放大篝火
-        if (urlParams.get('joined') === 'true') {
-            const userId = urlParams.get('user_id');
-            const userName = urlParams.get('user_name');
-            const token = urlParams.get('token');
-
-            if (token) {
-                localStorage.setItem('campfire_token', token);
-            }
-            if (userId) {
-                localStorage.setItem('campfire_user_id', userId);
-            }
-            if (userName) {
-                localStorage.setItem('campfire_user_name', decodeURIComponent(userName));
-            }
-
-            // 清除 URL 参数
-            window.history.replaceState({}, document.title, window.location.pathname);
-
-            // 隐藏登录界面，显示主应用
-            document.body.classList.remove('not-logged-in');
-            document.body.classList.add('logged-in');
-            document.getElementById('loginScreen').classList.add('hidden');
-
-            // 直接设置 currentUser，不等待 fetchCampers
-            currentUser = {
-                id: parseInt(userId),
-                name: decodeURIComponent(userName)
-            };
-
-            // 更新侧边栏用户信息
-            updateSidebarUserInfo();
-
-            const btn = document.getElementById('loginBtn');
-            btn.style.display = 'none';
-            document.getElementById('campground').classList.add('zoomed');
-            showStatus('欢迎来到数字篝火！');
-
-            // 显示首次引导
-            setTimeout(() => {
-                checkFirstTime();
-            }, 1000);
-        }
-
-        function showStatus(msg) {
-            const status = document.getElementById('status');
-            status.textContent = msg;
-            status.classList.add('visible');
-            setTimeout(() => status.classList.remove('visible'), 3000);
-        }
-
-        function toggleMobileDrawer() {
-            document.getElementById('mobileDrawer').classList.toggle('open');
-            document.getElementById('mobileDrawerOverlay').classList.toggle('open');
-        }
-
-        function showStoryPanel() {
-            toggleMobileDrawer();
-            document.getElementById('storyPanel').style.display = 'block';
-            showStoryLogs();
-        }
-
-        function closeStoryPanel() {
-            document.getElementById('storyPanel').style.display = 'none';
-        }
-
-        function showInstructions() {
-            toggleMobileDrawer();
-            alert('数字篝火使用说明：\n\n1. 点击"开始相遇"按钮登录\n2. 选择你的状态（钓鱼/煮茶/围炉夜话等）\n3. 与其他用户互动生成故事\n4. 点击篝火中的用户查看信息');
-        }
-
-        // ================== 专注模式全局变量 ==================
-        let focusInterval = null;           // 倒计时定时器
-        let focusRemainingSeconds = 0;      // 剩余秒数
-        let focusParticleInterval = null;   // 粒子效果定时器
-        let selectedFocusDuration = 25;     // 选中的专注时长
-        let isFocusing = false;            // 是否正在专注
-        let isProcessing = false;          // 防止重复点击
-
-        // 设置右侧边栏时长
-        function setDuration(minutes) {
-            document.getElementById('focusDurationRight').value = minutes;
-            selectedFocusDuration = minutes;
-        }
-
-        // 处理主按钮点击
-        function handleFocusButtonClick() {
-            if (isProcessing) return;
-
-            if (isFocusing) {
-                // 专注中，点击停止
-                quitFocus();
-            } else {
-                // 未专注，点击开始
-                // 从右侧边栏获取时长
-                const rightDuration = document.getElementById('focusDurationRight')?.value;
-                if (rightDuration) {
-                    selectedFocusDuration = parseInt(rightDuration) || 25;
-                }
-                showActionSelector();
-            }
-        }
-
-        // 更新主按钮状态
-        function updateFocusButton() {
-            const btn = document.getElementById('mainFocusBtn');
-            const hint = document.getElementById('focusAgentHint');
-            const hintAction = document.getElementById('focusHintAction');
-
-            if (!btn) return;
-
-            if (isFocusing) {
-                // 专注中，显示倒计时
-                const minutes = Math.floor(focusRemainingSeconds / 60);
-                const seconds = focusRemainingSeconds % 60;
-                btn.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} | 停止`;
-                btn.classList.add('focusing');
-                btn.disabled = false;
-
-                // 显示 Agent 动作提示
-                const action = localStorage.getItem('focusAction') || '烤棉花糖';
-                const actionIcon = localStorage.getItem('focusActionIcon') || '🍢';
-                if (hint) {
-                    hint.style.display = 'block';
-                    if (hintAction) hintAction.textContent = `${actionIcon} ${action}`;
-                }
-            } else {
-                // 未专注，显示开始按钮
-                btn.textContent = '开始专注';
-                btn.classList.remove('focusing');
-                btn.disabled = false;
-
-                // 隐藏 Agent 动作提示
-                if (hint) hint.style.display = 'none';
-            }
-        }
-
-        // 页面加载时检查专注状态（不自动恢复专注模式）
-        function checkFocusStatus() {
-            const userId = localStorage.getItem('campfire_user_id');
-            if (!userId) return;
-
-            const savedFocusStart = localStorage.getItem('campfire_focus_start_time');
-            const savedFocusDuration = localStorage.getItem('campfire_focus_duration');
-            const focusShouldAutoRestore = localStorage.getItem('campfire_focus_should_restore');
-
-            // 如果有保存的专注数据，检查是否已过期，过期则清理
-            if (savedFocusStart && savedFocusDuration) {
-                const startTime = parseInt(savedFocusStart);
-                const duration = parseInt(savedFocusDuration);
-                const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                const remaining = duration * 60 - elapsed;
-
-                if (remaining <= 0) {
-                    // 专注时间已过，清理旧数据
-                    localStorage.removeItem('campfire_focus_start_time');
-                    localStorage.removeItem('campfire_focus_duration');
-                    localStorage.removeItem('campfire_focus_active');
-                    localStorage.removeItem('campfire_focus_should_restore');
-                }
-            }
-
-            // 获取后端专注状态（仅检查，不自动恢复）
-            fetch(`/api/focus/status?user_id=${userId}`)
-                .then(res => res.json())
-                .then(data => {
-                    // 只有明确标记需要恢复（用户主动开始）且剩余时间大于0时才恢复
-                    // 防止刷新页面后自动开始倒计时
-                    const shouldRestore = focusShouldAutoRestore === 'true' && data.focusing && data.remaining_seconds > 0 && !isFocusing;
-
-                    if (shouldRestore) {
-                        // 从后端获取动作信息
-                        const action = data.focus_action || '烤棉花糖';
-                        const actionIcon = data.focus_action_icon || '🍢';
-                        localStorage.setItem('focusAction', action);
-                        localStorage.setItem('focusActionIcon', actionIcon);
-                        restoreFocusModeUI();
-                        startFocusTimer(data.remaining_seconds);
-                        // 恢复后清除标记
-                        localStorage.removeItem('campfire_focus_should_restore');
-                    } else if (!data.focusing) {
-                        // 后端已结束，清理前端数据
-                        localStorage.removeItem('campfire_focus_start_time');
-                        localStorage.removeItem('campfire_focus_duration');
-                        localStorage.removeItem('campfire_focus_active');
-                        localStorage.removeItem('campfire_focus_should_restore');
-                        // 确保界面显示"开始计时"按钮
-                        resetFocusUI();
-                    }
-                })
-                .catch(e => console.error('Failed to get focus status:', e));
-
-            // 加载专注历史
-            loadFocusHistory();
-        }
-
-        // 重置专注 UI 到初始状态
-        function resetFocusUI() {
-            document.body.classList.remove('focus-mode');
-            const fireContainer = document.getElementById('campground');
-            if (fireContainer) {
-                fireContainer.classList.remove('focus-active');
-            }
-
-            // 清除计时器
-            if (focusInterval) {
-                clearInterval(focusInterval);
-                focusInterval = null;
-            }
-            if (focusParticleInterval) {
-                clearInterval(focusParticleInterval);
-                focusParticleInterval = null;
-            }
-
-            // 清除专注粒子
-            document.querySelectorAll('.focus-spark').forEach(p => p.remove());
-
-            // 移除 focus-hide 类
-            document.querySelectorAll('.focus-hide').forEach(el => el.classList.remove('focus-hide'));
-
-            // 重置状态
-            isFocusing = false;
-            isProcessing = false;
-            focusRemainingSeconds = 0;
-
-            // 清理 localStorage
-            localStorage.removeItem('campfire_focus_start_time');
-            localStorage.removeItem('campfire_focus_duration');
-            localStorage.removeItem('campfire_focus_active');
-            localStorage.removeItem('campfire_focus_should_restore');
-            localStorage.removeItem('focusAction');
-            localStorage.removeItem('focusActionIcon');
-
-            // 更新按钮状态
-            updateFocusButton();
-
-            // 隐藏旧的 UI 元素（兼容旧代码）
-            const focusPanel = document.getElementById('focusPanel');
-            const focusUI = document.getElementById('focusUI');
-            if (focusPanel) focusPanel.style.display = 'none';
-            if (focusUI) focusUI.style.display = 'none';
-        }
-
-        // 恢复专注模式 UI（用于页面刷新后）
-        function restoreFocusModeUI() {
-            const fireContainer = document.getElementById('campground');
-
-            // 添加 .focus-active 类到火焰容器
-            fireContainer.classList.add('focus-active');
-
-            // 显示专注 UI
-            document.getElementById('focusUI').style.display = 'block';
-
-            // 切换移动端按钮
-            const mobileFocusBtn = document.getElementById('mobileFocusBtn');
-            const mobileQuitFocusBtn = document.getElementById('mobileQuitFocusBtn');
-            if (mobileFocusBtn) mobileFocusBtn.style.display = 'none';
-            if (mobileQuitFocusBtn) mobileQuitFocusBtn.style.display = 'block';
-
-            // 添加 .focus-hide 类隐藏所有干扰项
-            document.querySelectorAll('.sidebar, .right-sidebar, .header, .mobile-menu-btn, .login-container, .camper, .story-panel, .focusing-indicator').forEach(el => {
-                el.classList.add('focus-hide');
-            });
-
-            // 添加 body 沉浸模式类
-            document.body.classList.add('focus-mode');
-
-            // 添加额外的粒子效果
-            addFocusParticles();
-        }
-
-        function selectFocusDuration(minutes) {
-            selectedFocusDuration = minutes;
-            const durationInput = document.getElementById('focusDuration');
-            durationInput.value = minutes;
-            updateFocusTimerDisplay(minutes * 60);
-        }
-
-        function updateFocusTimerDisplay(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = seconds % 60;
-            document.getElementById('focusTimerDisplay').textContent =
-                `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        }
-
-        // 选中的专注动作
-        let selectedAction = null;
-        let selectedActionIcon = null;
-
-        // 打开动作选择弹窗
-        function showActionSelector() {
-            openModal('action');
-        }
-
-        // 选择动作并开始专注
-        function selectAction(action, icon) {
-            selectedAction = action;
-            selectedActionIcon = icon;
-            closeModal('action');
-            // 开始专注（选择动作后立即开始）
-            beginFocus();
-        }
-
-        // 开始专注（动作选择后）
-        async function beginFocus() {
-            if (isProcessing) return; // 防止重复点击
-            isProcessing = true;
-
-            const userId = localStorage.getItem('campfire_user_id');
-            const token = localStorage.getItem('campfire_token');
-
-            if (!userId) {
-                alert('请先登录后再开始专注');
-                isProcessing = false;
-                return;
-            }
-
-            // 保存专注动作到 localStorage
-            localStorage.setItem('focusAction', selectedAction || '烤棉花糖');
-            localStorage.setItem('focusActionIcon', selectedActionIcon || '🍢');
-
-            // 从右侧边栏获取专注时长（优先）
-            const rightDurationInput = document.getElementById('focusDurationRight');
-            let focusDuration = rightDurationInput ? parseInt(rightDurationInput.value) : 25;
-            if (!focusDuration || focusDuration < 1) focusDuration = 25;
-            selectedFocusDuration = focusDuration;
-
-            if (focusDuration < 1 || focusDuration > 180) {
-                alert('请输入 1-180 之间的分钟数');
-                isProcessing = false;
-                return;
-            }
-
-            // 调用后端 API 开始专注
             try {
-                const action = selectedAction || '烤棉花糖';
-                const actionIcon = selectedActionIcon || '🍢';
-                const res = await fetch('/api/focus/start', {
+                const res = await fetch('/api/story/generate', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        user_id: parseInt(userId),
-                        duration: focusDuration,
-                        action: action,
-                        action_icon: actionIcon
-                    })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mbti_type: mbti, target_user_id: userId })
                 });
                 const data = await res.json();
 
-                if (data.error) {
-                    alert(data.error);
-                    isProcessing = false;
+                // 隐藏Loading
+                document.getElementById('loadingOverlay').classList.remove('visible');
+
+                // 显示故事
+                showStory(data.story);
+            } catch (e) {
+                console.error(e);
+                document.getElementById('loadingOverlay').classList.remove('visible');
+                alert('生成故事失败');
+            }
+        }
+
+        function showStory(story) {
+            document.getElementById('storyText').textContent = story;
+            document.getElementById('storyModal').classList.add('visible');
+        }
+
+        function closeStoryModal() {
+            document.getElementById('storyModal').classList.remove('visible');
+        }
+
+        // ======== 加载日志 ========
+        async function loadLogs() {
+            try {
+                const res = await fetch('/api/story/logs?limit=10');
+                const stories = await res.json();
+
+                const container = document.getElementById('logsList');
+                if (!stories || stories.length === 0) {
+                    container.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-size:0.8rem;text-align:center;padding:20px;">暂无故事</div>';
                     return;
                 }
 
-                // 保存到 localStorage（用于页面刷新后恢复状态）
-                localStorage.setItem('campfire_focus_start_time', Date.now().toString());
-                localStorage.setItem('campfire_focus_duration', focusDuration.toString());
-                localStorage.setItem('campfire_focus_active', 'true');
-                localStorage.setItem('campfire_focus_should_restore', 'true');
-
-                // 添加 .focus-active 类到火焰容器
-                const fireContainer = document.getElementById('campground');
-                fireContainer.classList.add('focus-active');
-
-                // 添加 .focus-hide 类隐藏干扰项
-                document.querySelectorAll('.sidebar, .right-sidebar, .header, .mobile-menu-btn, .login-container, .camper, .story-panel, .focusing-indicator').forEach(el => {
-                    el.classList.add('focus-hide');
-                });
-
-                // 启动计时器
-                startFocusTimer(focusDuration * 60);
-
-                // 更新按钮状态
-                updateFocusButton();
-
-            } catch (e) {
-                console.error('Focus start error:', e);
-                isProcessing = false;
-            }
-        }
-
-        // 添加专注模式额外粒子
-        function addFocusParticles() {
-            const fireContainer = document.getElementById('campground');
-
-            // 立即添加一批粒子
-            for (let i = 0; i < 10; i++) {
-                createFocusParticle();
-            }
-
-            // 持续添加粒子
-            focusParticleInterval = setInterval(() => {
-                if (isFocusing) {
-                    createFocusParticle();
-                }
-            }, 100);
-        }
-
-        function createFocusParticle() {
-            const fireContainer = document.getElementById('campground');
-            const particle = document.createElement('div');
-            particle.className = 'particle focus-spark';
-            particle.style.cssText = `
-                position: absolute;
-                bottom: 30px;
-                left: ${45 + Math.random() * 10}%;
-                width: ${3 + Math.random() * 4}px;
-                height: ${3 + Math.random() * 4}px;
-                background: #ffcc00;
-                border-radius: 50%;
-                box-shadow: 0 0 6px #ff6600;
-                pointer-events: none;
-                animation: focus-spark-rise ${0.8 + Math.random() * 0.4}s ease-out forwards;
-            `;
-            fireContainer.appendChild(particle);
-
-            setTimeout(() => {
-                particle.remove();
-            }, 1200);
-        }
-
-        // 添加专注粒子动画样式
-        const focusStyle = document.createElement('style');
-        focusStyle.textContent = `
-            @keyframes focus-spark-rise {
-                0% { transform: translateY(0) scale(1); opacity: 1; }
-                100% { transform: translateY(-350px) translateX(${Math.random() > 0.5 ? '' : '-'}${30 + Math.random() * 30}px) scale(0); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(focusStyle);
-
-        function startFocusTimer(seconds) {
-            // 防止多个计时器叠加，先清除已有计时器
-            if (focusInterval) {
-                clearInterval(focusInterval);
-                focusInterval = null;
-            }
-
-            focusRemainingSeconds = seconds;
-            isFocusing = true;
-
-            // 更新按钮状态
-            updateFocusButton();
-
-            // CSS focus-mode 会自动处理火焰增强效果
-            console.log('🔥 计时器启动，秒数:', seconds);
-            focusInterval = setInterval(() => {
-                focusRemainingSeconds--;
-                updateFocusTimerDisplay(focusRemainingSeconds);
-                updateFocusButton(); // 更新按钮倒计时
-                console.log('⏱️ 剩余秒数:', focusRemainingSeconds);
-
-                if (focusRemainingSeconds <= 0) {
-                    console.log('⏰ 计时结束，调用 finishFocus');
-                    clearInterval(focusInterval);
-                    focusInterval = null;
-                    finishFocus();
-                }
-            }, 1000);
-        }
-
-        // 专注计时结束，调用后端生成故事
-        async function finishFocus() {
-            console.log('🎯 finishFocus 被调用');
-
-            // 获取必要信息
-            const token = localStorage.getItem('campfire_token');
-            const duration = parseInt(localStorage.getItem('campfire_focus_duration')) || 25;
-            const userId = localStorage.getItem('campfire_user_id');
-            const action = localStorage.getItem('focusAction') || '烤棉花糖';
-
-            // 清理保存的动作
-            localStorage.removeItem('focusAction');
-            localStorage.removeItem('focusActionIcon');
-
-            // 显示加载提示
-            showStatus('AI 正在编写故事...');
-
-            // 清除 UI 元素
-            clearInterval(focusInterval);
-            clearInterval(focusParticleInterval);
-            focusInterval = null;
-            focusParticleInterval = null;
-            isFocusing = false;
-
-            // 清除专注粒子
-            document.querySelectorAll('.focus-spark').forEach(p => p.remove());
-
-            // 移除专注模式样式
-            document.getElementById('campground').classList.remove('focus-active');
-            document.querySelectorAll('.focus-hide').forEach(el => el.classList.remove('focus-hide'));
-            document.body.classList.remove('focus-mode');
-
-            // 隐藏专注 UI
-            document.getElementById('focusUI').style.display = 'none';
-
-            // 切换移动端按钮
-            const mobileFocusBtn = document.getElementById('mobileFocusBtn');
-            const mobileQuitFocusBtn = document.getElementById('mobileQuitFocusBtn');
-            if (mobileFocusBtn) mobileFocusBtn.style.display = 'block';
-            if (mobileQuitFocusBtn) mobileQuitFocusBtn.style.display = 'none';
-
-            // 检查是否登录
-            if (!userId) {
-                showStatus('专注结束！登录后可生成故事');
-                localStorage.removeItem('campfire_focus_start_time');
-                localStorage.removeItem('campfire_focus_duration');
-                localStorage.removeItem('campfire_focus_active');
-                updateFocusTimerDisplay(25 * 60);
-                return;
-            }
-
-            // 调用后端 API 结束专注并生成故事
-            try {
-                // 从保存的动作或localStorage获取
-                const savedAction = localStorage.getItem('focusAction') || selectedAction || '烤棉花糖';
-                const res = await fetch('/api/focus/end', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token || ''}`
-                    },
-                    body: JSON.stringify({
-                        user_id: parseInt(userId),
-                        action: savedAction
-                    })
-                });
-                const data = await res.json();
-
-                console.log('📖 故事生成响应:', data);
-
-                if (data.story) {
-                    // 显示故事弹窗（使用新的Modal系统）
-                    showStoryModal(data.story);
-                    showStatus('专注结束！');
-                    // 刷新故事日志
-                    fetchStoryLogs();
-                } else {
-                    console.warn('故事生成失败:', data);
-                    showStatus(data.message || '专注结束');
-                }
-            } catch (e) {
-                console.error('finishFocus error:', e);
-                showStatus('专注结束');
-            }
-
-            // 清理 localStorage
-            localStorage.removeItem('campfire_focus_start_time');
-            localStorage.removeItem('campfire_focus_duration');
-            localStorage.removeItem('campfire_focus_active');
-
-            // 重置计时器显示
-            const durationInput = document.getElementById('focusDuration');
-            if (durationInput) {
-                updateFocusTimerDisplay(25 * 60);
-            }
-
-            // 刷新专注历史
-            if (typeof loadFocusHistory === 'function') loadFocusHistory();
-
-            // 重置按钮状态
-            resetFocusUI();
-        }
-
-        async function endFocus() {
-            console.log('🎯 endFocus 被调用！');
-            clearInterval(focusInterval);
-            clearInterval(focusParticleInterval);
-            focusInterval = null;
-            focusParticleInterval = null;
-            isFocusing = false;
-
-            // 清除专注粒子
-            document.querySelectorAll('.focus-spark').forEach(p => p.remove());
-
-            const userId = localStorage.getItem('campfire_user_id');
-            const token = localStorage.getItem('campfire_token');
-
-            // 显示加载提示
-            showStatus('AI 正在编写故事...');
-
-            // 清除 localStorage
-            localStorage.removeItem('campfire_focus_start_time');
-            localStorage.removeItem('campfire_focus_duration');
-            localStorage.removeItem('campfire_focus_active');
-
-            // 移除所有专注模式类
-            document.getElementById('campground').classList.remove('focus-active');
-            document.querySelectorAll('.focus-hide').forEach(el => {
-                el.classList.remove('focus-hide');
-            });
-
-            // 隐藏专注 UI
-            document.getElementById('focusUI').style.display = 'none';
-
-            // 退出沉浸模式
-            document.body.classList.remove('focus-mode');
-
-            // 切换移动端按钮
-            const mobileFocusBtn = document.getElementById('mobileFocusBtn');
-            const mobileQuitFocusBtn = document.getElementById('mobileQuitFocusBtn');
-            if (mobileFocusBtn) mobileFocusBtn.style.display = 'block';
-            if (mobileQuitFocusBtn) mobileQuitFocusBtn.style.display = 'none';
-
-            // 重置计时器显示
-            const durationInput = document.getElementById('focusDuration');
-            if (durationInput) {
-                updateFocusTimerDisplay((parseInt(durationInput.value) || 25) * 60);
-            } else {
-                updateFocusTimerDisplay(25 * 60);
-            }
-
-            // 检查是否登录
-            if (!userId) {
-                showStatus('专注结束！登录后可生成故事');
-                return;
-            }
-
-            // 调用后端 API 结束专注，获取故事
-            try {
-                const res = await fetch('/api/focus/end', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token || ''}`
-                    },
-                    body: JSON.stringify({
-                        user_id: parseInt(userId)
-                    })
-                });
-                const data = await res.json();
-
-                if (data.error) {
-                    console.error('Focus end error:', data.error);
-                    showStatus('专注结束');
-                    return;
-                }
-
-                // 打印调试信息
-                console.log('专注结束响应:', data);
-                if (data.debug) {
-                    console.log('调试信息:', data.debug);
-                }
-
-                if (data.story) {
-                    // 显示故事弹窗
-                    document.getElementById('focusPopupStory').textContent = data.story;
-                    document.getElementById('focusPopup').classList.add('show');
-                    showStatus('专注结束！');
-                    // 刷新故事列表
-                    fetchStoryLogs && fetchStoryLogs();
-                } else if (data.message) {
-                    showStatus(data.message);
-                    // 显示调试信息帮助排查
-                    if (data.debug) {
-                        console.warn('故事生成失败原因:', data.debug);
-                    }
-                } else {
-                    showStatus('专注结束，但故事生成失败');
-                }
-            } catch (e) {
-                console.error('Focus end error:', e);
-                showStatus('专注结束');
-            }
-
-            // 刷新专注历史
-            loadFocusHistory();
-        }
-
-        function cancelFocus() {
-            // 弹出确认对话框
-            if (!confirm("确定要熄灭火堆，退出这次专注吗？")) {
-                return;
-            }
-
-            clearInterval(focusInterval);
-            clearInterval(focusParticleInterval);
-            focusInterval = null;
-            focusParticleInterval = null;
-            isFocusing = false;
-
-            // 清除专注粒子
-            document.querySelectorAll('.focus-spark').forEach(p => p.remove());
-
-            // 清除 localStorage
-            localStorage.removeItem('campfire_focus_start_time');
-            localStorage.removeItem('campfire_focus_duration');
-            localStorage.removeItem('campfire_focus_active');
-
-            // 隐藏专注 UI
-            const focusUI = document.getElementById('focusUI');
-            if (focusUI) focusUI.style.display = 'none';
-
-            // 移除所有专注模式类
-            document.getElementById('campground').classList.remove('focus-active');
-            document.querySelectorAll('.focus-hide').forEach(el => {
-                el.classList.remove('focus-hide');
-            });
-
-            // 退出沉浸模式
-            document.body.classList.remove('focus-mode');
-
-            // 切换移动端按钮
-            const mobileFocusBtn = document.getElementById('mobileFocusBtn');
-            const mobileQuitFocusBtn = document.getElementById('mobileQuitFocusBtn');
-            if (mobileFocusBtn) mobileFocusBtn.style.display = 'block';
-            if (mobileQuitFocusBtn) mobileQuitFocusBtn.style.display = 'none';
-
-            // 重置计时器显示
-            const durationInput = document.getElementById('focusDuration');
-            if (durationInput) {
-                updateFocusTimerDisplay((parseInt(durationInput.value) || 25) * 60);
-            } else {
-                updateFocusTimerDisplay(25 * 60);
-            }
-
-            showStatus('已退出专注模式');
-        }
-
-        // 退出专注按钮调用的函数
-        function quitFocus() {
-            // 弹出确认对话框
-            if (!confirm("确定要熄灭火堆，退出这次专注吗？")) {
-                return;
-            }
-
-            // 重置状态
-            isProcessing = false;
-
-            // 清除 localStorage
-            localStorage.removeItem('campfire_focus_start_time');
-            localStorage.removeItem('campfire_focus_duration');
-            localStorage.removeItem('campfire_focus_active');
-            localStorage.removeItem('campfire_focus_should_restore');
-            localStorage.removeItem('focusAction');
-            localStorage.removeItem('focusActionIcon');
-
-            // 调用 resetFocusUI 统一重置
-            resetFocusUI();
-        }
-
-        function closeFocusPopup() {
-            document.getElementById('focusPopup').classList.remove('show');
-        }
-
-        function shareFocusStory() {
-            const story = document.getElementById('focusPopupStory').textContent;
-            const text = `🌟 我的数字篝火专注故事\n\n${story}\n\n#数字篝火 #专注 #SecondMe`;
-
-            // 复制到剪贴板
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showStatus('故事已复制到剪贴板');
-                });
-            } else {
-                // 备用方案
-                const textarea = document.createElement('textarea');
-                textarea.value = text;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                showStatus('故事已复制到剪贴板');
-            }
-        }
-
-        async function loadFocusHistory() {
-            const userId = localStorage.getItem('campfire_user_id');
-            if (!userId) return;
-
-            try {
-                const res = await fetch('/api/stories?type=focus_social');
-                const data = await res.json();
-
-                const historyContainer = document.getElementById('focusHistory');
-                const modalContainer = document.getElementById('focusHistoryContainer');
-                const sidebarStoriesList = document.getElementById('storyLogsList');
-                const userStories = data.stories ? data.stories.filter(s => s.user_id == userId) : [];
-
-                if (userStories.length === 0) {
-                    if (historyContainer) historyContainer.innerHTML = '<div class="focus-history-title">暂无专注记录</div>';
-                    if (modalContainer) modalContainer.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-size:12px;text-align:center;">暂无记录</div>';
-                    if (sidebarStoriesList) sidebarStoriesList.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-size:0.8rem;text-align:center;padding:20px;">暂无故事</div>';
-                    return;
-                }
-
-                let html = '<div class="focus-history-title">专注记录</div>';
-                let modalHtml = '';
-                let sidebarHtml = '';
-                userStories.slice(0, 10).forEach(story => {
-                    const date = new Date(story.created_at);
+                container.innerHTML = stories.map(s => {
+                    const date = new Date(s.created_at);
                     const dateStr = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
-                    html += `
-                        <div class="focus-history-item" onclick="showFocusStoryDetail('${story.content.replace(/'/g, "\\'")}')">
-                            <div class="focus-history-time">${dateStr}</div>
-                            <div class="focus-history-duration">${story.duration} 分钟专注</div>
+                    return `
+                        <div class="log-item" onclick="showStory('${(s.content || '').replace(/'/g, "\\'")}')">
+                            <div class="log-time">${dateStr} · ${s.duration || 25}分钟</div>
+                            <div class="log-preview">${s.content || '暂无内容'}</div>
                         </div>
                     `;
-                    modalHtml += `<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:12px;">
-                        <span style="color:rgba(255,255,255,0.4)">${dateStr}</span> · ${story.duration}分钟
-                    </div>`;
-                    // 侧边栏故事列表
-                    sidebarHtml += `<div class="story-item" onclick="showFocusStoryDetail('${story.content.replace(/'/g, "\\'")}')">
-                        <div class="time">${dateStr}</div>
-                        <div class="duration">${story.duration} 分钟专注</div>
-                        <div class="preview">${story.content || '暂无内容'}</div>
-                    </div>`;
-                });
-                if (historyContainer) historyContainer.innerHTML = html;
-                if (modalContainer) modalContainer.innerHTML = modalHtml;
-                if (sidebarStoriesList) sidebarStoriesList.innerHTML = sidebarHtml;
+                }).join('');
             } catch (e) {
-                console.error('Failed to load focus history:', e);
+                console.error(e);
             }
         }
 
-        function showFocusStoryDetail(story) {
-            document.getElementById('focusPopupStory').textContent = story;
-            document.getElementById('focusPopup').classList.add('show');
-        }
-
+        // ======== 创建星空 ========
         function createStars() {
             const container = document.getElementById('stars');
-            for (let i = 0; i < 150; i++) {
+            for (let i = 0; i < 100; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
                 star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                const size = Math.random() * 2 + 1;
-                star.style.width = size + 'px';
-                star.style.height = size + 'px';
+                star.style.top = Math.random() * 60 + '%';
+                star.style.width = star.style.height = (Math.random() * 2 + 1) + 'px';
                 star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
                 star.style.setProperty('--base-opacity', Math.random() * 0.5 + 0.3);
                 container.appendChild(star);
             }
         }
 
-        function createParticle(type = 'spark') {
-            const particle = document.createElement('div');
-            particle.className = 'particle ' + type;
-            const size = type === 'spark' ? Math.random() * 3 + 2 : Math.random() * 4 + 2;
-            particle.style.width = size + 'px';
-            particle.style.height = size + 'px';
-
-            const startAngle = Math.random() * Math.PI * 2;
-            particle.style.left = (centerX + Math.cos(startAngle) * 20) + 'px';
-            particle.style.top = (centerY + Math.sin(startAngle) * 20) + 'px';
-
-            campground.appendChild(particle);
-
-            const angle = Math.random() * Math.PI - Math.PI / 2;
-            const velocity = Math.random() * 150 + 100;
-            const vx = Math.cos(angle) * velocity, vy = Math.sin(angle) * velocity - 50;
-
-            let x = 0, y = 0, opacity = 1;
-            const startTime = performance.now();
-
-            function animate(currentTime) {
-                const elapsed = (currentTime - startTime) / 1000;
-                x = vx * elapsed; y = vy * elapsed + 0.5 * 200 * elapsed * elapsed;
-                opacity = Math.max(0, 1 - elapsed / 2);
-                particle.style.transform = `translate(${x}px, ${-y}px)`;
-                particle.style.opacity = opacity;
-                if (opacity > 0) requestAnimationFrame(animate);
-                else particle.remove();
-            }
-            requestAnimationFrame(animate);
-        }
-
-        // Old particle effects removed - using fire-particle CSS instead
-        // setInterval(() => createParticle('spark'), 100);
-        // setInterval(() => createParticle('ember'), 300);
-
-        async function fetchCampers() {
-            try {
-                const res = await fetch('/api/campers');
-                const data = await res.json();
-                renderCampers(data);
-                renderMbtiGroups(data);
-                renderAgents(data);
-
-                // 尝试通过 /api/me 获取当前用户
-                const token = localStorage.getItem('campfire_token');
-                if (token) {
-                    try {
-                        const meRes = await fetch('/api/me', {
-                            headers: { 'Authorization': `Bearer ${token}` }
-                        });
-                        const meData = await meRes.json();
-                        if (meData.authenticated && meData.user) {
-                            currentUser = meData.user;
-                            localStorage.setItem('campfire_user_id', currentUser.id);
-                        }
-                    } catch (e) {
-                        console.error('Failed to get /api/me:', e);
-                    }
-                }
-
-                // 备用：查找本地存储的用户
-                if (!currentUser) {
-                    const savedUserId = localStorage.getItem('campfire_user_id');
-                    const savedUserName = localStorage.getItem('campfire_user_name');
-                    if (savedUserId) {
-                        // 先尝试从数据中查找
-                        const found = data.find(c => c.id == savedUserId);
-                        if (found) {
-                            currentUser = found;
-                        } else {
-                            // 如果数据中没有，创建一个临时用户对象
-                            currentUser = {
-                                id: parseInt(savedUserId),
-                                name: savedUserName || 'User'
-                            };
-                        }
-                    } else if (data.length > 0) {
-                        currentUser = data[data.length - 1];
-                        localStorage.setItem('campfire_user_id', currentUser.id);
-                    }
-                }
-                fetchStatusCounts();
-            } catch (e) { console.error(e); }
-        }
-
-        async function fetchActivities() {
-            try {
-                const res = await fetch('/api/status/counts');
-                const counts = await res.json();
-                renderStatusCounts(counts);
-                const hasActivity = Object.values(counts).some(c => c > 0);
-                if (hasActivity) document.getElementById('storyPanel').style.display = 'block';
-            } catch (e) { console.error(e); }
-        }
-
-        function renderCampers(campers) {
-            document.querySelectorAll('.camper').forEach(el => el.remove());
-
-            campers.forEach(c => {
-                const camper = document.createElement('div');
-                camper.className = 'camper';
-                if (c.current_activity) camper.classList.add('has-activity');
-
-                const isFocusing = c.status === 'focusing';
-                const focusAction = c.focus_action || '';
-                const focusActionIcon = c.focus_action_icon || '';
-
-                const rad = (c.angle * Math.PI) / 180;
-                // 统一使用百分比定位，与桌面端相同
-                camper.style.left = (centerX + Math.cos(rad) * c.distance - 8) + 'px';
-                camper.style.top = (centerY + Math.sin(rad) * c.distance - 8) + 'px';
-
-                const avatar = document.createElement('div');
-                avatar.className = 'camper-avatar';
-                avatar.style.backgroundColor = c.color;
-                avatar.style.boxShadow = `0 0 15px ${c.color}, 0 0 30px ${c.color}66`;
-
-                const name = document.createElement('div');
-                name.className = 'camper-name';
-                name.textContent = c.name;
-
-                // 显示用户名 + MBTI 或 专注状态
-                const mbti = document.createElement('div');
-                mbti.className = 'camper-mbti';
-                if (isFocusing) {
-                    mbti.textContent = `${c.mbti || '?'} | ${focusActionIcon} 正在${focusAction}...`;
-                    mbti.style.color = 'rgba(255, 165, 0, 0.9)';
-                    mbti.style.fontSize = '0.65rem';
-                } else {
-                    mbti.textContent = c.mbti || '?';
-                }
-
-                // 隐藏旧的 activity 显示，只保留简洁的标签
-                const activity = document.createElement('div');
-                activity.className = 'camper-activity';
-                activity.style.display = 'none'; // 隐藏活动状态文字，避免重叠
-
-                camper.appendChild(avatar);
-                camper.appendChild(name);
-                camper.appendChild(mbti);
-                camper.appendChild(activity);
-
-                // 点击头像生成故事
-                camper.onclick = () => generateStoryForUser(c);
-
-                campground.appendChild(camper);
-            });
-        }
-
-        function renderMbtiGroups(campers) {
-            const container = document.getElementById('mbtiGroups');
-            container.innerHTML = '';
-
-            // 统计各组成员
-            const groups = { "智识之火": [], "灵感之火": [], "秩序之火": [], "实践之火": [] };
-            campers.forEach(c => {
-                const group = c.mbti_group || 'misc';
-                if (groups[group]) groups[group].push(c);
-            });
-
-            // 显示全部4个分组
-            Object.entries(groups).forEach(([name, members]) => {
-                const div = document.createElement('div');
-                div.className = 'mbti-group';
-                const groupInfo = mbtiGroups[name] || { color: '#666' };
-
-                // 判断是否是当前用户所在的组
-                const isMyGroup = currentUser && currentUser.mbti_group === name;
-                const memberNames = members.length > 0 ? members.map(m => m.name).join(' · ') : '暂无成员';
-
-                div.style.border = isMyGroup ? `1px solid ${groupInfo.color}` : '1px solid transparent';
-                div.style.background = isMyGroup ? `${groupInfo.color}22` : 'rgba(255,255,255,0.03)';
-
-                div.innerHTML = `
-                    <div class="mbti-group-name" style="color: ${groupInfo.color}">${name} ${isMyGroup ? '👈' : ''}</div>
-                    <div class="mbti-group-members">${memberNames}</div>
-                `;
-                div.onclick = () => generateStory(name);
-                container.appendChild(div);
-            });
-
-            // 渲染移动端 MBTI 分组
-            const mobileMbtiContainer = document.getElementById('mobileMbtiSection');
-            if (mobileMbtiContainer) {
-                mobileMbtiContainer.innerHTML = '<h3>🔥 篝火群组</h3>';
-                Object.entries(groups).forEach(([name, members]) => {
-                    const div = document.createElement('div');
-                    div.style.padding = '5px';
-                    div.style.margin = '5px 0';
-                    div.style.background = 'rgba(255,255,255,0.05)';
-                    div.style.borderRadius = '5px';
-                    div.style.fontSize = '12px';
-                    div.innerHTML = `<span style="color:var(--fire-mid)">${name}</span>: ${members.length}人`;
-                    div.onclick = () => { toggleMobileDrawer(); generateStory(name); };
-                    mobileMbtiContainer.appendChild(div);
-                });
-            }
-        }
-
-        // 渲染 Agents 面板
-        function renderAgents(campers) {
-            const container = document.getElementById('agentsList');
-            const modalContainer = document.getElementById('onlineUsersList');
-            const leftSidebarContainer = document.getElementById('onlineUsersList');
-            container.innerHTML = '';
-            if (modalContainer) modalContainer.innerHTML = '';
-            if (leftSidebarContainer) leftSidebarContainer.innerHTML = '';
-
-            if (campers.length === 0) {
-                container.innerHTML = '<div style="color: var(--text-secondary); font-size: 10px; text-align: center; padding: 10px;">暂无 Agents</div>';
-                return;
-            }
-
-            // 按群组分类显示
-            const groups = { "智识之火": [], "灵感之火": [], "秩序之火": [], "实践之火": [] };
-            campers.forEach(c => {
-                const group = c.mbti_group || 'misc';
-                if (groups[group]) groups[group].push(c);
-            });
-
-            Object.entries(groups).forEach(([groupName, members]) => {
-                if (members.length === 0) return;
-
-                members.forEach(c => {
-                    const div = document.createElement('div');
-                    div.className = 'agent-item';
-                    div.onclick = () => generateStoryForUser(c);
-
-                    const groupColors = {
-                        "智识之火": "#00d4ff",
-                        "灵感之火": "#a855f7",
-                        "秩序之火": "#22c55e",
-                        "实践之火": "#f59e0b"
-                    };
-                    const color = groupColors[groupName] || '#666';
-
-                    div.innerHTML = `
-                        <div class="agent-avatar" style="background: ${c.color || color}; box-shadow: 0 0 8px ${c.color || color}66;">
-                            ${c.name.charAt(0)}
-                        </div>
-                        <div class="agent-info">
-                            <div class="agent-name">${c.name}</div>
-                            <div class="agent-mbti">${c.mbti || '?'} · ${groupName}</div>
-                        </div>
-                    `;
-                    container.appendChild(div);
-
-                    // 弹窗内用户列表
-                    if (modalContainer) {
-                        const li = document.createElement('li');
-                        li.innerHTML = `<span style="color:${c.color || color}">●</span> ${c.name} <small style="color:rgba(255,255,255,0.4)">${c.mbti || '?'}</small>`;
-                        modalContainer.appendChild(li);
-                    }
-
-                    // 左侧边栏用户列表
-                    if (leftSidebarContainer && c.id !== currentUser?.id) {
-                        const isFocusing = c.status === 'focusing';
-                        const actionIcon = c.focus_action_icon || '🍢';
-                        const actionName = c.focus_action || '烤棉花糖';
-                        const userDiv = document.createElement('div');
-                        userDiv.className = 'online-user-item';
-                        userDiv.innerHTML = `
-                            <div class="online-user-avatar" style="background:${c.color || color};box-shadow:0 0 10px ${c.color || color}66;">
-                                ${c.name.charAt(0)}
-                            </div>
-                            <div class="online-user-info">
-                                <div class="online-user-name">${c.name}</div>
-                                <div class="online-user-status ${isFocusing ? 'focusing' : ''}">
-                                    ${isFocusing ? `<span class="action-icon">${actionIcon}</span> 正在${actionName}...` : `<span>${c.mbti || '?'}</span>`}
-                                </div>
-                            </div>
-                        `;
-                        leftSidebarContainer.appendChild(userDiv);
-                    }
-                });
-            });
-
-            // 渲染移动端 Agents
-            const mobileAgentsContainer = document.getElementById('mobileAgentsSection');
-            if (mobileAgentsContainer) {
-                mobileAgentsContainer.innerHTML = '<h3>🤖 在线用户</h3>';
-                if (campers.length === 0) {
-                    mobileAgentsContainer.innerHTML += '<div style="font-size:12px;color:var(--text-secondary)">暂无用户</div>';
-                } else {
-                    campers.forEach(c => {
-                        const div = document.createElement('div');
-                        div.style.padding = '5px';
-                        div.style.margin = '5px 0';
-                        div.style.background = 'rgba(255,255,255,0.05)';
-                        div.style.borderRadius = '5px';
-                        div.style.fontSize = '12px';
-                        div.innerHTML = `<span style="color:${c.color}">●</span> ${c.name} (${c.mbti})`;
-                        mobileAgentsContainer.appendChild(div);
-                    });
-                }
-            }
-        }
-
-        function renderActivities(activityList) {
-            const container = document.getElementById('activityList');
-            const modalContainer = document.getElementById('activityButtonsContainer');
-            container.innerHTML = '';
-            if (modalContainer) modalContainer.innerHTML = '';
-
-            activities.forEach(act => {
-                const count = activityList.filter(a => a.name === act.name).length;
-
-                // 侧边栏
-                const div = document.createElement('div');
-                div.className = 'activity-item';
-                div.innerHTML = `
-                    <span class="activity-emoji">${act.emoji}</span>
-                    <div>
-                        <div class="activity-name">${act.name}</div>
-                        <div class="activity-desc">${act.desc}</div>
-                    </div>
-                    <span class="activity-count">${count > 0 ? count + '人' : ''}</span>
-                `;
-                div.onclick = () => joinActivity(act.name);
-                container.appendChild(div);
-
-                // 弹窗内按钮
-                if (modalContainer) {
-                    const btn = document.createElement('button');
-                    btn.className = 'modal-btn';
-                    btn.innerHTML = `${act.emoji} ${act.name}`;
-                    btn.onclick = () => joinActivity(act.name);
-                    modalContainer.appendChild(btn);
-                }
-            });
-        }
-
-        async function joinActivity(activityName) {
-            if (!currentUser) {
-                showStatus('请先登录 SecondMe');
-                return;
-            }
-            try {
-                // 调用新API：更新用户状态
-                await fetch('/api/user/status', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: currentUser.id, status: activityName })
-                });
-                showStatus(`已设置为 ${activityName}！`);
-                fetchStatusCounts();
-                fetchCampers();
-            } catch (e) { showStatus('设置失败'); }
-        }
-
-        async function clearActivity() {
-            if (!currentUser) {
-                showStatus('请先登录 SecondMe');
-                return;
-            }
-            try {
-                await fetch('/api/user/status', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: currentUser.id, status: '无' })
-                });
-                showStatus('已清除状态');
-                fetchStatusCounts();
-                fetchCampers();
-            } catch (e) { showStatus('清除失败'); }
-        }
-
-        async function fetchStatusCounts() {
-            try {
-                const res = await fetch('/api/status/counts');
-                const counts = await res.json();
-                renderStatusCounts(counts);
-            } catch (e) { console.error(e); }
-        }
-
-        function renderStatusCounts(counts) {
-            const container = document.getElementById('activityList');
-            container.innerHTML = '';
-
-            activities.forEach(act => {
-                const count = counts[act.name] || 0;
-                const div = document.createElement('div');
-                div.className = 'activity-item';
-                const isActive = currentUser && currentUser.current_activity === act.name;
-                div.style.border = isActive ? '1px solid var(--fire-mid)' : 'none';
-                div.innerHTML = `
-                    <span class="activity-emoji">${act.emoji}</span>
-                    <div>
-                        <div class="activity-name">${act.name}</div>
-                        <div class="activity-desc">${act.desc}</div>
-                    </div>
-                    <span class="activity-count">${count > 0 ? count + '人在做' : ''}</span>
-                `;
-                div.onclick = () => joinActivity(act.name);
-                container.appendChild(div);
-            });
-
-            // 添加"无"选项
-            const clearDiv = document.createElement('div');
-            clearDiv.className = 'activity-item';
-            const isCleared = !currentUser || !currentUser.current_activity;
-            clearDiv.style.border = isCleared ? '1px solid var(--text-secondary)' : 'none';
-            clearDiv.innerHTML = `
-                <span class="activity-emoji">❌</span>
-                <div>
-                    <div class="activity-name">无</div>
-                    <div class="activity-desc">清除状态</div>
-                </div>
-                <span class="activity-count">${counts['无'] > 0 ? counts['无'] + '人' : ''}</span>
-            `;
-            clearDiv.onclick = () => clearActivity();
-            container.appendChild(clearDiv);
-
-            // 渲染移动端状态栏
-            renderMobileStatusBar(counts);
-        }
-
-        function renderMobileStatusBar(counts) {
-            const bar = document.getElementById('mobileStatusBar');
-            if (!bar) return;
-            bar.innerHTML = '';
-
-            // 添加状态选项
-            activities.forEach(act => {
-                const count = counts[act.name] || 0;
-                const isActive = currentUser && currentUser.current_activity === act.name;
-                const item = document.createElement('div');
-                item.className = 'mobile-status-item' + (isActive ? ' active' : '');
-                item.innerHTML = `${act.emoji} ${act.name} ${count > 0 ? '('+count+')' : ''}`;
-                item.onclick = () => joinActivity(act.name);
-                bar.appendChild(item);
-            });
-
-            // 添加"无"选项
-            const clearItem = document.createElement('div');
-            const isCleared = !currentUser || !currentUser.current_activity;
-            clearItem.className = 'mobile-status-item' + (isCleared ? ' active' : '');
-            clearItem.innerHTML = `❌ 无`;
-            clearItem.onclick = () => clearActivity();
-            bar.appendChild(clearItem);
-        }
-
-        // 打字机效果函数
-        function typeWriter(element, text, speed = 30) {
-            element.textContent = '';
-            let i = 0;
-            element.dataset.typing = 'true';
-
-            function type() {
-                if (element.dataset.typing !== 'true') return;
-                if (i < text.length) {
-                    element.textContent += text.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
-                }
-            }
-            type();
-        }
-
-        // 停止打字机效果
-        function stopTypeWriter(element) {
-            element.dataset.typing = 'false';
-        }
-
-        async function generateStory(groupName) {
-            try {
-                const mbti = groupName || currentUser?.mbti || 'INTJ';
-                const storyContent = document.getElementById('storyContent');
-
-                // 显示加载状态
-                stopTypeWriter(storyContent);
-                storyContent.textContent = '✨ 故事生成中...';
-                document.getElementById('storyPanel').style.display = 'block';
-
-                const res = await fetch('/api/story/generate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mbti_type: mbti })
-                });
-                const data = await res.json();
-
-                // 使用打字机效果呈现
-                typeWriter(storyContent, data.story, 25);
-                fetchStoryLogs(); // 刷新日志
-            } catch (e) {
-                console.error(e);
-                document.getElementById('storyContent').textContent = '故事生成失败，请重试';
-            }
-        }
-
-        // 为指定用户生成故事（点击头像时调用）
-        async function generateStoryForUser(user) {
-            if (!user.mbti) {
-                showStatus('该用户暂无 MBTI 信息');
-                return;
-            }
-
-            // 显示持续 Loading 提示
-            const loadingOverlay = document.getElementById('storyLoadingOverlay');
-            if (loadingOverlay) {
-                loadingOverlay.style.display = 'flex';
-            }
-
-            try {
-                const res = await fetch('/api/story/generate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        mbti_type: user.mbti,
-                        target_user_id: user.id
-                    })
-                });
-                const data = await res.json();
-
-                // 隐藏 Loading 提示
-                if (loadingOverlay) {
-                    loadingOverlay.style.display = 'none';
-                }
-
-                const storyContent = document.getElementById('storyContent');
-
-                // 使用打字机效果呈现
-                typeWriter(storyContent, data.story, 25);
-                document.getElementById('storyPanel').style.display = 'block';
-                fetchStoryLogs();
-            } catch (e) {
-                console.error(e);
-                // 隐藏 Loading 提示
-                if (loadingOverlay) {
-                    loadingOverlay.style.display = 'none';
-                }
-                showStatus('生成故事失败');
-            }
-        }
-
-        // 获取故事日志
-        async function fetchStoryLogs() {
-            try {
-                const res = await fetch('/api/story/logs?limit=30');
-                const logs = await res.json();
-                renderStoryLogs(logs);
-            } catch (e) { console.error(e); }
-        }
-
-        // 渲染故事日志
-        function renderStoryLogs(logs) {
-            const container = document.getElementById('logList');
-            container.innerHTML = '';
-
-            if (logs.length === 0) {
-                container.innerHTML = '<div style="color: var(--text-secondary); font-size: 10px; text-align: center; padding: 20px;">暂无故事记录</div>';
-                return;
-            }
-
-            logs.forEach(log => {
-                const div = document.createElement('div');
-                div.className = 'log-item';
-                div.onclick = () => {
-                    document.getElementById('storyContent').textContent = log.content;
-                    document.getElementById('storyPanel').style.display = 'block';
-                };
-
-                const time = new Date(log.created_at).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
-                const group = log.mbti_group || log.mbti_type || '';
-
-                div.innerHTML = `
-                    <div class="log-story">${log.content}</div>
-                    <div class="log-meta">
-                        <span class="log-group">${group}</span>
-                        <span>${time}</span>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        // 切换侧边栏章节展开/收起
-        function toggleSection(sectionId) {
-            const section = document.getElementById(sectionId);
-            section.classList.toggle('collapsed');
-        }
-
+        // ======== 定期刷新 ========
         createStars();
-        fetchCampers();
-        fetchStatusCounts();
-        fetchStoryLogs();
-        checkFocusStatus(); // 检查专注状态
-
-        // 首次访问自动弹出帮助说明（使用 sessionStorage，刷新不重复弹出）
-        window.addEventListener('load', () => {
-            const userId = localStorage.getItem('campfire_user_id');
-            const token = localStorage.getItem('campfire_token');
-            // 用户已登录且未看过引导
-            if (userId && token && !sessionStorage.getItem('guideShown')) {
-                setTimeout(() => {
-                    openModal('guide');
-                    sessionStorage.setItem('guideShown', 'true');
-                }, 1500); // 延迟1.5秒弹出，等待页面完全加载
-            }
-        });
-
-        // 专注时长输入框事件监听
-        const focusDurationInput = document.getElementById('focusDuration');
-        if (focusDurationInput) {
-            focusDurationInput.addEventListener('input', function() {
-                const value = parseInt(this.value) || 25;
-                updateFocusTimerDisplay(value * 60);
-            });
-            focusDurationInput.addEventListener('change', function() {
-                let value = parseInt(this.value) || 25;
-                if (value < 1) value = 1;
-                if (value > 180) value = 180;
-                this.value = value;
-                updateFocusTimerDisplay(value * 60);
-            });
-        }
-
-        setInterval(fetchCampers, 3000);
-        setInterval(fetchStatusCounts, 5000);
-        setInterval(fetchStoryLogs, 10000); // 每10秒刷新日志
+        setInterval(fetchCampers, 5000);
     </script>
 </body>
 </html>

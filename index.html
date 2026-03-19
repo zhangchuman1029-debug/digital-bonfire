@@ -1497,6 +1497,9 @@
             const userId = localStorage.getItem('campfire_user_id');
             const token = localStorage.getItem('campfire_token');
 
+            // 显示加载提示
+            showStatus('AI 正在编写故事...');
+
             // 清除 localStorage
             localStorage.removeItem('campfire_focus_start_time');
             localStorage.removeItem('campfire_focus_duration');
@@ -1528,13 +1531,19 @@
                 updateFocusTimerDisplay(25 * 60);
             }
 
+            // 检查是否登录
+            if (!userId) {
+                showStatus('专注结束！登录后可生成故事');
+                return;
+            }
+
             // 调用后端 API 结束专注，获取故事
             try {
                 const res = await fetch('/api/focus/end', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': `Bearer ${token || ''}`
                     },
                     body: JSON.stringify({
                         user_id: parseInt(userId)
@@ -1542,11 +1551,21 @@
                 });
                 const data = await res.json();
 
+                if (data.error) {
+                    console.error('Focus end error:', data.error);
+                    showStatus('专注结束');
+                    return;
+                }
+
                 if (data.story) {
                     // 显示故事弹窗
                     document.getElementById('focusPopupStory').textContent = data.story;
                     document.getElementById('focusPopup').classList.add('show');
                     showStatus('专注结束！');
+                    // 刷新故事列表
+                    fetchStoryLogs && fetchStoryLogs();
+                } else if (data.message) {
+                    showStatus(data.message);
                 } else {
                     showStatus('专注结束，但故事生成失败');
                 }

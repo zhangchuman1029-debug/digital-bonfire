@@ -804,31 +804,43 @@ async def end_focus(request: FocusEndRequest):
     # 生成"我专注时 Agent 替我社交"的故事
     story = await generate_focus_story(camper, participants, focus_duration)
 
-    if story:
-        # 保存故事
-        story_entry = {
-            "id": len(data.get("stories", [])) + 1,
-            "type": "focus_social",
-            "user_id": request.user_id,
-            "user_name": camper.get("name"),
-            "content": story,
-            "participants": [p.get("name") for p in participants],
-            "duration": focus_duration,
-            "created_at": datetime.now().isoformat()
-        }
-        data.setdefault("stories", []).append(story_entry)
-        save_data(data)
+    # 保存故事（无论是否生成成功）
+    story_entry = {
+        "id": len(data.get("stories", [])) + 1,
+        "type": "focus_social",
+        "user_id": request.user_id,
+        "user_name": camper.get("name"),
+        "content": story or "",
+        "participants": [p.get("name") for p in participants],
+        "duration": focus_duration,
+        "created_at": datetime.now().isoformat()
+    }
+    data.setdefault("stories", []).append(story_entry)
+    save_data(data)
 
+    if story:
         return {
             "message": "专注结束",
             "story": story,
             "participants_count": len(participants)
         }
     else:
-        return {
-            "message": "专注结束，但故事生成失败",
-            "participants_count": len(participants)
-        }
+        # 返回具体失败原因
+        if not DEEPSEEK_API_KEY:
+            return {
+                "message": "专注结束，故事服务未配置",
+                "participants_count": len(participants)
+            }
+        elif len(participants) == 0:
+            return {
+                "message": "专注结束，没有其他营员在场",
+                "participants_count": 0
+            }
+        else:
+            return {
+                "message": "专注结束，故事生成失败",
+                "participants_count": len(participants)
+            }
 
 @app.get("/api/focus/status")
 async def get_focus_status(user_id: int):

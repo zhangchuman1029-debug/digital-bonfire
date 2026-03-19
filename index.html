@@ -777,17 +777,6 @@
                 overflow: visible !important;
                 z-index: 10 !important;
             }
-            /* 移动端用户头像 - 基于视口居中定位 */
-            .camper {
-                position: fixed !important;
-                left: 50vw !important;
-                top: 50vh !important;
-                z-index: 100 !important;
-            }
-            .camper-avatar { width: 18px !important; height: 18px !important; }
-            .camper-name { font-size: 10px !important; }
-            .camper-mbti { opacity: 1 !important; font-size: 9px !important; }
-            .camper-activity { opacity: 1 !important; font-size: 8px !important; }
             .header { top: 80px !important; padding: 5px; }
             .header h1 { font-size: 1.5rem !important; letter-spacing: 2px !important; }
             .header .subtitle { font-size: 0.5rem !important; }
@@ -1774,18 +1763,9 @@
                 if (c.current_activity) camper.classList.add('has-activity');
 
                 const rad = (c.angle * Math.PI) / 180;
-                // 移动端使用视口单位定位
-                const isMobile = window.innerWidth <= 768;
-                if (isMobile) {
-                    // 移动端：使用 vw/vh 单位，基于屏幕中心
-                    const distance = Math.min(c.distance, 40); // 限制最大距离，让头像靠近火堆
-                    camper.style.left = `calc(50vw + ${Math.cos(rad) * distance}px)`;
-                    camper.style.top = `calc(50vh + ${Math.sin(rad) * distance}px)`;
-                } else {
-                    // 桌面端：使用百分比定位
-                    camper.style.left = (centerX + Math.cos(rad) * c.distance - 8) + 'px';
-                    camper.style.top = (centerY + Math.sin(rad) * c.distance - 8) + 'px';
-                }
+                // 统一使用百分比定位，与桌面端相同
+                camper.style.left = (centerX + Math.cos(rad) * c.distance - 8) + 'px';
+                camper.style.top = (centerY + Math.sin(rad) * c.distance - 8) + 'px';
 
                 const avatar = document.createElement('div');
                 avatar.className = 'camper-avatar';

@@ -1054,42 +1054,34 @@
         body.not-logged-in .right-sidebar,
         body.not-logged-in .central-action-area,
         body.not-logged-in #campground,
-        body.not-logged-in .modal-trigger {
+        body.not-logged-in .bottom-triggers {
             display: none !important;
         }
 
-        /* ==================== 弹窗触发器 ==================== */
-        .modal-trigger {
+        /* ==================== 底部极简图标按钮 ==================== */
+        .bottom-triggers {
             position: fixed;
-            color: rgba(255, 255, 255, 0.3);
-            font-size: 0.75rem;
-            cursor: pointer;
-            z-index: 50;
-            padding: 8px 12px;
-            transition: color 0.3s ease;
-            letter-spacing: 1px;
-        }
-
-        .modal-trigger:hover {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        #triggerLeft {
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        #triggerRight {
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        #triggerTop {
-            top: 10px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 50;
+        }
+
+        .bottom-trigger {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 8px 12px;
+            transition: all 0.3s ease;
+            opacity: 0.5;
+        }
+
+        .bottom-trigger:hover {
+            color: rgba(255, 255, 255, 0.8);
+            opacity: 1;
+            transform: scale(1.1);
         }
 
         /* ==================== 弹窗系统 ==================== */
@@ -1221,7 +1213,7 @@
         }
 
         /* 专注模式隐藏触发器 */
-        body.focus-mode .modal-trigger {
+        body.focus-mode .bottom-triggers {
             display: none !important;
         }
 
@@ -1266,15 +1258,18 @@
     </div>
 
     <!-- 弹窗触发器 -->
-    <span class="modal-trigger" id="triggerLeft" onclick="openModal('left')">功能</span>
-    <span class="modal-trigger" id="triggerRight" onclick="openModal('right')">状态</span>
-    <span class="modal-trigger" id="triggerTop" onclick="openModal('help')">?</span>
+    <!-- 底部极简图标按钮 -->
+    <div class="bottom-triggers" id="bottomTriggers">
+        <span class="bottom-trigger" onclick="openModal('status')" title="状态">⚙️</span>
+        <span class="bottom-trigger" onclick="openModal('logs')" title="日志">📜</span>
+        <span class="bottom-trigger" onclick="openModal('guide')" title="帮助">❓</span>
+    </div>
 
-    <!-- 左侧弹窗 - 功能区 -->
-    <div class="modal-overlay" id="modalLeft">
+    <!-- 状态弹窗 -->
+    <div class="modal-overlay" id="modalStatus">
         <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('left')">&times;</button>
-            <div class="modal-title">功能</div>
+            <button class="modal-close" onclick="closeModal('status')">&times;</button>
+            <div class="modal-title">⚙️ 状态与专注</div>
             <div class="modal-body">
                 <div class="modal-section">
                     <h3>选择你的状态</h3>
@@ -1288,37 +1283,48 @@
         </div>
     </div>
 
-    <!-- 右侧弹窗 - 状态区 -->
-    <div class="modal-overlay" id="modalRight">
+    <!-- 日志弹窗 -->
+    <div class="modal-overlay" id="modalLogs">
         <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('right')">&times;</button>
-            <div class="modal-title">在线营员</div>
+            <button class="modal-close" onclick="closeModal('logs')">&times;</button>
+            <div class="modal-title">📜 故事日志</div>
             <div class="modal-body">
                 <div class="modal-section">
-                    <h3>在线用户</h3>
-                    <ul class="modal-list" id="onlineUsersList"></ul>
+                    <ul class="modal-list" id="logListContainer"></ul>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 顶部弹窗 - 帮助 -->
-    <div class="modal-overlay" id="modalHelp">
+    <!-- 帮助弹窗 -->
+    <div class="modal-overlay" id="modalGuide">
         <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('help')">&times;</button>
-            <div class="modal-title">使用说明</div>
+            <button class="modal-close" onclick="closeModal('guide')">&times;</button>
+            <div class="modal-title">❓ 使用说明</div>
             <div class="modal-body">
                 <div class="modal-section">
                     <h3>关于数字篝火</h3>
-                    <p>这是一个基于 MBTI 的陌生人社交应用。在星空下围坐篝火，与志同道合的旅者相遇。</p>
+                    <p>在星空下围坐篝火，与志同道合的旅者相遇。AI 会记录你的专注时光，生成温暖的故事。</p>
                 </div>
                 <div class="modal-section">
-                    <h3>如何开始</h3>
-                    <p>1. 点击右上角登录<br>2. 选择你的 MBTI 类型<br>3. 选择当前状态<br>4. 开始社交</p>
+                    <h3>操作指南</h3>
+                    <p>• 点击头像 - 与营员互动<br>• 底部图标 - 打开功能面板<br>• 专注计时 - 开启沉浸工作</p>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 故事弹窗 -->
+    <div class="modal-overlay" id="modalStory">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('story')">&times;</button>
+            <div class="modal-title">🌟 专注故事</div>
+            <div class="modal-body">
                 <div class="modal-section">
-                    <h3>专注模式</h3>
-                    <p>设置专注时长，AI 会记录你在专注时与营员的互动，生成温暖的故事。</p>
+                    <p id="storyModalContent" style="line-height:1.8;white-space:pre-wrap;"></p>
+                </div>
+                <div style="text-align:center;margin-top:20px;">
+                    <button class="modal-btn" onclick="saveStoryToHistory()">收录</button>
                 </div>
             </div>
         </div>
@@ -1361,97 +1367,6 @@
         <p class="subtitle">◈ MBTI 篝火社群 ◈</p>
     </div>
 
-    <!-- 统一侧边栏 -->
-    <div class="sidebar">
-        <!-- MBTI 群组 -->
-        <div class="sidebar-section mbti" id="mbtiSection">
-            <div class="sidebar-header" onclick="toggleSection('mbtiSection')">
-                <h3>🔥 篝火群组</h3>
-                <span class="sidebar-toggle">▼</span>
-            </div>
-            <div class="sidebar-content">
-                <div id="mbtiGroups"></div>
-            </div>
-        </div>
-
-        <!-- 状态选择 -->
-        <div class="sidebar-section activity" id="activitySection">
-            <div class="sidebar-header" onclick="toggleSection('activitySection')">
-                <h3>🎯 选择状态</h3>
-                <span class="sidebar-toggle">▼</span>
-            </div>
-            <div class="sidebar-content">
-                <div id="activityList"></div>
-            </div>
-        </div>
-
-        <!-- 故事日志 -->
-        <div class="sidebar-section logs" id="logsSection">
-            <div class="sidebar-header" onclick="toggleSection('logsSection')">
-                <h3>📜 故事日志</h3>
-                <span class="sidebar-toggle">▼</span>
-            </div>
-            <div class="sidebar-content">
-                <div class="log-list" id="logList"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 右侧 Agents 面板 -->
-    <div class="right-sidebar">
-        <div class="sidebar-section agents" id="agentsSection">
-            <div class="sidebar-header" onclick="toggleSection('agentsSection')">
-                <h3>🤖 Agents</h3>
-                <span class="sidebar-toggle">▼</span>
-            </div>
-            <div class="sidebar-content">
-                <div id="agentsList"></div>
-            </div>
-        </div>
-
-        <!-- 专注模式面板 -->
-        <div class="sidebar-section focus" id="focusSection">
-            <div class="sidebar-header" onclick="toggleSection('focusSection')">
-                <h3>🎯 专注模式</h3>
-                <span class="sidebar-toggle">▼</span>
-            </div>
-            <div class="sidebar-content">
-                <div class="focus-timer" id="timerContainer">
-                    <div class="focus-timer-display" id="timer">25:00</div>
-                    <div class="focus-duration-input-wrap">
-                        <input type="number" id="focusDuration" class="focus-duration-input" value="25" min="1" max="180" placeholder="25">
-                        <span class="focus-duration-unit">分钟</span>
-                    </div>
-                    <button class="focus-start-btn" id="focusStartBtn" onclick="startFocus()">开始专注</button>
-                    <button class="focus-cancel-btn" id="cancelFocusBtn" style="display:none;" onclick="cancelFocus()">退出专注</button>
-                </div>
-                <div class="focus-history" id="focusHistory">
-                    <div class="focus-history-title">专注记录</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 说明书面板 -->
-        <div class="sidebar-section help" id="helpSection">
-            <div class="sidebar-header" onclick="toggleSection('helpSection')">
-                <h3>📖 说明书</h3>
-                <span class="sidebar-toggle">▼</span>
-            </div>
-            <div class="sidebar-content">
-                <div class="help-content">
-                    <h4>🎮 操作指南</h4>
-                    <p><span class="key">点击头像</span> 生成故事</p>
-                    <p><span class="key">点击群组</span> 切换分组故事</p>
-                    <p><span class="key">点击状态</span> 选择当前活动</p>
-                    <h4>🔥 四大群组</h4>
-                    <p>🔵 智识之火 - 理性讨论</p>
-                    <p>🟣 灵感之火 - 创意分享</p>
-                    <p>🟢 秩序之火 - 组织规划</p>
-                    <p>🟠 实践之火 - 行动派</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- 故事面板 -->
     <div class="story-panel" id="storyPanel" style="display: none;">
@@ -1528,14 +1443,16 @@
             // 关闭其他弹窗
             document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
 
-            const modal = document.getElementById('modal' + type.charAt(0).toUpperCase() + type.slice(1));
+            const modalId = 'modal' + type.charAt(0).toUpperCase() + type.slice(1);
+            const modal = document.getElementById(modalId);
             if (modal) {
                 modal.classList.add('active');
             }
         }
 
         function closeModal(type) {
-            const modal = document.getElementById('modal' + type.charAt(0).toUpperCase() + type.slice(1));
+            const modalId = 'modal' + type.charAt(0).toUpperCase() + type.slice(1);
+            const modal = document.getElementById(modalId);
             if (modal) {
                 modal.classList.remove('active');
             }
@@ -1549,6 +1466,18 @@
                 }
             });
         });
+
+        // 显示故事弹窗
+        function showStoryModal(content) {
+            document.getElementById('storyModalContent').textContent = content;
+            document.getElementById('modalStory').classList.add('active');
+        }
+
+        function saveStoryToHistory() {
+            closeModal('story');
+            showStatus('已收录到故事日志');
+            loadFocusHistory();
+        }
 
         // ==================== 专注模式关闭弹窗 ====================
         function closeAllModals() {
@@ -1964,12 +1893,9 @@
                 console.log('📖 故事生成响应:', data);
 
                 if (data.story) {
-                    // 显示故事弹窗
-                    document.getElementById('focusPopupStory').textContent = data.story;
-                    document.getElementById('focusPopup').classList.add('show');
+                    // 显示故事弹窗（使用新的Modal系统）
+                    showStoryModal(data.story);
                     showStatus('专注结束！');
-                    // 刷新故事列表
-                    if (typeof fetchStoryLogs === 'function') fetchStoryLogs();
                 } else {
                     console.warn('故事生成失败:', data);
                     showStatus(data.message || '专注结束');

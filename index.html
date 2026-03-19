@@ -77,7 +77,7 @@
         }
 
         .fire-container.zoomed {
-            transform: scale(1.5);
+            transform: scale(1.0);
         }
 
         /* 中央行动区域 - 极致极简 */
@@ -2017,7 +2017,7 @@
         <button class="enter-btn" id="loginBtn">进入数字篝火</button>
     </div>
 
-    <!-- 侧边栏 -->
+    <!-- 左侧边栏：个人信息 + 状态选择 + 故事日志 -->
     <div class="sidebar" id="sidebar">
         <button class="sidebar-toggle-btn" onclick="toggleSidebar()">◀</button>
 
@@ -2033,29 +2033,6 @@
             </div>
         </div>
 
-        <!-- 动作选择 -->
-        <div class="sidebar-section activities">
-            <div class="sidebar-section-title">选择专注动作</div>
-            <div class="action-btn-grid" id="actionBtnGrid">
-                <button class="action-btn-item selected" data-action="棉花糖" data-icon="🍢">
-                    <span class="icon">🍢</span>烤棉花糖
-                </button>
-                <button class="action-btn-item" data-action="钓鱼" data-icon="🎣">
-                    <span class="icon">🎣</span>湖边钓鱼
-                </button>
-                <button class="action-btn-item" data-action="古籍" data-icon="📖">
-                    <span class="icon">📖</span>翻阅古籍
-                </button>
-                <button class="action-btn-item" data-action="琴弦" data-icon="🎸">
-                    <span class="icon">🎸</span>拨弄琴弦
-                </button>
-                <button class="action-btn-item" data-action="星空" data-icon="🌌">
-                    <span class="icon">🌌</span>仰望星空
-                </button>
-            </div>
-            <button class="start-focus-btn" id="startFocusBtn" onclick="showActionSelector()">开始专注</button>
-        </div>
-
         <!-- 分身日志 -->
         <div class="sidebar-section stories">
             <div class="sidebar-section-title">📜 分身日志</div>
@@ -2066,8 +2043,8 @@
     </div>
 
     <!-- 右侧复合边栏：时间设置 + 在线营员 -->
-    <div class="right-sidebar" id="rightSidebar">
-        <button class="right-sidebar-toggle-btn" onclick="toggleRightSidebar()">▶</button>
+    <div class="right-sidebar" id="rightSidePanel">
+        <button class="right-sidebar-toggle-btn" onclick="toggleRightSidePanel()">▶</button>
 
         <!-- 时间设置面板 -->
         <div class="right-sidebar-section time-setting">
@@ -2297,7 +2274,7 @@
     <div class="central-action-area" id="centralActionArea">
         <!-- 单一动态按钮：未专注时显示开始，专注中显示倒计时+停止 -->
         <div id="focusButtonContainer" style="text-align: center;">
-            <button id="focusMainButton" class="focus-main-btn" onclick="handleFocusButtonClick()">
+            <button id="mainFocusBtn" class="focus-main-btn" onclick="handleFocusButtonClick()">
                 开始专注
             </button>
             <div id="focusAgentHint" class="focus-agent-hint" style="display: none;">
@@ -2378,9 +2355,9 @@
         }
 
         // 切换右侧面板收起/展开
-        function toggleRightSidebar() {
-            const rightSidebar = document.getElementById('rightSidebar');
-            rightSidebar.classList.toggle('collapsed');
+        function toggleRightSidePanel() {
+            const rightSidePanel = document.getElementById('rightSidePanel');
+            rightSidePanel.classList.toggle('collapsed');
         }
 
         // 渲染侧边栏用户信息
@@ -2631,7 +2608,7 @@
 
         // 更新主按钮状态
         function updateFocusButton() {
-            const btn = document.getElementById('focusMainButton');
+            const btn = document.getElementById('mainFocusBtn');
             const hint = document.getElementById('focusAgentHint');
             const hintAction = document.getElementById('focusHintAction');
 
@@ -2968,6 +2945,12 @@
         document.head.appendChild(focusStyle);
 
         function startFocusTimer(seconds) {
+            // 防止多个计时器叠加，先清除已有计时器
+            if (focusInterval) {
+                clearInterval(focusInterval);
+                focusInterval = null;
+            }
+
             focusRemainingSeconds = seconds;
             isFocusing = true;
 
@@ -2984,6 +2967,8 @@
 
                 if (focusRemainingSeconds <= 0) {
                     console.log('⏰ 计时结束，调用 finishFocus');
+                    clearInterval(focusInterval);
+                    focusInterval = null;
                     finishFocus();
                 }
             }, 1000);
@@ -3936,14 +3921,14 @@
         checkFocusStatus(); // 检查专注状态
 
         // 首次访问自动弹出帮助说明（使用 sessionStorage，刷新不重复弹出）
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('load', () => {
             const userId = localStorage.getItem('campfire_user_id');
             const token = localStorage.getItem('campfire_token');
             // 用户已登录且未看过引导
-            if (userId && token && !sessionStorage.getItem('hasSeenGuide')) {
+            if (userId && token && !sessionStorage.getItem('guideShown')) {
                 setTimeout(() => {
                     openModal('guide');
-                    sessionStorage.setItem('hasSeenGuide', 'true');
+                    sessionStorage.setItem('guideShown', 'true');
                 }, 1500); // 延迟1.5秒弹出，等待页面完全加载
             }
         });

@@ -885,6 +885,74 @@ async def get_focus_status(user_id: int):
         "remaining_seconds": int(remaining)
     }
 
+@app.post("/api/focus-story")
+async def generate_focus_story_endpoint(
+    token: str = Query(None),
+    duration: int = Query(25)
+):
+    """专注结束后生成社交故事"""
+    print(f"📖 收到故事生成请求: duration={duration}, token={'已提供' if token else '未提供'}")
+
+    if not token:
+        return {"error": "未登录，无法生成故事", "story": None}
+
+    # 从 token 获取用户信息（这里简化为从 campers 中查找）
+    data = load_data()
+
+    # 尝试通过 token 查找用户（这里使用简化的方式）
+    camper = None
+    for c in data.get("campers", []):
+        if c.get("token") == token:
+            camper = c
+            break
+
+    # 如果找不到，尝试通过 Authorization header 解析
+    if not camper and token:
+        # token 可能是完整的 Bearer token
+        token_clean = token.replace("Bearer ", "").replace("bearer ", "")
+        for c in data.get("campers", []):
+            if c.get("token") == token_clean:
+                camper = c
+                break
+
+    if not camper:
+        print("❌ 找不到用户信息")
+        return {"error": "用户不存在", "story": None}
+
+    print(f"👤 找到用户: {camper.get('name')}, MBTI: {camper.get('mbti')}")
+
+    # 获取专注期间的在场营员
+    participants = camper.get("focus_participants", [])
+    print(f"👥 参与者数量: {len(participants)}")
+
+    # 生成故事
+    story = await generate_focus_story(camper, participants, duration)
+
+    # 保存故事记录
+    story_entry = {
+        "id": len(data.get("stories", [])) + 1,
+        "type": "focus_social",
+        "user_id": camper.get("id"),
+        "user_name": camper.get("name"),
+        "content": story or "",
+        "participants": [p.get("name") for p in participants] if participants else [],
+        "duration": duration,
+        "created_at": datetime.now().isoformat()
+    }
+    data.setdefault("stories", []).append(story_entry)
+    save_data(data)
+
+    if story:
+        print(f"✅ 故事生成成功，长度: {len(story)} 字符")
+        return {"story": story, "message": "专注结束"}
+    else:
+        print(f"❌ 故事生成失败: {'无API Key' if not DEEPSEEK_API_KEY else '无参与者' if len(participants) == 0 else '未知原因'}")
+        return {
+            "story": None,
+            "message": "故事生成失败",
+            "reason": "no_api_key" if not DEEPSEEK_API_KEY else "no_participants" if len(participants) == 0 else "unknown"
+        }
+
 async def generate_focus_story(focus_user, participants, duration):
     """生成专注时的社交故事"""
     if not DEEPSEEK_API_KEY:

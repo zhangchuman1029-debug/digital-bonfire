@@ -1280,8 +1280,8 @@
                     // 继续之前的专注
                     startFocusTimer(remaining);
                 } else {
-                    // 专注时间已过，结束专注
-                    endFocus();
+                    // 专注时间已过，调用 finishFocus 生成故事
+                    finishFocus();
                 }
             }
 
@@ -1292,6 +1292,9 @@
                     if (data.focusing && data.remaining_seconds > 0) {
                         restoreFocusModeUI();
                         startFocusTimer(data.remaining_seconds);
+                    } else if (!data.focusing && savedFocusStart && savedFocusDuration) {
+                        // 后端已结束但前端还在检查，调用 finishFocus
+                        finishFocus();
                     }
                 })
                 .catch(e => console.error('Failed to get focus status:', e));
@@ -1474,17 +1477,114 @@
             isFocusing = true;
 
             // CSS focus-mode 会自动处理火焰增强效果
+            console.log('🔥 计时器启动，秒数:', seconds);
             focusInterval = setInterval(() => {
                 focusRemainingSeconds--;
                 updateFocusTimerDisplay(focusRemainingSeconds);
+                console.log('⏱️ 剩余秒数:', focusRemainingSeconds);
 
                 if (focusRemainingSeconds <= 0) {
-                    endFocus();
+                    console.log('⏰ 计时结束，调用 finishFocus');
+                    finishFocus();
                 }
             }, 1000);
         }
 
+        // 专注计时结束，调用后端生成故事
+        async function finishFocus() {
+            console.log('🎯 finishFocus 被调用');
+
+            // 获取必要信息
+            const token = localStorage.getItem('campfire_token');
+            const duration = parseInt(localStorage.getItem('campfire_focus_duration')) || 25;
+            const userId = localStorage.getItem('campfire_user_id');
+
+            // 显示加载提示
+            showStatus('AI 正在编写故事...');
+
+            // 清除 UI 元素
+            clearInterval(focusInterval);
+            clearInterval(focusParticleInterval);
+            focusInterval = null;
+            focusParticleInterval = null;
+            isFocusing = false;
+
+            // 清除专注粒子
+            document.querySelectorAll('.focus-spark').forEach(p => p.remove());
+
+            // 移除专注模式样式
+            document.getElementById('campground').classList.remove('focus-active');
+            document.querySelectorAll('.focus-hide').forEach(el => el.classList.remove('focus-hide'));
+            document.body.classList.remove('focus-mode');
+
+            // 隐藏专注 UI
+            document.getElementById('focusUI').style.display = 'none';
+
+            // 切换移动端按钮
+            const mobileFocusBtn = document.getElementById('mobileFocusBtn');
+            const mobileQuitFocusBtn = document.getElementById('mobileQuitFocusBtn');
+            if (mobileFocusBtn) mobileFocusBtn.style.display = 'block';
+            if (mobileQuitFocusBtn) mobileQuitFocusBtn.style.display = 'none';
+
+            // 检查是否登录
+            if (!userId) {
+                showStatus('专注结束！登录后可生成故事');
+                localStorage.removeItem('campfire_focus_start_time');
+                localStorage.removeItem('campfire_focus_duration');
+                localStorage.removeItem('campfire_focus_active');
+                updateFocusTimerDisplay(25 * 60);
+                return;
+            }
+
+            // 调用后端 API 结束专注并生成故事
+            try {
+                const res = await fetch('/api/focus/end', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token || ''}`
+                    },
+                    body: JSON.stringify({
+                        user_id: parseInt(userId)
+                    })
+                });
+                const data = await res.json();
+
+                console.log('📖 故事生成响应:', data);
+
+                if (data.story) {
+                    // 显示故事弹窗
+                    document.getElementById('focusPopupStory').textContent = data.story;
+                    document.getElementById('focusPopup').classList.add('show');
+                    showStatus('专注结束！');
+                    // 刷新故事列表
+                    if (typeof fetchStoryLogs === 'function') fetchStoryLogs();
+                } else {
+                    console.warn('故事生成失败:', data);
+                    showStatus(data.message || '专注结束');
+                }
+            } catch (e) {
+                console.error('finishFocus error:', e);
+                showStatus('专注结束');
+            }
+
+            // 清理 localStorage
+            localStorage.removeItem('campfire_focus_start_time');
+            localStorage.removeItem('campfire_focus_duration');
+            localStorage.removeItem('campfire_focus_active');
+
+            // 重置计时器显示
+            const durationInput = document.getElementById('focusDuration');
+            if (durationInput) {
+                updateFocusTimerDisplay(25 * 60);
+            }
+
+            // 刷新专注历史
+            if (typeof loadFocusHistory === 'function') loadFocusHistory();
+        }
+
         async function endFocus() {
+            console.log('🎯 endFocus 被调用！');
             clearInterval(focusInterval);
             clearInterval(focusParticleInterval);
             focusInterval = null;

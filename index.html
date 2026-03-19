@@ -1024,19 +1024,36 @@
         }
 
         #loginScreen h1 {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 2.5rem;
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 3rem;
             font-weight: 300;
-            letter-spacing: 8px;
-            margin-bottom: 10px;
-            text-shadow: 0 0 30px rgba(255, 165, 0, 0.3);
+            letter-spacing: 12px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 40px rgba(255, 165, 0, 0.5);
         }
 
         #loginScreen .subtitle {
             color: rgba(255, 255, 255, 0.5);
-            font-size: 0.9rem;
-            letter-spacing: 4px;
+            font-size: 1rem;
+            letter-spacing: 6px;
+            margin-bottom: 50px;
+        }
+
+        /* 欢迎词 - 呼吸灯特效 */
+        #loginScreen .welcome-text {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            letter-spacing: 2px;
             margin-bottom: 60px;
+            max-width: 600px;
+            text-align: center;
+            line-height: 1.8;
+            animation: breathe 4s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { opacity: 0.6; text-shadow: 0 0 20px rgba(255, 165, 0, 0.2); }
+            50% { opacity: 1; text-shadow: 0 0 40px rgba(255, 165, 0, 0.5); }
         }
 
         #loginScreen .enter-btn {
@@ -1114,6 +1131,88 @@
                 font-size: 1.2rem;
                 padding: 10px;
             }
+        }
+
+        /* 首次引导气泡 */
+        .menu-tooltip {
+            position: absolute;
+            right: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            animation: tooltip-fade 0.5s ease;
+        }
+
+        .menu-tooltip::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 6px solid transparent;
+            border-left-color: rgba(255, 255, 255, 0.95);
+        }
+
+        @keyframes tooltip-fade {
+            from { opacity: 0; transform: translateY(-50%) translateX(10px); }
+            to { opacity: 1; transform: translateY(-50%) translateX(0); }
+        }
+
+        /* 分身动作按钮 */
+        .action-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 20px 15px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            min-width: 90px;
+        }
+
+        .action-btn span {
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 165, 0, 0.2);
+            border-color: rgba(255, 165, 0, 0.5);
+            transform: scale(1.05);
+        }
+
+        /* 专注中 Agent 动作显示 */
+        #focusAgentAction {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            margin-top: 10px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        /* Canvas 用户标注 */
+        .camper-label {
+            position: absolute;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            pointer-events: none;
+        }
+
+        .camper-label.focusing {
+            color: rgba(255, 165, 0, 0.9);
         }
 
         /* ==================== 弹窗系统 ==================== */
@@ -1286,6 +1385,7 @@
     <div id="loginScreen">
         <h1>数字篝火</h1>
         <p class="subtitle">DIGITAL BONFIRE</p>
+        <p class="welcome-text">深夜里的每一团火，都是为了等待一个同频率的灵魂。靠近一点，分享你的光。</p>
         <button class="enter-btn" id="loginBtn">进入数字篝火</button>
     </div>
 
@@ -1294,6 +1394,52 @@
         <div class="menu-item" onclick="openModal('status')" title="状态">👤</div>
         <div class="menu-item" onclick="openModal('logs')" title="日志">📜</div>
         <div class="menu-item" onclick="openModal('guide')" title="帮助">❓</div>
+    </div>
+
+    <!-- 首次登录引导弹窗 -->
+    <div class="modal-overlay" id="modalTutorial">
+        <div class="modal-content" style="max-width: 500px; text-align: center;">
+            <div class="modal-title">🌟 欢迎来到数字篝火</div>
+            <div class="modal-body" style="text-align: left;">
+                <div class="modal-section">
+                    <h3>🎭 分身社交玩法</h3>
+                    <p>当你专注工作时，你的 AI 分身会代替你坐在篝火旁，与其他旅者互动交流。</p>
+                    <p>选择一项专注动作，让分身帮你社交，收获温暖的见闻故事。</p>
+                </div>
+                <div class="modal-section">
+                    <h3>🕯️ 动作选择</h3>
+                    <p>🍢 烤棉花糖 - 甜蜜社交</p>
+                    <p>🎣 湖边钓鱼 - 静心交流</p>
+                    <p>📖 翻阅古籍 - 知识分享</p>
+                    <p>🎸 拨弄琴弦 - 音乐共鸣</p>
+                    <p>🌌 仰望星空 - 哲思对话</p>
+                </div>
+                <div class="modal-section">
+                    <h3>📜 故事日志</h3>
+                    <p>每次专注结束，AI 会记录分身与他人互动的故事，保存在日志中随时查看。</p>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="modal-btn" onclick="closeModal('tutorial'); localStorage.setItem('hasSeenTutorial', 'true');">我知道了</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 分身动作选择弹窗 -->
+    <div class="modal-overlay" id="modalAction">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <button class="modal-close" onclick="closeModal('action')">&times;</button>
+            <div class="modal-title">🎭 选择专注动作</div>
+            <div class="modal-body">
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;">
+                    <button class="action-btn" data-action="棉花糖" data-icon="🍢">🍢<br><span>烤棉花糖</span></button>
+                    <button class="action-btn" data-action="钓鱼" data-icon="🎣">🎣<br><span>湖边钓鱼</span></button>
+                    <button class="action-btn" data-action="古籍" data-icon="📖">📖<br><span>翻阅古籍</span></button>
+                    <button class="action-btn" data-action="琴弦" data-icon="🎸">🎸<br><span>拨弄琴弦</span></button>
+                    <button class="action-btn" data-action="星空" data-icon="🌌">🌌<br><span>仰望星空</span></button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- 状态弹窗 -->
@@ -1440,12 +1586,13 @@
         <div id="focusPanel">
             <input type="number" id="focusDurationCentral" class="duration-input" value="25" min="1" max="180">
             <span class="unit">分钟</span>
-            <span id="startFocusText" onclick="startFocus()">开始计时</span>
+            <span id="startFocusText" onclick="showActionSelector()">开始计时</span>
         </div>
 
         <!-- 专注计时显示（专注时显示） -->
         <div id="focusUI" style="display: none; text-align: center;">
             <div id="focusTimerDisplay" style="font-size: 4rem; color: white; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 30px rgba(255,165,0,0.8);">00:00</div>
+            <div id="focusAgentAction"></div>
             <button onclick="quitFocus()" style="background: none; border: 1px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.6); cursor: pointer; padding: 8px 20px; border-radius: 20px; margin-top: 20px; font-size: 14px;">退出专注</button>
         </div>
     </div>
@@ -1513,6 +1660,40 @@
         // ==================== 专注模式关闭弹窗 ====================
         function closeAllModals() {
             document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+        }
+
+        // ==================== 分身动作按钮事件 ====================
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const action = btn.dataset.action;
+                const icon = btn.dataset.icon;
+                selectAction(action, icon);
+            });
+        });
+
+        // ==================== 首次登录引导 ====================
+        function checkFirstTime() {
+            const hasSeen = localStorage.getItem('hasSeenTutorial');
+            if (!hasSeen && token && userId) {
+                setTimeout(() => openModal('tutorial'), 1000);
+            }
+        }
+
+        // ==================== 首次引导气泡 ====================
+        function showMenuTooltip() {
+            const hasSeenTooltip = localStorage.getItem('hasSeenTooltip');
+            if (!hasSeenTooltip && token && userId) {
+                const tooltip = document.createElement('div');
+                tooltip.className = 'menu-tooltip';
+                tooltip.textContent = '在这里切换分身动作或查看日志';
+                document.getElementById('floatingMenu').appendChild(tooltip);
+                // 5秒后消失
+                setTimeout(() => {
+                    tooltip.style.opacity = '0';
+                    setTimeout(() => tooltip.remove(), 300);
+                    localStorage.setItem('hasSeenTooltip', 'true');
+                }, 5000);
+            }
         }
 
         const campground = document.getElementById('campground');
@@ -1587,7 +1768,12 @@
             const btn = document.getElementById('loginBtn');
             btn.style.display = 'none';
             document.getElementById('campground').classList.add('zoomed');
-            showStatus('欢迎来到数字篝火！请选择一项状态开始');
+            showStatus('欢迎来到数字篝火！');
+            // 显示首次引导
+            setTimeout(() => {
+                checkFirstTime();
+                showMenuTooltip();
+            }, 500);
         }
 
         function showStatus(msg) {
@@ -1711,7 +1897,32 @@
                 `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
-        async function startFocus() {
+        // 选中的专注动作
+        let selectedAction = null;
+        let selectedActionIcon = null;
+
+        // 打开动作选择弹窗
+        function showActionSelector() {
+            openModal('action');
+        }
+
+        // 选择动作并开始专注
+        function selectAction(action, icon) {
+            selectedAction = action;
+            selectedActionIcon = icon;
+            closeModal('action');
+            // 隐藏专注面板，显示计时器
+            document.getElementById('focusPanel').style.display = 'none';
+            document.getElementById('focusUI').style.display = 'block';
+            // 显示 Agent 动作
+            document.getElementById('focusAgentAction').innerHTML =
+                `你的 Agent 正在 <span style="font-size:1.2em">${icon}</span> ${action}...<br><small style="opacity:0.6">它正替你在篝火旁社交</small>`;
+            // 开始专注
+            beginFocus();
+        }
+
+        // 开始专注（动作选择后）
+        async function beginFocus() {
             const userId = localStorage.getItem('campfire_user_id');
             const token = localStorage.getItem('campfire_token');
 
@@ -1720,10 +1931,13 @@
                 return;
             }
 
-            // 从输入框获取专注时长（优先使用中央区域的输入）
+            // 保存专注动作到 localStorage
+            localStorage.setItem('focusAction', selectedAction || '烤棉花糖');
+            localStorage.setItem('focusActionIcon', selectedActionIcon || '🍢');
+
+            // 从输入框获取专注时长
             const centralInput = document.getElementById('focusDurationCentral');
-            const sidebarInput = document.getElementById('focusDuration');
-            const durationInput = centralInput || sidebarInput;
+            const durationInput = centralInput;
             const focusDuration = parseInt(durationInput?.value) || 25;
             selectedFocusDuration = focusDuration;
 
@@ -1869,6 +2083,11 @@
             const token = localStorage.getItem('campfire_token');
             const duration = parseInt(localStorage.getItem('campfire_focus_duration')) || 25;
             const userId = localStorage.getItem('campfire_user_id');
+            const action = localStorage.getItem('focusAction') || '烤棉花糖';
+
+            // 清理保存的动作
+            localStorage.removeItem('focusAction');
+            localStorage.removeItem('focusActionIcon');
 
             // 显示加载提示
             showStatus('AI 正在编写故事...');
@@ -1909,6 +2128,8 @@
 
             // 调用后端 API 结束专注并生成故事
             try {
+                // 从保存的动作或localStorage获取
+                const savedAction = localStorage.getItem('focusAction') || selectedAction || '烤棉花糖';
                 const res = await fetch('/api/focus/end', {
                     method: 'POST',
                     headers: {
@@ -1916,7 +2137,8 @@
                         'Authorization': `Bearer ${token || ''}`
                     },
                     body: JSON.stringify({
-                        user_id: parseInt(userId)
+                        user_id: parseInt(userId),
+                        action: savedAction
                     })
                 });
                 const data = await res.json();

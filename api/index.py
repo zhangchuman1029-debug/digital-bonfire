@@ -724,6 +724,7 @@ class FocusStartRequest(BaseModel):
 
 class FocusEndRequest(BaseModel):
     user_id: int
+    action: str = "烤棉花糖"  # 专注动作
 
 @app.post("/api/focus/start")
 async def start_focus(request: FocusStartRequest):
@@ -802,7 +803,8 @@ async def end_focus(request: FocusEndRequest):
     save_data(data)
 
     # 生成"我专注时 Agent 替我社交"的故事
-    story = await generate_focus_story(camper, participants, focus_duration)
+    focus_action = request.action
+    story = await generate_focus_story(camper, participants, focus_duration, focus_action)
 
     # 保存故事（无论是否生成成功）
     story_entry = {
@@ -953,7 +955,7 @@ async def generate_focus_story_endpoint(
             "reason": "no_api_key" if not DEEPSEEK_API_KEY else "no_participants" if len(participants) == 0 else "unknown"
         }
 
-async def generate_focus_story(focus_user, participants, duration):
+async def generate_focus_story(focus_user, participants, duration, action="烤棉花糖"):
     """生成专注时的社交故事"""
     if not DEEPSEEK_API_KEY:
         return None
@@ -1032,25 +1034,23 @@ async def generate_focus_story(focus_user, participants, duration):
    - 简介：{p['intro']}
    - 兴趣：{shades_str if shades_str else '无'}"""
 
-    prompt = f"""你是"数字篝火"的故事生成器。当一位用户在专注工作时，他的 AI Agent 会代替他与篝火旁的其他营员社交。
+    prompt = f"""你是 {focus_user.get('name')} 的 AI 分身。当你正在篝火旁{action}时，其他旅者走了过来与你攀谈。
 
-请生成一个温暖治愈的故事，讲述：在 {duration} 分钟的专注时间里，{focus_user.get('name')}（{focus_mbti}，{focus_traits}）专注工作时，他的 Agent 与篝火旁的营员们的温馨互动。
+请以第一人称"我"的口吻，生成一个温暖治愈的分身见闻故事。
 
-专注用户信息：
-- 名字：{focus_user.get('name')}
-- MBTI：{focus_mbti}，性格：{focus_traits}
-- 所属群组：{focus_group}（{focus_group_traits}）
-- 兴趣标签：{', '.join(focus_shades) if focus_shades else '无'}
-- 简介：{focus_user.get('intro', '')}
+背景信息：
+- 你的本尊正在 {duration} 分钟专注工作中
+- 你（本尊）信息：MBTI {focus_mbti}（{focus_traits}），属于{focus_group}
+- 兴趣：{', '.join(focus_shades) if focus_shades else '无'}
 
-篝火旁的营员：{participants_desc}
+篝火旁的其他旅者：{participants_desc}
 
 要求：
 1. 故事风格：温暖、治愈、轻松
-2. 以其他营员的视角讲述他们与 {focus_user.get('name')} 的 Agent 聊天的场景
-3. 必须引用每个人的 MBTI 性格特点和兴趣标签！
-4. 体现"我专注时，Agent 替我社交"的温暖主题
-5. Agent 会向其他营员介绍 {focus_user.get('name')} 的特点和兴趣
+2. 以第一人称"我"（AI分身）的视角叙述
+3. 描述我{action}时与其他旅者的互动对话
+4. 必须引用每个人的 MBTI 性格特点
+5. 体现"本尊专注工作，分身代为社交"的温馨场景
 6. 加入自然的对话，用引号标注说话者
 7. 故事长度约 200-300 字
 

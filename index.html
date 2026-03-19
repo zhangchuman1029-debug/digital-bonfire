@@ -1557,6 +1557,12 @@
                     return;
                 }
 
+                // 打印调试信息
+                console.log('专注结束响应:', data);
+                if (data.debug) {
+                    console.log('调试信息:', data.debug);
+                }
+
                 if (data.story) {
                     // 显示故事弹窗
                     document.getElementById('focusPopupStory').textContent = data.story;
@@ -1566,6 +1572,10 @@
                     fetchStoryLogs && fetchStoryLogs();
                 } else if (data.message) {
                     showStatus(data.message);
+                    // 显示调试信息帮助排查
+                    if (data.debug) {
+                        console.warn('故事生成失败原因:', data.debug);
+                    }
                 } else {
                     showStatus('专注结束，但故事生成失败');
                 }

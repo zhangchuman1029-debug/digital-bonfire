@@ -818,28 +818,41 @@ async def end_focus(request: FocusEndRequest):
     data.setdefault("stories", []).append(story_entry)
     save_data(data)
 
+    # 调试信息
+    debug_info = {
+        "has_api_key": bool(DEEPSEEK_API_KEY),
+        "participants_count": len(participants),
+        "camper_name": camper.get("name"),
+        "participants_names": [p.get("name") for p in participants]
+    }
+    print(f"专注结束调试信息: {debug_info}")
+
     if story:
         return {
             "message": "专注结束",
             "story": story,
-            "participants_count": len(participants)
+            "participants_count": len(participants),
+            "debug": debug_info
         }
     else:
         # 返回具体失败原因
         if not DEEPSEEK_API_KEY:
             return {
-                "message": "专注结束，故事服务未配置",
-                "participants_count": len(participants)
+                "message": "专注结束，故事服务未配置（请设置 DEEPSEEK_API_KEY）",
+                "participants_count": len(participants),
+                "debug": debug_info
             }
         elif len(participants) == 0:
             return {
                 "message": "专注结束，没有其他营员在场",
-                "participants_count": 0
+                "participants_count": 0,
+                "debug": debug_info
             }
         else:
             return {
                 "message": "专注结束，故事生成失败",
-                "participants_count": len(participants)
+                "participants_count": len(participants),
+                "debug": debug_info
             }
 
 @app.get("/api/focus/status")

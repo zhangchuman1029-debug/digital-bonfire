@@ -176,7 +176,8 @@
         }
 
         /* 专注模式 - 倒计时位置重排到火焰下方 */
-        .focus-timer.focus-active {
+        .focus-timer.focus-active,
+        #timerContainer.focus-active {
             position: fixed !important;
             top: 70% !important;
             left: 50% !important;
@@ -925,8 +926,8 @@
                 <span class="sidebar-toggle">▼</span>
             </div>
             <div class="sidebar-content">
-                <div class="focus-timer">
-                    <div class="focus-timer-display" id="focusTimerDisplay">25:00</div>
+                <div class="focus-timer" id="timerContainer">
+                    <div class="focus-timer-display" id="timer">25:00</div>
                     <div class="focus-duration-input-wrap">
                         <input type="number" id="focusDuration" class="focus-duration-input" value="25" min="1" max="180" placeholder="25">
                         <span class="focus-duration-unit">分钟</span>
@@ -1101,11 +1102,12 @@
             alert('数字篝火使用说明：\n\n1. 点击"开始相遇"按钮登录\n2. 选择你的状态（钓鱼/煮茶/围炉夜话等）\n3. 与其他用户互动生成故事\n4. 点击篝火中的用户查看信息');
         }
 
-        // ================== 专注模式 ==================
-        let focusTimer = null;
-        let focusRemainingSeconds = 0;
-        let selectedFocusDuration = 25;
-        let isFocusing = false;
+        // ================== 专注模式全局变量 ==================
+        let focusInterval = null;           // 倒计时定时器
+        let focusRemainingSeconds = 0;      // 剩余秒数
+        let focusParticleInterval = null;   // 粒子效果定时器
+        let selectedFocusDuration = 25;     // 选中的专注时长
+        let isFocusing = false;            // 是否正在专注
 
         // 页面加载时检查专注状态
         function checkFocusStatus() {
@@ -1152,13 +1154,13 @@
         // 恢复专注模式 UI（用于页面刷新后）
         function restoreFocusModeUI() {
             const fireContainer = document.getElementById('campground');
-            const focusTimer = document.querySelector('.focus-timer');
+            const timerContainer = document.getElementById('timerContainer');
 
             // 添加 .focus-active 类到火焰容器
             fireContainer.classList.add('focus-active');
 
             // 添加 .focus-active 类到计时器
-            focusTimer.classList.add('focus-active');
+            timerContainer.classList.add('focus-active');
 
             // 添加 .focus-hide 类隐藏所有干扰项
             document.querySelectorAll('.sidebar, .right-sidebar, .header, .mobile-menu-btn, .login-container, .camper, .story-panel, .focusing-indicator').forEach(el => {
@@ -1182,7 +1184,7 @@
         function updateFocusTimerDisplay(seconds) {
             const mins = Math.floor(seconds / 60);
             const secs = seconds % 60;
-            document.getElementById('focusTimerDisplay').textContent =
+            document.getElementById('timer').textContent =
                 `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
@@ -1238,8 +1240,8 @@
             fireContainer.classList.add('focus-active');
 
             // 添加 .focus-active 类到计时器（移动到火焰下方）
-            const focusTimer = document.querySelector('.focus-timer');
-            focusTimer.classList.add('focus-active');
+            const timerContainer = document.getElementById('timerContainer');
+            timerContainer.classList.add('focus-active');
 
             // 添加 .focus-hide 类隐藏所有干扰项
             document.querySelectorAll('.sidebar, .right-sidebar, .header, .mobile-menu-btn, .login-container, .camper, .story-panel, .focusing-indicator').forEach(el => {
@@ -1314,7 +1316,7 @@
             isFocusing = true;
 
             // CSS focus-mode 会自动处理火焰增强效果
-            focusTimer = setInterval(() => {
+            focusInterval = setInterval(() => {
                 focusRemainingSeconds--;
                 updateFocusTimerDisplay(focusRemainingSeconds);
 
@@ -1325,9 +1327,9 @@
         }
 
         async function endFocus() {
-            clearInterval(focusTimer);
+            clearInterval(focusInterval);
             clearInterval(focusParticleInterval);
-            focusTimer = null;
+            focusInterval = null;
             isFocusing = false;
 
             // 清除专注粒子
@@ -1392,9 +1394,9 @@
                 return;
             }
 
-            clearInterval(focusTimer);
+            clearInterval(focusInterval);
             clearInterval(focusParticleInterval);
-            focusTimer = null;
+            focusInterval = null;
             isFocusing = false;
 
             // 清除专注粒子

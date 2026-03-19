@@ -766,7 +766,13 @@
 
         @media (max-width: 768px) {
             .sidebar, .right-sidebar { display: none; }
-            .fire-container { width: 200px; height: 200px; top: 45% !important; left: 50% !important; transform: translate(-50%, -50%) !important; }
+            .fire-container { width: 200px; height: 200px; top: 45% !important; left: 50% !important; transform: translate(-50%, -50%) !important; overflow: visible !important; }
+            /* 移动端用户头像样式 */
+            .camper { transform: scale(1.2); z-index: 100 !important; }
+            .camper-avatar { width: 20px !important; height: 20px !important; }
+            .camper-name { font-size: 11px !important; }
+            .camper-mbti { opacity: 1 !important; font-size: 10px !important; }
+            .camper-activity { opacity: 1 !important; font-size: 9px !important; }
             .header { top: 80px !important; padding: 5px; }
             .header h1 { font-size: 1.5rem !important; letter-spacing: 2px !important; }
             .header .subtitle { font-size: 0.5rem !important; }

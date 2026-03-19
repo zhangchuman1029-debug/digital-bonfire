@@ -2291,7 +2291,7 @@
     <div class="story-loading-overlay" id="storyLoadingOverlay" style="display: none;">
         <div class="story-loading-content">
             <div class="story-loading-spinner"></div>
-            <p class="story-loading-text" id="storyLoadingText">正在读取分身的心声...</p>
+            <p class="story-loading-text" id="storyLoadingText">Agent 正在记录火堆旁的所见所闻...</p>
         </div>
     </div>
 
@@ -3118,6 +3118,9 @@
 
             // 刷新专注历史
             if (typeof loadFocusHistory === 'function') loadFocusHistory();
+
+            // 重置按钮状态
+            resetFocusUI();
         }
 
         async function endFocus() {

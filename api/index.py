@@ -139,43 +139,43 @@ async def generate_story_with_ai(participants, group_name):
         else:
             shades_list.append([])
 
-    prompt = f"""你是数字篝火的故事生成器。请根据以下参与者详细信息生成一个精准反映每个人性格特点的篝火故事。
+    prompt = f"""你是数字篝火的见闻记录者。你的任务是静静观察火堆旁正在发生的微妙互动，并以旁观者的视角记录下来。
 
-参与者详情：
+观察对象：
 1. {p1['name']}
    - MBTI：{mbti1}，性格：{traits1}
    - 简介/经历：{intros[0]}
    - 兴趣标签：{', '.join(shades_list[0]) if shades_list[0] else '无'}
-   - 当前状态：{statuses[0]}
+   - 当前动作：{statuses[0]}
 
 2. {p2['name']}
    - MBTI：{mbti2}，性格：{traits2}
    - 简介/经历：{intros[1 if len(participants) > 1 else 0]}
    - 兴趣标签：{', '.join(shades_list[1]) if len(shades_list) > 1 and shades_list[1] else '无'}
-   - 当前状态：{statuses[1 if len(participants) > 1 else 0]}
+   - 当前动作：{statuses[1 if len(participants) > 1 else 0]}
 
 3. {p3['name']}
    - MBTI：{mbti3}，性格：{traits3}
    - 简介/经历：{intros[2 if len(participants) > 2 else 0]}
    - 兴趣标签：{', '.join(shades_list[2]) if len(shades_list) > 2 and shades_list[2] else '无'}
-   - 当前状态：{statuses[2 if len(participants) > 2 else 0]}
+   - 当前动作：{statuses[2 if len(participants) > 2 else 0]}
 
 所属群组：{group_name}（{group_traits.get(group_name, '')}）
 
-要求：
-1. 故事必须精准反映每个MBTI的性格特点！
+记录要求：
+1. 以"我注意到..."开头，用第一人称旁观者视角记录
 
-2. 必须引用用户的经历/简介和兴趣标签来展开对话！
-   - 例如：提到他的职业、去过的地方、擅长的事
-   - 例如：围绕共同兴趣展开话题
+2. 观察他们各自的当前动作如何与环境或其他营员产生微妙互动
+   - 比如：他钓鱼时的专注神态吸引了谁的注意
+   - 比如：她仰望星空时的侧影让我想起...
 
-3. 加入自然的对话，用引号标注说话者
+3. 不需要对话，用描述性语言记录场景
 
-4. 围绕他们当前的状态展开（钓鱼、煮茶、围炉夜话等）
+4. 捕捉MBTI性格与动作之间的有趣呼应
 
-5. 故事长度约200字
+5. 长度约150字，用细腻的观察代替情节
 
-请直接输出故事："""
+请直接输出见闻："""
 
     try:
         async with httpx.AsyncClient() as client:

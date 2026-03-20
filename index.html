@@ -116,6 +116,11 @@
                 0 0 20px #fefcc9 inset !important;
         }
 
+        /* 专注模式隐藏Canvas */
+        body.focusing #campersCanvas {
+            display: none;
+        }
+
         /* ======== 中央按钮区域 ======== */
         .central-area {
             position: fixed;
@@ -649,6 +654,9 @@
         <div class="flame"></div>
     </div>
 
+    <!-- Canvas 用于绘制营员头像 -->
+    <canvas id="campersCanvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;"></canvas>
+
     <!-- 中央区域：倒计时 + 按钮 -->
     <div class="central-area">
         <div class="timer-overlay" id="timerOverlay">00:00</div>
@@ -1144,8 +1152,138 @@
             }
         }
 
+        // ======== Canvas 绘制营员头像 ========
+        const canvas = document.getElementById('campersCanvas');
+        const ctx = canvas.getContext('2d');
+        let camperPositions = []; // 存储头像位置用于点击判定
+
+        // MBTI 颜色映射
+        const mbtiColors = {
+            'INTJ': '#a855f7', 'INTP': '#a855f7', 'ENTJ': '#a855f7', 'ENTP': '#a855f7',
+            'INFJ': '#ff6b35', 'INFP': '#ff6b35', 'ENFJ': '#ff6b35', 'ENFP': '#ff6b35',
+            'ISTJ': '#22c55e', 'ISFJ': '#22c55e', 'ESTJ': '#22c55e', 'ESFJ': '#22c55e',
+            'ISTP': '#00d4ff', 'ISFP': '#00d4ff', 'ESTP': '#00d4ff', 'ESFP': '#00d4ff'
+        };
+        const defaultColor = '#666';
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function drawCampers() {
+            // 专注模式：隐藏所有头像
+            if (isFocusing) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                camperPositions = [];
+                return;
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (!campers || campers.length === 0) {
+                camperPositions = [];
+                return;
+            }
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            // 环绕半径 - 根据屏幕尺寸动态调整
+            const radius = Math.min(canvas.width, canvas.height) * 0.32;
+
+            camperPositions = [];
+
+            campers.forEach((camper, index) => {
+                // 使用角度或均匀分布
+                const angle = camper.angle || (index * (360 / campers.length));
+                const radian = (angle - 90) * (Math.PI / 180);
+                const x = centerX + Math.cos(radian) * radius;
+                const y = centerY + Math.sin(radian) * radius;
+
+                // 记录位置用于点击判定
+                camperPositions.push({ x, y, radius: 40, camper });
+
+                const size = 32; // 头像大小
+
+                // 绘制MBTI发光边框
+                const mbtiColor = mbtiColors[camper.mbti] || defaultColor;
+                ctx.beginPath();
+                ctx.arc(x, y, size + 6, 0, Math.PI * 2);
+                ctx.strokeStyle = mbtiColor;
+                ctx.lineWidth = 3;
+                ctx.shadowColor = mbtiColor;
+                ctx.shadowBlur = 15;
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                // 绘制头像圆形裁剪
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.clip();
+
+                // 头像背景
+                ctx.fillStyle = camper.color || mbtiColor;
+                ctx.fillRect(x - size, y - size, size * 2, size * 2);
+
+                // 头像文字
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 18px Noto Sans SC';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(camper.name.charAt(0), x, y);
+                ctx.restore();
+
+                // 名字和MBTI
+                ctx.fillStyle = 'rgba(255,255,255,0.8)';
+                ctx.font = '12px Noto Sans SC';
+                ctx.textAlign = 'center';
+                const label = `${camper.name} | ${camper.mbti || '?'}`;
+                ctx.fillText(label, x, y + size + 18);
+
+                // 专注状态显示
+                if (camper.status === 'focusing') {
+                    const actionIcon = camper.focus_action_icon || '🍢';
+                    const actionName = camper.focus_action || '烤棉花糖';
+                    ctx.fillStyle = '#ffaa00';
+                    ctx.font = '10px Noto Sans SC';
+                    ctx.fillText(`${actionIcon} ${actionName}`, x, y + size + 32);
+                }
+            });
+        }
+
+        // 点击判定
+        canvas.style.pointerEvents = 'auto';
+        canvas.addEventListener('click', (e) => {
+            if (isFocusing) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+
+            for (const pos of camperPositions) {
+                const dx = clickX - pos.x;
+                const dy = clickY - pos.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist <= pos.radius) {
+                    // 点击了头像
+                    generateStory(pos.camper.name, pos.camper.mbti || '?', pos.camper.id);
+                    return;
+                }
+            }
+        });
+
+        // 定期绘制
+        function startDrawing() {
+            resizeCanvas();
+            drawCampers();
+            requestAnimationFrame(startDrawing);
+        }
+
         // ======== 定期刷新 ========
         createStars();
+        startDrawing();
+        window.addEventListener('resize', resizeCanvas);
         setInterval(fetchCampers, 5000);
     </script>
 </body>

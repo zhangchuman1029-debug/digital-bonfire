@@ -1200,53 +1200,43 @@
                 const y = centerY + Math.sin(radian) * radius;
 
                 // 记录位置用于点击判定
-                camperPositions.push({ x, y, radius: 40, camper });
+                camperPositions.push({ x, y, radius: 30, camper });
 
-                const size = 32; // 头像大小
-
-                // 绘制MBTI发光边框
                 const mbtiColor = mbtiColors[camper.mbti] || defaultColor;
+                const coreColor = camper.color || mbtiColor;
+
+                // 绘制彩色光点 - 外层光晕
+                const glowGradient = ctx.createRadialGradient(x, y, 0, x, y, 20);
+                glowGradient.addColorStop(0, coreColor);
+                glowGradient.addColorStop(0.4, mbtiColor);
+                glowGradient.addColorStop(1, 'transparent');
                 ctx.beginPath();
-                ctx.arc(x, y, size + 6, 0, Math.PI * 2);
-                ctx.strokeStyle = mbtiColor;
-                ctx.lineWidth = 3;
-                ctx.shadowColor = mbtiColor;
-                ctx.shadowBlur = 15;
-                ctx.stroke();
+                ctx.arc(x, y, 20, 0, Math.PI * 2);
+                ctx.fillStyle = glowGradient;
+                ctx.fill();
+
+                // 绘制核心光点
+                ctx.beginPath();
+                ctx.arc(x, y, 6, 0, Math.PI * 2);
+                ctx.fillStyle = '#fff';
+                ctx.shadowColor = coreColor;
+                ctx.shadowBlur = 12;
+                ctx.fill();
                 ctx.shadowBlur = 0;
 
-                // 绘制头像圆形裁剪
-                ctx.save();
-                ctx.beginPath();
-                ctx.arc(x, y, size, 0, Math.PI * 2);
-                ctx.clip();
-
-                // 头像背景
-                ctx.fillStyle = camper.color || mbtiColor;
-                ctx.fillRect(x - size, y - size, size * 2, size * 2);
-
-                // 头像文字
-                ctx.fillStyle = '#fff';
-                ctx.font = 'bold 18px Noto Sans SC';
+                // 名字和MBTI（缩小间距）
+                ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                ctx.font = '10px Noto Sans SC';
                 ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(camper.name.charAt(0), x, y);
-                ctx.restore();
-
-                // 名字和MBTI
-                ctx.fillStyle = 'rgba(255,255,255,0.8)';
-                ctx.font = '12px Noto Sans SC';
-                ctx.textAlign = 'center';
-                const label = `${camper.name} | ${camper.mbti || '?'}`;
-                ctx.fillText(label, x, y + size + 18);
+                const label = `${camper.mbti || '?'}`;
+                ctx.fillText(label, x, y + 26);
 
                 // 专注状态显示
                 if (camper.status === 'focusing') {
                     const actionIcon = camper.focus_action_icon || '🍢';
-                    const actionName = camper.focus_action || '烤棉花糖';
                     ctx.fillStyle = '#ffaa00';
-                    ctx.font = '10px Noto Sans SC';
-                    ctx.fillText(`${actionIcon} ${actionName}`, x, y + size + 32);
+                    ctx.font = '9px Noto Sans SC';
+                    ctx.fillText(actionIcon, x, y + 38);
                 }
             });
         }

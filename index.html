@@ -1171,8 +1171,11 @@
             canvas.height = window.innerHeight;
         }
 
+        // 呼吸动画变量
+        let glowPhase = 0;
+
         function drawCampers() {
-            // 专注模式：隐藏所有头像
+            // 专注模式：隐藏所有头像（禅定状态）
             if (isFocusing) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 camperPositions = [];
@@ -1185,63 +1188,95 @@
                 return;
             }
 
+            // 更新呼吸动画相位
+            glowPhase += 0.05;
+
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            // 环绕半径 - 根据屏幕尺寸动态调整
-            const radius = Math.min(canvas.width, canvas.height) * 0.32;
+            // 基础环绕半径
+            const baseRadius = Math.min(canvas.width, canvas.height) * 0.32;
 
             camperPositions = [];
 
             campers.forEach((camper, index) => {
-                // 使用角度或均匀分布
-                const angle = camper.angle || (index * (360 / campers.length));
+                // 黄金角分布：使用后端传回的 angle，如果没有则即时计算
+                const angle = camper.angle || ((index + 1) * 137.508) % 360;
+                // 半径扰动：使用后端传回的 radius_shift，如果没有则计算
+                const rShift = camper.radius_shift || (1 + (index % 3) * 0.1);
                 const radian = (angle - 90) * (Math.PI / 180);
-                const x = centerX + Math.cos(radian) * radius;
-                const y = centerY + Math.sin(radian) * radius;
 
-                // 记录位置用于点击判定
-                camperPositions.push({ x, y, radius: 30, camper });
+                // 应用半径扰动
+                const x = centerX + Math.cos(radian) * baseRadius * rShift;
+                const y = centerY + Math.sin(radian) * baseRadius * rShift;
+
+                // 记录位置用于点击判定（50px）
+                camperPositions.push({ x, y, radius: 50, camper });
 
                 const mbtiColor = mbtiColors[camper.mbti] || defaultColor;
                 const coreColor = camper.color || mbtiColor;
+                const avatarSize = 28; // 头像大小
 
-                // 绘制彩色光点 - 外层光晕
-                const glowGradient = ctx.createRadialGradient(x, y, 0, x, y, 20);
-                glowGradient.addColorStop(0, coreColor);
-                glowGradient.addColorStop(0.4, mbtiColor);
-                glowGradient.addColorStop(1, 'transparent');
+                // 呼吸光环效果
+                const breathScale = 1 + Math.sin(glowPhase + index * 0.5) * 0.15;
+                const glowSize = (avatarSize + 8) * breathScale;
+
+                // 绘制 MBTI 呼吸光环
                 ctx.beginPath();
-                ctx.arc(x, y, 20, 0, Math.PI * 2);
+                ctx.arc(x, y, glowSize, 0, Math.PI * 2);
+                const glowGradient = ctx.createRadialGradient(x, y, avatarSize * 0.8, x, y, glowSize);
+                glowGradient.addColorStop(0, mbtiColor + 'aa');
+                glowGradient.addColorStop(0.5, mbtiColor + '44');
+                glowGradient.addColorStop(1, 'transparent');
                 ctx.fillStyle = glowGradient;
                 ctx.fill();
 
-                // 绘制核心光点
+                // 绘制外圈光晕
                 ctx.beginPath();
-                ctx.arc(x, y, 6, 0, Math.PI * 2);
-                ctx.fillStyle = '#fff';
-                ctx.shadowColor = coreColor;
-                ctx.shadowBlur = 12;
-                ctx.fill();
+                ctx.arc(x, y, avatarSize + 4, 0, Math.PI * 2);
+                ctx.strokeStyle = mbtiColor;
+                ctx.lineWidth = 2;
+                ctx.shadowColor = mbtiColor;
+                ctx.shadowBlur = 10;
+                ctx.stroke();
                 ctx.shadowBlur = 0;
 
-                // 名字和MBTI（缩小间距）
-                ctx.fillStyle = 'rgba(255,255,255,0.7)';
-                ctx.font = '10px Noto Sans SC';
+                // 绘制圆形头像
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(x, y, avatarSize, 0, Math.PI * 2);
+                ctx.clip();
+
+                // 头像背景
+                ctx.fillStyle = coreColor;
+                ctx.fillRect(x - avatarSize, y - avatarSize, avatarSize * 2, avatarSize * 2);
+
+                // 头像首字母
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 16px Noto Sans SC';
                 ctx.textAlign = 'center';
-                const label = `${camper.mbti || '?'}`;
-                ctx.fillText(label, x, y + 26);
+                ctx.textBaseline = 'middle';
+                ctx.fillText(camper.name.charAt(0), x, y);
+                ctx.restore();
+
+                // 名字标签（MBTI + 名字）
+                ctx.fillStyle = 'rgba(255,255,255,0.85)';
+                ctx.font = '11px Noto Sans SC';
+                ctx.textAlign = 'center';
+                const label = `${camper.name} | ${camper.mbti || '?'}`;
+                ctx.fillText(label, x, y + avatarSize + 16);
 
                 // 专注状态显示
                 if (camper.status === 'focusing') {
                     const actionIcon = camper.focus_action_icon || '🍢';
+                    const actionName = camper.focus_action || '烤棉花糖';
                     ctx.fillStyle = '#ffaa00';
-                    ctx.font = '9px Noto Sans SC';
-                    ctx.fillText(actionIcon, x, y + 38);
+                    ctx.font = '10px Noto Sans SC';
+                    ctx.fillText(`${actionIcon} ${actionName}`, x, y + avatarSize + 30);
                 }
             });
         }
 
-        // 点击判定
+        // 点击判定（50px 范围）
         canvas.style.pointerEvents = 'auto';
         canvas.addEventListener('click', (e) => {
             if (isFocusing) return;

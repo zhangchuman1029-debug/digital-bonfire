@@ -644,17 +644,18 @@ async def callback(code: str = Query(...), state: str = Query(...)):
         camper["mbti_group"] = MBTI_GROUPS.get(mbti, "misc")
         camper["updated_at"] = datetime.now().isoformat()
     else:
-        # 计算均匀分布的角度，避免重叠
-        # 使用黄金角分布，确保持续均匀
-        golden_angle = 137.508 * (existing_count + 1)  # 黄金角
-        angle = (golden_angle % 360)
+        # 黄金角分布 + 半径扰动
+        golden_angle = 137.508 * (existing_count + 1)
+        angle = golden_angle % 360
+        radius_shift = 0.8 + (existing_count * 0.05)  # 前后错落感
 
         camper = {
             "id": existing_count + 1,
             "name": name.upper(),
             "access_token": access_token,
             "intro": "通过 SecondMe 登录",
-            "angle": angle,  # 使用黄金角分布
+            "angle": angle,  # 黄金角
+            "radius_shift": radius_shift,  # 半径扰动
             "distance": distance,
             "color": color,
             "type": type_label,
@@ -1090,22 +1091,26 @@ async def generate_focus_story(focus_user, participants, duration, action="烤�
 
 @app.post("/api/recalculate-positions")
 async def recalculate_positions():
-    """重新计算所有用户位置，使用黄金角分布"""
+    """重新计算所有用户位置，使用黄金角分布 + 半径扰动"""
     data = load_data()
     campers = data.get("campers", [])
 
     if not campers:
         return {"message": "没有用户需要更新", "count": 0}
 
-    # 使用黄金角重新计算每个用户的位置
+    # 使用黄金角 + 半径扰动重新计算每个用户的位置
     for i, camper in enumerate(campers):
-        golden_angle = 137.508 * (i + 1)
+        # 黄金角分布：angle = (index * 137.508) % 360
+        golden_angle = (i + 1) * 137.508
         camper["angle"] = golden_angle % 360
+
+        # 半径扰动：0.8 + (index * 0.05)，创造前后错落感
+        camper["radius_shift"] = 0.8 + (i * 0.05)
 
     data["campers"] = campers
     save_data(data)
 
-    return {"message": "位置已更新", "count": len(campers)}
+    return {"message": "位置已更新", "count": len(campers), "algorithm": "golden_angle + radius_shift"}
 @app.post("/api/chat")
 async def chat_with_secondme(message: str, token: str):
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}

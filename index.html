@@ -1381,10 +1381,10 @@
                 ctx.fillStyle = morandiColor.replace('0.7', '0.3');
                 ctx.fill();
 
-                // 绘制核心光点 - 白色柔和核心
+                // 绘制核心光点 - 与光点同色
                 ctx.beginPath();
                 ctx.arc(x, y, pointSize, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.fillStyle = morandiColor;
                 ctx.shadowColor = morandiColor;
                 ctx.shadowBlur = breathe; // 极其克制的光晕
                 ctx.fill();

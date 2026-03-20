@@ -24,6 +24,12 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        html, body {
+            background-color: #050505 !important;
+            height: 100%;
+            overflow: hidden;
+        }
+
         body {
             background: radial-gradient(ellipse at 50% 120%, #1a0a00 0%, var(--bg-center) 30%, var(--bg-deep) 100%);
             min-height: 100vh;
@@ -63,6 +69,80 @@
         }
 
         .header .subtitle { font-size: 0.7rem; color: var(--accent-logic); letter-spacing: 3px; opacity: 0.8; }
+
+        /* ======== 汉堡菜单按钮 ======== */
+        .hamburger-btn {
+            position: fixed;
+            top: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(20, 20, 35, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            z-index: 150;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-btn:hover {
+            background: rgba(255, 170, 0, 0.2);
+            border-color: rgba(255, 170, 0, 0.5);
+        }
+
+        .hamburger-btn span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-btn.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-btn.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        .hamburger-left { left: 20px; }
+        .hamburger-right { right: 20px; }
+
+        /* 专注模式隐藏汉堡按钮 */
+        body.focusing .hamburger-btn {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* ======== 抽屉遮罩层 ======== */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 90;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
 
         /* ======== 恒定火焰 - 大小固定 ======== */
         .fire-container {
@@ -181,7 +261,7 @@
             display: block;
         }
 
-        /* ======== 右侧面板 ======== */
+        /* ======== 右侧面板 - 抽屉式 ======== */
         .right-panel {
             position: fixed;
             right: 0;
@@ -195,27 +275,17 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(100%); /* 默认收起 */
         }
 
-        .right-panel.collapsed {
-            transform: translateX(240px);
+        .right-panel.expanded {
+            transform: translateX(0);
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.5);
         }
 
         .panel-toggle {
-            position: absolute;
-            left: -30px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 30px;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 8px 0 0 8px;
-            color: rgba(255, 255, 255, 0.6);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: none; /* 隐藏旧切换按钮，使用汉堡菜单 */
         }
 
         .panel-section {
@@ -325,7 +395,7 @@
             color: #ffaa00;
         }
 
-        /* ======== 左侧面板 ======== */
+        /* ======== 左侧面板 - 抽屉式 ======== */
         .left-panel {
             position: fixed;
             left: 0;
@@ -336,28 +406,20 @@
             background: linear-gradient(180deg, rgba(20, 20, 35, 0.95) 0%, rgba(10, 10, 20, 0.98) 100%);
             backdrop-filter: blur(20px);
             border-right: 1px solid rgba(255, 255, 255, 0.08);
-            z-index: 100;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(-100%); /* 默认收起 */
         }
 
-        .left-panel.collapsed {
-            transform: translateX(-240px);
+        .left-panel.expanded {
+            transform: translateX(0);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
         }
 
         .left-toggle {
-            position: absolute;
-            right: -30px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 30px;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 0 8px 8px 0;
-            color: rgba(255, 255, 255, 0.6);
-            cursor: pointer;
+            display: none; /* 隐藏旧切换按钮，使用汉堡菜单 */
         }
 
         .user-info {
@@ -614,12 +676,27 @@
 
         @media (max-width: 768px) {
             .right-panel, .left-panel {
-                width: 260px;
+                width: 280px;
+                /* drawer 模式：收起时在屏幕外 */
+            }
+            .right-panel {
                 transform: translateX(100%);
             }
-            .right-panel.expanded, .left-panel.expanded {
+            .right-panel.expanded {
                 transform: translateX(0);
             }
+            .left-panel {
+                transform: translateX(-100%);
+            }
+            .left-panel.expanded {
+                transform: translateX(0);
+            }
+            .hamburger-btn {
+                width: 40px;
+                height: 40px;
+            }
+            .hamburger-left { left: 12px; }
+            .hamburger-right { right: 12px; }
             .focus-btn {
                 font-size: 1.2rem;
                 padding: 14px 30px;
@@ -627,10 +704,29 @@
             .timer-overlay {
                 font-size: 2rem;
             }
+            .header h1 {
+                font-size: 1.2rem;
+                letter-spacing: 4px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- 抽屉遮罩层 -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- 汉堡菜单按钮 -->
+    <button class="hamburger-btn hamburger-left" id="hamburgerLeft" onclick="toggleLeftSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <button class="hamburger-btn hamburger-right" id="hamburgerRight" onclick="toggleRightSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
     <!-- 星空背景 -->
     <div class="stars" id="stars"></div>
 
@@ -749,6 +845,59 @@
         let selectedAction = '烤棉花糖';
         let selectedActionIcon = '🍢';
         let campers = [];
+        let leftSidebarOpen = false;
+        let rightSidebarOpen = false;
+
+        // ======== 抽屉侧边栏控制 ========
+        function toggleLeftSidebar() {
+            const leftPanel = document.querySelector('.left-panel');
+            const hamburger = document.getElementById('hamburgerLeft');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            leftSidebarOpen = !leftSidebarOpen;
+
+            if (leftSidebarOpen) {
+                leftPanel.classList.add('expanded');
+                hamburger.classList.add('active');
+                // 如果右侧打开，关闭右侧
+                if (rightSidebarOpen) {
+                    toggleRightSidebar();
+                }
+                overlay.classList.add('visible');
+            } else {
+                leftPanel.classList.remove('expanded');
+                hamburger.classList.remove('active');
+                overlay.classList.remove('visible');
+            }
+        }
+
+        function toggleRightSidebar() {
+            const rightPanel = document.querySelector('.right-panel');
+            const hamburger = document.getElementById('hamburgerRight');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            rightSidebarOpen = !rightSidebarOpen;
+
+            if (rightSidebarOpen) {
+                rightPanel.classList.add('expanded');
+                hamburger.classList.add('active');
+                // 如果左侧打开，关闭左侧
+                if (leftSidebarOpen) {
+                    toggleLeftSidebar();
+                }
+                overlay.classList.add('visible');
+            } else {
+                rightPanel.classList.remove('expanded');
+                hamburger.classList.remove('active');
+                overlay.classList.remove('visible');
+            }
+        }
+
+        // 点击遮罩层关闭侧边栏
+        document.getElementById('sidebarOverlay').addEventListener('click', () => {
+            if (leftSidebarOpen) toggleLeftSidebar();
+            if (rightSidebarOpen) toggleRightSidebar();
+        });
 
         // ======== 初始化 ========
         const token = localStorage.getItem('campfire_token');
@@ -919,6 +1068,10 @@
             localStorage.removeItem('campfire_focus_duration');
             localStorage.removeItem('focusAction');
             localStorage.removeItem('focusActionIcon');
+
+            // 关闭侧边栏抽屉
+            if (leftSidebarOpen) toggleLeftSidebar();
+            if (rightSidebarOpen) toggleRightSidebar();
 
             // 更新UI
             updateFocusUI();
